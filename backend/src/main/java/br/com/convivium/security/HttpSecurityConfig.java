@@ -130,7 +130,7 @@ public class HttpSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Configuração explícita para permitir o acesso do frontend
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://watchcar.com.br"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://convivium-front.onrender.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);  // Permite enviar cookies e cabeçalhos de autenticação entre domínios
