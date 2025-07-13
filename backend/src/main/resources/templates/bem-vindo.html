@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Bem-vindo</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f1f8e9;
+          margin: 0;
+          padding: 40px;
+        }
+
+        .container {
+          background-color: #ffffff;
+          border-radius: 12px;
+          padding: 30px;
+          max-width: 650px;
+          margin: 0 auto;
+          box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+          border-left: 8px solid #33691e;
+        }
+
+        h2 {
+          color: #2e7d32;
+        }
+
+        p, li {
+          color: #333;
+          font-size: 15px;
+          line-height: 1.6;
+        }
+
+        .footer {
+          margin-top: 30px;
+          font-size: 12px;
+          color: #777;
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Bem-vindo!</h2>
+
+    <p>Olá <strong th:text="${usuario.username}">Fulano</strong>, seu cadastro foi realizado com sucesso.</p>
+
+    <p>Abaixo estão seus dados de registro:</p>
+    <ul>
+        <li><strong>Nome:</strong> <span th:text="${usuario.username}">Fulano</span></li>
+        <li><strong>CPF:</strong> <span th:text="${usuario.cpf}">00000000000</span></li>
+        <li><strong>Email:</strong> <span th:text="${usuario.email}">fulano@email.com</span></li>
+    </ul>
+
+    <p>
+        Acesse seu cadastro <a th:href="${usuario.url}">clicando aqui</a>.
+    </p>
+
+    <div class="footer">
+        <p>Este é um e-mail automático enviado por Convivium. Não responda.</p>
+    </div>
+</div>
+</body>
+</html>

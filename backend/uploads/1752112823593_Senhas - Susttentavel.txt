@@ -1,0 +1,34 @@
+VPN: 
+Nome: Cleyton de Jesus Sales Prudencio
+Chamado VPN: Chamado_000119953
+Usuário: cleyton.pasquali
+Senha: u59r37n86MxN
+Acesso estendido até 23/08/25
+ 
+VEGA.LOCAL/VPN_TERCEIROS/Cleyton J Sales Prudencio - Pasquali
+Acesso liberado no Firewall Sophos:
+AWS_VEGA_REDE1
+SRV_JUMPSERVER_VEGA
+-------------------------------------------------------
+Banco: 
+host: 172.30.0.150
+porta: 22
+user: ubuntu
+privaty key: jump-server.pem (ANEXO ABAIXO)
+
+
+
+AMBIENTE STAGING:
+host: vega-multiapp-test-public.cqc5r0k185th.us-east-1.rds.amazonaws.com
+porta: 5432
+banco: parceria_sustentavel
+
+AMBIENTE TEST
+host: vega-multiapp-test-public.cqc5r0k185th.us-east-1.rds.amazonaws.com
+porta: 5432
+banco: parceria_sustentavel_test
+
+
+user: cleyton_prudencio
+pass: ZV91Y5zi1K4OMgp8
+

@@ -1,0 +1,34 @@
+VPN:
+login: altamiro.rodrigues
+Senha: CNR9jf0Ibfb
+
+Usuário: cleyton.sales
+Senha:  jnY9lgai#@&+Xuv
+
+DEPLOY: Y0L$0GcbFGuj joicy.reis
+
+DEV:10.153.18.103#/intranet/acesso
+USER:37625282848
+SENHA:12345678
+
+SSL: BANCO:
+ssh -L 63333:10.153.18.103:5432 cleyton.prudencio@10.153.18.103 -p 22
+Senha: Nb5Hxl@cnNJ9
+
+INTRANET:
+376.252.828-48
+12345678
+
+analise Prada
+
+20240792102849 - VIVO
+
+https://git.vegamonitoramento.com.br/car-sao-paulo/mapa-geo-car-wc
+
++DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+
+(12345678): 25-D5-5A-D2-83-AA-40-0A-F4-64-C7-6D-71-3C-07-AD 
+
+
+usuario: 104.725.748-33
+senha: 12345678

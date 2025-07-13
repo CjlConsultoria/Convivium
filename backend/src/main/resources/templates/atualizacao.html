@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Denúncia</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8f5e9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 650px;
+            margin: 0 auto;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            border-left: 8px solid #2e7d32;
+        }
+
+        h2 {
+            color: #1b5e20;
+        }
+
+        p, li {
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Nova Denúncia Recebida</h2>
+
+    <p>Uma nova denúncia foi registrada com os seguintes dados:</p>
+
+    <ul>
+        <li><strong>ID:</strong> <span th:text="${ocorrencia.id}">123</span></li>
+        <li><strong>Descrição:</strong> <span th:text="${ocorrencia.descricaoOcorrencia}">Roubo de veículo</span></li>
+        <li><strong>Data e Hora:</strong> <span th:text="${ocorrencia.dataHora}">2024-01-01T12:00</span></li>
+        <li><strong>Status:</strong> <span th:text="${ocorrencia.statusDenuncia}">Aberto</span></li>
+    </ul>
+
+    <p><strong>Denunciante:</strong>
+        <span th:text="${denunciante.username}">Carlos</span>
+        (<span th:text="${denunciante.email}">carlos@email.com</span>)
+    </p>
+
+    <p>Por favor, acesse o sistema para mais detalhes.</p>
+
+    <div class="footer">
+        <p>Este é um e-mail automático enviado por WatchCar. Não responda.</p>
+    </div>
+</div>
+</body>
+</html>
