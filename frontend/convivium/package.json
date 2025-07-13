@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --build && vite build --mode prod",
+    "start": "vite preview --mode prod",
     "preview": "vite preview --mode prod",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
