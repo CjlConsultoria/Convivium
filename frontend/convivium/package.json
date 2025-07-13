@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --build && vite build --mode prod",
-    "start": "vite preview --mode prod",
     "preview": "vite preview --mode prod",
+    "start": "vite preview --host 0.0.0.0 --port $PORT --mode prod",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
