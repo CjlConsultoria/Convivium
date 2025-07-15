@@ -28,7 +28,6 @@ function updateUserData() {
 onMounted(() => {
   updateUserData()
   window.addEventListener('storage', updateUserData)
-  empresa.value = JSON.parse(localStorage.getItem('userEmpresa') || '{}')
 })
 
 onUnmounted(() => {
@@ -77,7 +76,9 @@ const handleLogout = () => {
   userName.value = 'Usuário'
   perfilUsuario.value = 'PUBLICO'
   empresa.value = {}
-  router.push({ name: 'login' })
+  if (router.currentRoute.value.name !== 'login') {
+    router.push({ name: 'login' })
+  }
 }
 
 const menuAberto = ref(false)

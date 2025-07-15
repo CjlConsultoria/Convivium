@@ -68,17 +68,6 @@ const router = createRouter({
   ],
 })
 
-// Verifica autenticação
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.meta.requiresAuth
-  const token = localStorage.getItem('authToken')
-
-  if (requiresAuth && !token) {
-    return next({ name: 'login' })
-  }
-
-  next()
-})
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.meta.requiresAuth
   const token = localStorage.getItem('authToken')
@@ -87,10 +76,7 @@ router.beforeEach(async (to, from, next) => {
     return next({ name: 'login' })
   }
 
-  if (!token) {
-    // Não precisa de auth, deixa passar
-    return next()
-  }
+  if (!token) return next()
 
   try {
     const userData = await fetchUserData()
@@ -105,7 +91,7 @@ router.beforeEach(async (to, from, next) => {
     const allowedRoles = (to.meta?.allowedRoles || []) as string[]
     const codigoEmpresa = userData.empresa?.codigoPublico
 
-    // Se tentar acessar login/home e já está logado:
+    // Redirecionamento ao acessar login/home já autenticado
     if (['home', 'login'].includes(to.name?.toString() || '')) {
       if (!codigoEmpresa) {
         localStorage.clear()
@@ -119,34 +105,24 @@ router.beforeEach(async (to, from, next) => {
         })
       }
 
-      // Redireciona conforme perfil
       if (perfil === 'ADMIN') {
-        return next({ name: 'licenca' }) // Tela Licença
+        return next({ name: 'licenca' })
       }
 
-      if (perfil === 'SINDICO') {
+      if (perfil === 'ADMINISTRATIVO') {
         return next({ name: 'adminPorEmpresa', params: { codigo: codigoEmpresa } })
       }
 
-      // Outros perfis vão para a denúncia
+      // USUARIO → denúncia
       return next({ name: 'denuncia' })
     }
 
-    // Rota tem allowedRoles?
+    // Validação com base nos allowedRoles definidos na rota
     if (allowedRoles.length > 0 && !allowedRoles.includes(perfil)) {
-      // Bloqueia acesso e direciona conforme perfil
       if (perfil === 'ADMIN') return next({ name: 'licenca' })
-      if (perfil === 'SINDICO')
+      if (perfil === 'ADMINISTRATIVO')
         return next({ name: 'adminPorEmpresa', params: { codigo: codigoEmpresa } })
       return next({ name: 'denuncia' })
-    }
-
-    // Verifica se perfil diferente só pode acessar a denúncia
-    if (perfil !== 'ADMIN' && perfil !== 'SINDICO') {
-      // Se tentar acessar qualquer rota que não seja denuncia
-      if (to.name !== 'denuncia') {
-        return next({ name: 'denuncia' })
-      }
     }
 
     return next()
