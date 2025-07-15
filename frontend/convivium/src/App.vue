@@ -108,14 +108,14 @@ div.layout
 
           // Administração - só para SÍNDICO e ADMIN
           RouterLink.nav-link(
-            v-if="(perfilUsuario === 'SINDICO' || perfilUsuario === 'ADMIN') && empresa?.codigoPublico"
+            v-if="(perfilUsuario === 'ADMINISTRATIVO' || perfilUsuario === 'ADMIN') && empresa?.codigoPublico"
             :to="`/empresa/${empresa.codigoPublico}/admin`"
             @click="fecharMenu"
           ) Administração
 
           // Licença - só para ADMIN
           RouterLink.nav-link(
-            v-if="perfilUsuario === 'ADMIN'"
+            v-if="perfilUsuario && perfilUsuario.toUpperCase() === 'ADMIN'"
             to="/licenca"
             @click="fecharMenu"
           ) Gestão de Licenças

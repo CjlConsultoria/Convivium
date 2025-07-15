@@ -42,7 +42,7 @@ const router = createRouter({
       path: '/empresa/:codigo/admin',
       name: 'adminPorEmpresa',
       component: Admin,
-      meta: { requiresAuth: true, allowedRoles: ['SINDICO', 'ADMIN'] }, // permitir ADMIN aqui também
+      meta: { requiresAuth: true, allowedRoles: ['ADMINISTRATIVO', 'ADMIN'] }, // permitir ADMIN aqui também
     },
     {
       path: '/empresa/:codigo/meus-dados',
