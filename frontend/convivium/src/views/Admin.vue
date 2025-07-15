@@ -362,6 +362,13 @@ function limparFiltroLocal(filtro: Record<string, any>) {
 
 const carregarReclamacoes = async () => {
   try {
+    const empresa = JSON.parse(localStorage.getItem('userEmpresa') || '{}')
+    const idEmpresa = empresa.id
+
+    if (!idEmpresa) {
+      throw new Error('ID da empresa não encontrado no localStorage.')
+    }
+
     // Ajusta datas para undefined se vazias
     const filtroAjustado = { ...filtroReclamacao.value }
     if (filtroAjustado.dataInicio === '') delete filtroAjustado.dataInicio
@@ -369,11 +376,15 @@ const carregarReclamacoes = async () => {
 
     const filtroLimpo = limparFiltroLocal(filtroAjustado)
 
+    // Adiciona idEmpresa no filtro
+    filtroLimpo.idEmpresa = idEmpresa
+
     const data = await listarReclamacoes(
       paginaAtualReclamacoes.value - 1,
       itensPorPagina,
       filtroLimpo,
     )
+
     reclamacoes.value = data.content
     totalPaginasReclamacoes.value = data.totalPages
   } catch (e) {

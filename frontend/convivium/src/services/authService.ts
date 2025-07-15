@@ -12,12 +12,12 @@ export const login = async (cpf: string, password: string) => {
   return response.data
 }
 
-interface MoradorPayload {
+export interface MoradorPayload {
   username: string
   password: string
   email: string
   cpf: string
-  tipo: number
+  tipoUsuario: number
   ativo?: boolean
   sobrenome?: string
   telefone?: string
@@ -160,4 +160,27 @@ export const updateUserData = async (
 
 export async function deletarUsuario(id: string) {
   return await api.delete(`/auth/usuario/delete/${id}`)
+}
+
+export async function atualizarUsuario(id: string, dados: any) {
+  return await api.put(`/auth/usuario/update/${id}`, dados)
+}
+
+export const fetchUsuarios = async (params: {
+  page: number
+  size: number
+  nome?: string
+  cpf?: string
+}) => {
+  const { page, size, nome, cpf } = params
+  const query = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  }).toString()
+
+  // Corpo só com filtro (nome e cpf)
+  const filtro = { nome, cpf }
+
+  const response = await api.post(`/user/filtrar?${query}`, filtro)
+  return response.data
 }

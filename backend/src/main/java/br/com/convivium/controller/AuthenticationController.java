@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -87,21 +88,26 @@ public class AuthenticationController {
     })
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        String username = getCurrentUsername();
+        String cpf = getCurrentUsername();
 
-        if (username == null) {
-            return ResponseEntity.status(403).body(null); // Se não tiver usuário, retorna erro
+        if (cpf == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Buscar o usuário no banco de dados com o nome de usuário
-        User user = authenticationService.getUserDetails(username);
+        User user = authenticationService.getUserDetails(cpf); // busca usuário pelo CPF
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
         return ResponseEntity.ok(user);
     }
+
+
 
     @PutMapping("/usuario/update/{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable String id,
-            @RequestBody UserUpdateRequest userUpdateRequest) {
+            @RequestBody RegisterRequest userUpdateRequest) {
 
         try {
             authenticationService.updateUserData(id, userUpdateRequest);
@@ -130,13 +136,22 @@ public class AuthenticationController {
 
 
     private String getCurrentUsername() {
-        // Obtém a autenticação atual do SecurityContextHolder
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return null;
         }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();  // aqui pega o CPF
+        } else if (principal instanceof String) {
+            return (String) principal;
+        }
+
+        return null;
     }
+
+
 }

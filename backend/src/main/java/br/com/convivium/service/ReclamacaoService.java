@@ -15,16 +15,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class ReclamacaoService {
@@ -170,5 +176,39 @@ public class ReclamacaoService {
         return acaoReclamacaoRepository.findByReclamacaoIdOrderByIdAsc(reclamacaoId);
     }
 
+    public byte[] gerarZipAnexos(Long idReclamacao) {
+        Reclamacao reclamacao = reclamacaoRepository.findById(idReclamacao)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada"));
+
+        List<Anexo> anexos = reclamacao.getAnexos();
+
+        if (anexos.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Reclamação não possui anexos");
+        }
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(baos)) {
+
+            for (Anexo anexo : anexos) {
+                File arquivo = new File(anexo.getCaminhoArquivo());
+
+                if (!arquivo.exists()) {
+                    // Se desejar ignorar arquivos ausentes, use continue ao invés de lançar exceção
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                            "Arquivo não encontrado: " + anexo.getNomeArquivo());
+                }
+
+                zos.putNextEntry(new ZipEntry(anexo.getNomeArquivo()));
+                Files.copy(arquivo.toPath(), zos);
+                zos.closeEntry();
+            }
+
+            zos.finish();
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao gerar ZIP", e);
+        }
+    }
 }
 

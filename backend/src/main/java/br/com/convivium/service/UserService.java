@@ -1,13 +1,17 @@
 package br.com.convivium.service;
 
+import br.com.convivium.dto.request.UsuarioFiltroDTO;
+import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.entity.Role;
 import br.com.convivium.entity.Tipo;
 import br.com.convivium.entity.User;
+import br.com.convivium.entity.specification.UsuarioSpecification;
 import br.com.convivium.repository.RoleRepository;
 import br.com.convivium.repository.TipoRepository;
 import br.com.convivium.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,5 +63,54 @@ public class UserService {
             userRepository.save(usuario);
         }
     }
+
+    public Page<UserResponseDTO> listarUsuariosSemSenha(Long idEmpresa, Pageable pageable) {
+        Page<User> usuarios = userRepository.findAllByEmpresaId(idEmpresa, pageable);
+        return usuarios.map(this::mapToDTO);
+    }
+
+    private UserResponseDTO mapToDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setCpf(user.getCpf());
+        dto.setTelefone(user.getTelefone());
+        dto.setAtivo(user.getAtivo());
+        dto.setSobrenome(user.getSobrenome());
+        dto.setGenero(user.getGenero());
+        dto.setCep(user.getCep());
+        dto.setLogradouro(user.getLogradouro());
+        dto.setCidade(user.getCidade());
+        dto.setEstado(user.getEstado());
+        dto.setBairro(user.getBairro());
+        dto.setNumero(user.getNumero());
+        dto.setComplemento(user.getComplemento());
+        dto.setAlerta(user.getAlerta());
+        dto.setBloco(user.getBloco());
+        dto.setApartamento(user.getApartamento());
+        dto.setVagaCarro(user.getVagaCarro());
+        dto.setVagaMoto(user.getVagaMoto());
+
+        if (user.getRole() != null) {
+            dto.setRole(user.getRole().getName());
+        }
+        if (user.getTipo() != null) {
+            dto.setTipo(user.getTipo().getName());
+        }
+        if (user.getEmpresa() != null) {
+            dto.setEmpresa(user.getEmpresa().getName());
+        }
+
+        return dto;
+    }
+
+    public Page<UserResponseDTO> listarComFiltro(UsuarioFiltroDTO filtro, Pageable pageable) {
+        Specification<User> spec = UsuarioSpecification.filtrarPorNomeECpf(filtro);
+        Page<User> page = userRepository.findAll(spec, pageable);
+        return page.map(this::mapToDTO);
+    }
+
+
 
 }

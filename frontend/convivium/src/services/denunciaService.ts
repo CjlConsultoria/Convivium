@@ -79,6 +79,7 @@ export async function listarReclamacoes(
     nomeUsuario?: string
     dataInicio?: string
     dataFim?: string
+    idEmpresa?: number // ✅ ADICIONADO AQUI
   } = {},
 ) {
   const params = {
@@ -140,4 +141,27 @@ export async function listarTodasAcoes(): Promise<AcaoReclamacao[]> {
     withCredentials: true,
   })
   return response.data
+}
+
+export async function baixarAnexosZip(reclamacaoId: number): Promise<void> {
+  try {
+    const response = await api.get(`/reclamacoes/${reclamacaoId}/anexos/zip`, {
+      responseType: 'blob', // essencial para downloads
+      withCredentials: true,
+    })
+
+    const blob = new Blob([response.data], { type: 'application/zip' })
+    const url = window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `reclamacao_${reclamacaoId}_anexos.zip`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Erro ao baixar anexos zip:', error)
+    throw new Error('Falha ao baixar os anexos da reclamação.')
+  }
 }

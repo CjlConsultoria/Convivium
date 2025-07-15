@@ -4,6 +4,7 @@ import Login from '../views/Login.vue'
 import MeusDados from '../views/MeusDados.vue'
 import Inicio from '../views/Home.vue'
 import Denuncia from '../views/DenunciaForm.vue'
+import Licenca from '../views/LicenseManagement.vue'
 
 import { fetchUserData } from '@/services/authService'
 
@@ -32,10 +33,16 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/licenca',
+      name: 'licenca',
+      component: Licenca,
+      meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
+    },
+    {
       path: '/empresa/:codigo/admin',
       name: 'adminPorEmpresa',
       component: Admin,
-      meta: { requiresAuth: true, allowedRoles: ['ADMIN'] }, // 👈 perfil permitido
+      meta: { requiresAuth: true, allowedRoles: ['SINDICO', 'ADMIN'] }, // permitir ADMIN aqui também
     },
     {
       path: '/empresa/:codigo/meus-dados',
@@ -77,57 +84,76 @@ router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('authToken')
 
   if (requiresAuth && !token) {
-    // Se a rota precisa de auth e não tem token, manda pro login
     return next({ name: 'login' })
   }
 
-  if (token) {
-    try {
-      const userData = await fetchUserData()
+  if (!token) {
+    // Não precisa de auth, deixa passar
+    return next()
+  }
 
-      localStorage.setItem('userName', userData.username)
-      localStorage.setItem('userPerfil', userData.role.name)
-      localStorage.setItem('userId', userData.id)
-      localStorage.setItem('userEmpresa', JSON.stringify(userData.empresa || {}))
-      window.dispatchEvent(new Event('storage'))
+  try {
+    const userData = await fetchUserData()
 
-      const allowedRoles = (to.meta?.allowedRoles || []) as string[]
+    localStorage.setItem('userName', userData.username)
+    localStorage.setItem('userPerfil', userData.role.name)
+    localStorage.setItem('userId', userData.id)
+    localStorage.setItem('userEmpresa', JSON.stringify(userData.empresa || {}))
+    window.dispatchEvent(new Event('storage'))
 
-      if (allowedRoles.length > 0 && !allowedRoles.includes(userData.role.name)) {
-        // Perfil não autorizado
-        return next({ name: 'inicio' })
+    const perfil = userData.role.name
+    const allowedRoles = (to.meta?.allowedRoles || []) as string[]
+    const codigoEmpresa = userData.empresa?.codigoPublico
+
+    // Se tentar acessar login/home e já está logado:
+    if (['home', 'login'].includes(to.name?.toString() || '')) {
+      if (!codigoEmpresa) {
+        localStorage.clear()
+        return next({ name: 'login' })
       }
 
-      const routeName = to.name?.toString() || ''
-      const codigoEmpresa = userData.empresa?.codigoPublico
+      if (!userData.ativo) {
+        return next({
+          name: 'verificaCpfPorEmpresa',
+          params: { codigo: codigoEmpresa, id: userData.id },
+        })
+      }
 
-      // Redireciona se tentar acessar home/login e já estiver logado
-      if (['home', 'login'].includes(routeName)) {
-        if (!codigoEmpresa) {
-          localStorage.clear()
-          return next({ name: 'login' })
-        }
+      // Redireciona conforme perfil
+      if (perfil === 'ADMIN') {
+        return next({ name: 'licenca' }) // Tela Licença
+      }
 
-        if (!userData.ativo) {
-          return next({
-            name: 'verificaCpfPorEmpresa',
-            params: { codigo: codigoEmpresa, id: userData.id },
-          })
-        }
-
+      if (perfil === 'SINDICO') {
         return next({ name: 'adminPorEmpresa', params: { codigo: codigoEmpresa } })
       }
 
-      // Se chegou aqui, pode seguir para a rota normalmente
-      return next()
-    } catch (err) {
-      console.error('Erro ao buscar dados do usuário', err)
-      localStorage.clear()
-      return next({ name: 'login' })
+      // Outros perfis vão para a denúncia
+      return next({ name: 'denuncia' })
     }
-  } else {
-    // Não tem token e não precisa de auth: deixa passar
+
+    // Rota tem allowedRoles?
+    if (allowedRoles.length > 0 && !allowedRoles.includes(perfil)) {
+      // Bloqueia acesso e direciona conforme perfil
+      if (perfil === 'ADMIN') return next({ name: 'licenca' })
+      if (perfil === 'SINDICO')
+        return next({ name: 'adminPorEmpresa', params: { codigo: codigoEmpresa } })
+      return next({ name: 'denuncia' })
+    }
+
+    // Verifica se perfil diferente só pode acessar a denúncia
+    if (perfil !== 'ADMIN' && perfil !== 'SINDICO') {
+      // Se tentar acessar qualquer rota que não seja denuncia
+      if (to.name !== 'denuncia') {
+        return next({ name: 'denuncia' })
+      }
+    }
+
     return next()
+  } catch (err) {
+    console.error('Erro ao buscar dados do usuário', err)
+    localStorage.clear()
+    return next({ name: 'login' })
   }
 })
 

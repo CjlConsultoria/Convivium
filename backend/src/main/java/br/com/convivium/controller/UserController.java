@@ -1,6 +1,8 @@
 package br.com.convivium.controller;
 
 import br.com.convivium.dto.request.AtivacaoContaRequest;
+import br.com.convivium.dto.request.UsuarioFiltroDTO;
+import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.entity.Role;
 import br.com.convivium.entity.Tipo;
 import br.com.convivium.entity.User;
@@ -87,5 +89,23 @@ public class UserController {
         userService.ativarConta(idUsuario, senhaCriptografada);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/listar-simples/{idEmpresa}")
+    public ResponseEntity<Page<UserResponseDTO>> listarSemSenha(
+            @PathVariable Long idEmpresa,
+            @PageableDefault(page = 0, size = 10, sort = "username") Pageable pageable) {
+        Page<UserResponseDTO> page = userService.listarUsuariosSemSenha(idEmpresa, pageable);
+        return ResponseEntity.ok(page);
+    }
+
+    @PostMapping("/filtrar")
+    public ResponseEntity<Page<UserResponseDTO>> filtrarUsuarios(
+            @RequestBody UsuarioFiltroDTO filtro,
+            @PageableDefault(page = 0, size = 10, sort = "username") Pageable pageable) {
+        Page<UserResponseDTO> resultado = userService.listarComFiltro(filtro, pageable);
+        return ResponseEntity.ok(resultado);
+    }
+
+
 
 }

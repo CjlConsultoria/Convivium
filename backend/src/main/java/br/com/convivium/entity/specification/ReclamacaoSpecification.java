@@ -46,6 +46,11 @@ public class ReclamacaoSpecification {
             if (filtro.getDataFim() != null) {
                 p = cb.and(p, cb.lessThanOrEqualTo(root.get("dataCriacao"), filtro.getDataFim().atTime(23, 59, 59)));
             }
+            if (filtro.getIdEmpresa() != null) {
+                p = cb.and(p, cb.equal(usuario.get("empresa").get("id"), filtro.getIdEmpresa()));
+            } else {
+                throw new IllegalArgumentException("idEmpresa é obrigatório para buscar reclamações.");
+            }
 
             return p;
         };

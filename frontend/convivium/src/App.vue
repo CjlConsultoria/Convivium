@@ -105,11 +105,22 @@ div.layout
         nav.nav-menu
           RouterLink.nav-link(to="/Inicio" @click="fecharMenu") Início
           RouterLink.nav-link(to="/denuncia" @click="fecharMenu") Reclamacao/Denuncia
+
+          // Administração - só para SÍNDICO e ADMIN
           RouterLink.nav-link(
-            v-if="perfilUsuario === 'ADMIN' && empresa?.codigoPublico"
+            v-if="(perfilUsuario === 'SINDICO' || perfilUsuario === 'ADMIN') && empresa?.codigoPublico"
             :to="`/empresa/${empresa.codigoPublico}/admin`"
             @click="fecharMenu"
           ) Administração
+
+          // Licença - só para ADMIN
+          RouterLink.nav-link(
+            v-if="perfilUsuario === 'ADMIN'"
+            to="/licenca"
+            @click="fecharMenu"
+          ) Gestão de Licenças
+
+
 
 
 

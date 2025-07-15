@@ -2,20 +2,32 @@ package br.com.convivium.service;
 
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.InvalidStateException;
+import br.com.convivium.dto.request.EmpresaCreateDTO;
 import br.com.convivium.entity.Empresa;
+import br.com.convivium.entity.specification.EmpresaSpecification;
+import br.com.convivium.exception.EmpresaComUsuariosException;
 import br.com.convivium.repository.EmpresaRepository;
-    import org.springframework.stereotype.Service;
+import br.com.convivium.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Service
 public class EmpresaService {
 
     private final EmpresaRepository empresaRepository;
-
-    public EmpresaService(EmpresaRepository empresaRepository) {
+    private final UserRepository usuarioRepository; // supondo que exista
+    public EmpresaService(EmpresaRepository empresaRepository, UserRepository usuarioRepository) {
         this.empresaRepository = empresaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<Empresa> buscarEmpresasAll() {
@@ -85,4 +97,41 @@ public class EmpresaService {
                 .replaceAll("(^-|-$)", ""); // remove traço no começo/fim
         return nomeSlug + "-" + empresa.getId();
     }
+
+    public Page<Empresa> buscarEmpresasAll(String nome, String cnpj, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Empresa> spec = EmpresaSpecification.filterByNomeOrCnpj(nome, cnpj);
+        return empresaRepository.findAll(spec, pageable);
+    }
+
+
+    public Empresa atualizarEndereco(Long id, Empresa enderecoAtualizado) {
+        return empresaRepository.findById(id).map(empresa -> {
+            // Não permite alterar nome nem cnpj
+            empresa.setCep(enderecoAtualizado.getCep());
+            empresa.setLogradouro(enderecoAtualizado.getLogradouro());
+            empresa.setNumero(enderecoAtualizado.getNumero());
+            empresa.setComplemento(enderecoAtualizado.getComplemento());
+            empresa.setBairro(enderecoAtualizado.getBairro());
+            empresa.setCidade(enderecoAtualizado.getCidade());
+            empresa.setEstado(enderecoAtualizado.getEstado());
+            return empresaRepository.save(empresa);
+        }).orElse(null);
+    }
+
+    public boolean excluirEmpresa(Long id) {
+        if (!empresaRepository.existsById(id)) {
+            return false;
+        }
+        // Verificar se existe usuário associado à empresa
+        boolean possuiUsuarios = usuarioRepository.existsByEmpresaId(id);
+        if (possuiUsuarios) {
+            throw new EmpresaComUsuariosException(
+                    "Não é possível excluir a empresa pois existem usuários associados a ela. Apague os usuários primeiro."
+            );
+        }
+        empresaRepository.deleteById(id);
+        return true;
+    }
+
 }

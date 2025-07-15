@@ -46,12 +46,23 @@
                 | {{ reclamacao.descricaoSolucao || 'Não tem dados' }}
 
     footer.modal-footer
+      button.btn.btn-secondary(@click="baixarAnexos") Baixar Anexos (.zip)
       button.btn.btn-primary(@click="$emit('close')") Fechar
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { listarAcoesReclamacao } from '@/services/denunciaService'
+import { baixarAnexosZip } from '@/services/denunciaService'
+
+async function baixarAnexos() {
+  try {
+    await baixarAnexosZip(props.reclamacao.id)
+  } catch (error) {
+    console.error('Erro no download dos anexos:', error)
+    alert('Erro ao baixar anexos.')
+  }
+}
 
 const props = defineProps<{ reclamacao: any }>()
 
@@ -271,6 +282,7 @@ function formatarStatus(status: string) {
   border-top: 1px solid #ddd;
   display: flex;
   justify-content: flex-end;
+  gap: 0.75rem; /* ou 1rem se quiser mais espaçado */
 }
 
 .btn {

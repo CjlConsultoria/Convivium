@@ -9,6 +9,7 @@ import br.com.convivium.entity.Reclamacao;
 import br.com.convivium.service.ReclamacaoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +79,16 @@ public class ReclamacaoController {
     @GetMapping("/{id}")
     public List<AcaoReclamacao> listarPorReclamacao(@PathVariable Long id) {
         return reclamacaoService.listarPorReclamacaoId(id);
+    }
+
+    @GetMapping("/{id}/anexos/zip")
+    public ResponseEntity<byte[]> downloadAnexosZip(@PathVariable Long id) {
+        byte[] zip = reclamacaoService.gerarZipAnexos(id);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reclamacao_" + id + "_anexos.zip")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(zip);
     }
 
 }

@@ -14,6 +14,7 @@ public class ReclamacaoFiltroDTO {
     private String tipo;       // novo campo
     private String descricao;  // novo campo
     private StatusReclamacao status;     // novo campo
+    private Long idEmpresa; // ✅ Novo campo
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dataInicio;

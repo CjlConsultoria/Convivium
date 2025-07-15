@@ -31,13 +31,14 @@ public class AuthenticationService {
     private final EmpresaRepository empresaRepository;
     private final TipoRepository tipoRepository;
     private final EmailService emailService;
+    private final LicencaRepository licencaRepository;
 
     @Autowired
     public AuthenticationService(UserRepository userRepository,
                                  BCryptPasswordEncoder passwordEncoder,
                                  JwtTokenUtil jwtTokenUtil,
                                  RoleRepository roleRepository,
-                                 TokenRepository tokenRepository, EmpresaRepository empresaRepository, TipoRepository tipoRepository, EmailService emailService) {
+                                 TokenRepository tokenRepository, EmpresaRepository empresaRepository, TipoRepository tipoRepository, EmailService emailService, LicencaRepository licencaRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -46,6 +47,7 @@ public class AuthenticationService {
         this.empresaRepository = empresaRepository;
         this.tipoRepository = tipoRepository;
         this.emailService = emailService;
+        this.licencaRepository = licencaRepository;
     }
 
     public String authenticate(String username, String password) {
@@ -71,12 +73,21 @@ public class AuthenticationService {
             throw new ApiException.ForbiddenException("Usuário está inativo.");
         }
 
+        Licenca licenca = (Licenca) licencaRepository.findByEmpresa(user.getEmpresa())
+                .orElseThrow(() -> new ApiException.ForbiddenException("Empresa não possui licença ativa."));
+
+        if (!licenca.isValida()) {
+            throw new ApiException.ForbiddenException("Licença da empresa está expirada ou inválida.");
+        }
+
         if (passwordEncoder.matches(password, user.getPassword())) {
             return jwtTokenUtil.generateToken(user);
         } else {
             throw new ApiException.UnauthorizedException("CPF ou senha inválidos.");
         }
     }
+
+
 
     public void register(RegisterRequest registerRequest) {
         userRepository.findByCpf(registerRequest.getCpf()).ifPresent(user -> {
@@ -103,17 +114,15 @@ public class AuthenticationService {
         user.setAtivo(true);
         updateUserFromRegisterRequest(user, registerRequest);
 
-        EmpresaType empresaType = EmpresaType.fromId(registerRequest.getEmpresa());
-        Empresa empresa = empresaRepository.findById((long) empresaType.getId())
-                .orElseThrow(() -> new ApiException.NotFoundException("Empresa não encontrado com ID: " + empresaType.getId()));
+        Empresa empresa = empresaRepository.findById(registerRequest.getEmpresa())
+                .orElseThrow(() -> new ApiException.NotFoundException("Empresa não encontrada com ID: " + registerRequest.getEmpresa()));
 
-        RoleType roleType = RoleType.fromId(registerRequest.getRole());
-        Role role = roleRepository.findById((long) roleType.getId())
-                .orElseThrow(() -> new ApiException.NotFoundException("Perfil não encontrado com ID: " + roleType.getId()));
+        Role role = roleRepository.findById(registerRequest.getRole())
+                .orElseThrow(() -> new ApiException.NotFoundException("Perfil não encontrado com ID: " + registerRequest.getRole()));
 
-        TipoCargo tipoCargo = TipoCargo.fromId(registerRequest.getTipoUsuario());
-        Tipo tipo = tipoRepository.findById((long) tipoCargo.getId())
-                .orElseThrow(() -> new ApiException.NotFoundException("Cargo não encontrado com ID: " + tipoCargo.getId()));
+        Tipo tipo = tipoRepository.findById(registerRequest.getTipoUsuario())
+                .orElseThrow(() -> new ApiException.NotFoundException("Cargo não encontrado com ID: " + registerRequest.getTipoUsuario()));
+
 
         user.setStatus("pendente_ativacao");
         user.setTipo(tipo);
@@ -163,10 +172,11 @@ public class AuthenticationService {
         user.setVagaMoto(req.getVagaMoto());
     }
 
-    public User getUserDetails(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado: " + username));
+    public User getUserDetails(String cpf) {
+        return userRepository.findByCpf(cpf)
+                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado: " + cpf));
     }
+
 
     public Map<String, Object> forgotPassword(String emailCpf) {
         User user;
@@ -230,39 +240,46 @@ public class AuthenticationService {
         return true;
     }
 
-    public boolean updateUserData(String id, UserUpdateRequest userUpdateRequest) {
+    public boolean updateUserData(String id, RegisterRequest request) {
         User user = userRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado."));
 
-        RoleType roleType = switch (userUpdateRequest.getTipo()) {
-            case 1 -> RoleType.ADMIN;
-            case 2 -> RoleType.ADMINISTRATIVO;
-            default -> throw new ApiException.BadRequestException("Tipo de usuário inválido.");
-        };
+        user.setSobrenome(request.getSobrenome());
+        user.setEmail(request.getEmail());
+        user.setTelefone(request.getTelefone());
+        user.setCep(request.getCep());
+        user.setLogradouro(request.getLogradouro());
+        user.setCidade(request.getCidade());
+        user.setEstado(request.getEstado());
+        user.setBairro(request.getBairro());
+        user.setNumero(request.getNumero());
+        user.setComplemento(request.getComplemento());
+        user.setGenero(request.getGenero());
+        user.setAlerta(request.getAlerta());
 
-        Role role = roleRepository.findById((long) roleType.getId())
-                .orElseThrow(() -> new ApiException.NotFoundException("Perfil não encontrado: " + roleType));
+        // Atualiza Empresa, Role e Tipo (se fornecidos)
+        if (request.getEmpresa() != null) {
+            Empresa empresa = empresaRepository.findById(request.getEmpresa())
+                    .orElseThrow(() -> new ApiException.NotFoundException("Empresa não encontrada com ID: " + request.getEmpresa()));
+            user.setEmpresa(empresa);
+        }
 
-        // Atualiza dados básicos
-        user.setUsername(userUpdateRequest.getUsername());
-        user.setSobrenome(userUpdateRequest.getSobrenome());
-        user.setEmail(userUpdateRequest.getEmail());
-        user.setCpf(userUpdateRequest.getCpf());
-        user.setTelefone(userUpdateRequest.getTelefone());
-        user.setCep(userUpdateRequest.getCep());
-        user.setLogradouro(userUpdateRequest.getLogradouro());
-        user.setCidade(userUpdateRequest.getCidade());
-        user.setEstado(userUpdateRequest.getEstado());
-        user.setBairro(userUpdateRequest.getBairro());
-        user.setNumero(userUpdateRequest.getNumero());
-        user.setComplemento(userUpdateRequest.getComplemento());
-        user.setGenero(userUpdateRequest.getGenero());
-        user.setAlerta(userUpdateRequest.getAlerta());
-        user.setRole(role);
+        if (request.getRole() != null) {
+            Role role = roleRepository.findById(request.getRole())
+                    .orElseThrow(() -> new ApiException.NotFoundException("Perfil não encontrado com ID: " + request.getRole()));
+            user.setRole(role);
+        }
+
+        if (request.getTipoUsuario() != null) {
+            Tipo tipo = tipoRepository.findById(request.getTipoUsuario())
+                    .orElseThrow(() -> new ApiException.NotFoundException("Cargo não encontrado com ID: " + request.getTipoUsuario()));
+            user.setTipo(tipo);
+        }
 
         userRepository.save(user);
         return true;
     }
+
 
     public void deleteUserById(String id) {
         Optional<User> userOptional = userRepository.findById(Long.valueOf(id));

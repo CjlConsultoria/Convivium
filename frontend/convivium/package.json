@@ -16,10 +16,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vueform/multiselect": "^2.6.11",
     "axios": "^1.9.0",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
+    "vue-the-mask": "^0.11.1",
     "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
