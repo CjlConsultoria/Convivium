@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Nova Denúncia Recebida</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f6f4;
+            margin: 0;
+            padding: 40px;
+            color: #2e7d32;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            margin: 0 auto;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 8px solid #2e7d32;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1b5e20;
+        }
+
+        p, li {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .highlight {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        a.button {
+            display: inline-block;
+            background-color: #2e7d32;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Nova Denúncia Recebida no Condomínio</h1>
+
+    <p>Olá, <span th:text="${sindicoNome}">Síndico</span>,</p>
+
+    <p>Foi registrada uma nova denúncia no sistema do condomínio com os seguintes detalhes:</p>
+
+    <ul>
+        <li><span class="highlight">ID da Denúncia:</span> <span th:text="${denuncia.id}">12345</span></li>
+        <li><span class="highlight">Descrição:</span> <span th:text="${denuncia.descricao}">Barulho excessivo durante a noite</span></li>
+        <li><span class="highlight">Data e Hora:</span> <span th:text="${denuncia.dataHora}">2025-07-16 20:15</span></li>
+        <li><span class="highlight">Status:</span> <span th:text="${denuncia.status}">Aberto</span></li>
+    </ul>
+
+    <p><strong>Denunciante:</strong> <span th:text="${denunciante.nome}">Carlos Silva</span> (<span th:text="${denunciante.email}">carlos@email.com</span>)</p>
+
+    <p>Por favor, acesse o sistema para verificar a denúncia e tomar as providências necessárias.</p>
+
+    <a href="https://seudominio.com/condominio/denuncias" target="_blank" class="button">Acessar Sistema</a>
+
+    <div class="footer">
+        <p>Este é um e-mail automático enviado pelo sistema Convivium. Por favor, não responda este e-mail.</p>
+    </div>
+</div>
+</body>
+</html>

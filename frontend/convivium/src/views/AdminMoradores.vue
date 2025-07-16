@@ -1,232 +1,87 @@
 <template lang="pug">
 .admin-condominio
   .layout-container
-    MenuLateral(:itemSelecionado="listaSelecionada" @selecao="listaSelecionada = $event")
-
+    MenuLateral(:itemSelecionado="'moradores'")
 
     main.area-conteudo
-      h2.titulo Administração do Condomínio
+      h2.titulo Administração do Condomínio - Moradores
 
-      // Conteúdo: moradores
-      div(v-if="listaSelecionada === 'moradores'")
-        .link-condominio
-          label Link para cadastro dos moradores:
-          p
-            a(:href="linkCadastroMoradores" target="_blank") {{ linkCadastroMoradores }}
+      .link-condominio
+        label Link para cadastro dos moradores:
+        p
+          a(:href="linkCadastroMoradores" target="_blank") {{ linkCadastroMoradores }}
 
-        .filtro-acoes
-          div.input-group
-            input(
-              type="text"
-              placeholder="Buscar por nome, unidade ou email"
-              v-model="filtroMorador"
-              @input="filtrarMoradores"
-              autocomplete="off"
-            )
-            span.icon 🔍
-          button.btn-outline(@click="abrirModalNovoMoradorCompleto") + Novo Morador
+      .filtro-acoes
+        div.input-group
+          input(
+            type="text"
+            placeholder="Buscar por nome, unidade ou email"
+            v-model="filtroMorador"
+            @input="filtrarMoradores"
+            autocomplete="off"
+          )
+          span.icon 🔍
+        button.btn-outline(@click="abrirModalNovoMoradorCompleto") + Novo Morador
 
-        table.lista-moradores
-          thead
-            tr
-              th Nome
-              th Tipo
-              th Unidade
-              th Email
-              th Contato
-              th Ações
-          tbody
-            tr(v-for="morador in moradoresPagina" :key="morador.id")
-              td {{ morador.nome }}
-              td {{ morador.tipo }}
-              td {{ morador.unidade }}
-              td {{ morador.email }}
-              td {{ morador.telefone }}
-              td
-                .dropdown
-                  button.btn-outline.btn-acao(@click="toggleDropdown(morador.id)") Ações ▾
-                  ul.dropdown-menu(v-if="dropdownAberto === morador.id")
-                    li(@click="abrirModalDetalhes(morador); fecharDropdown()") Detalhes
-                    li(@click="confirmarRemoverMoradorWrapper(morador); fecharDropdown()") Remover
+      table.lista-moradores
+        thead
+          tr
+            th Nome
+            th Tipo
+            th Unidade
+            th Email
+            th Contato
+            th Ações
+        tbody
+          tr(v-for="morador in moradoresPagina" :key="morador.id")
+            td {{ morador.nome }}
+            td {{ morador.tipo }}
+            td {{ morador.unidade }}
+            td {{ morador.email }}
+            td {{ morador.telefone }}
+            td
+              .dropdown
+                button.btn-outline.btn-acao(@click="toggleDropdown(morador.id)") Ações ▾
+                ul.dropdown-menu(v-if="dropdownAberto === morador.id")
+                  li(@click="abrirModalDetalhes(morador); fecharDropdown()") Detalhes
+                  li(@click="confirmarRemoverMoradorWrapper(morador); fecharDropdown()") Remover
 
-        .paginacao(v-if="totalPaginas > 1")
-          button.btn-outline.pag-btn(:disabled="paginaAtual === 1", @click="paginaAtual--") ‹
-          button.btn-outline.pag-btn(
-            v-for="num in totalPaginas"
-            :key="num"
-            :class="{ ativo: num === paginaAtual }"
-            @click="paginaAtual = num"
-          ) {{ num }}
-          button.btn-outline.pag-btn(:disabled="paginaAtual === totalPaginas", @click="paginaAtual++") ›
+      .paginacao(v-if="totalPaginas > 1")
+        button.btn-outline.pag-btn(:disabled="paginaAtual === 1", @click="paginaAtual--") ‹
+        button.btn-outline.pag-btn(
+          v-for="num in totalPaginas"
+          :key="num"
+          :class="{ ativo: num === paginaAtual }"
+          @click="paginaAtual = num"
+        ) {{ num }}
+        button.btn-outline.pag-btn(:disabled="paginaAtual === totalPaginas", @click="paginaAtual++") ›
 
-      div(v-if="listaSelecionada === 'reclamacoes'")
-        .filtro-acoes
-          div.input-group
-            input(
-              type="text"
-              placeholder="Buscar por nome do usuário"
-              v-model="filtroReclamacao.nomeUsuario"
-              @input="filtrarReclamacoes"
-              autocomplete="off"
-            )
-          div.input-group
-            input(
-              type="text"
-              placeholder="Buscar por apartamento"
-              v-model="filtroReclamacao.apartamento"
-              @input="filtrarReclamacoes"
-              autocomplete="off"
-            )
-          div.input-group
-            input(
-              type="text"
-              placeholder="Buscar por bloco"
-              v-model="filtroReclamacao.bloco"
-              @input="filtrarReclamacoes"
-              autocomplete="off"
-            )
-          div.input-group
-            label(for="dataInicio") Data início:
-            input(
-              type="date"
-              id="dataInicio"
-              v-model="filtroReclamacao.dataInicio"
-              @change="filtrarReclamacoes"
-            )
-          div.input-group
-            label(for="dataFim") Data fim:
-            input(
-              type="date"
-              id="dataFim"
-              v-model="filtroReclamacao.dataFim"
-              @change="filtrarReclamacoes"
-            )
-          div.input-group
-            input(
-              type="text"
-              placeholder="Buscar por tipo"
-              v-model="filtroReclamacao.tipo"
-              @input="filtrarReclamacoes"
-              autocomplete="off"
-            )
-          div.input-group
-            input(
-              type="text"
-              placeholder="Buscar por descrição"
-              v-model="filtroReclamacao.descricao"
-              @input="filtrarReclamacoes"
-              autocomplete="off"
-            )
-          div.input-group
-            select(
-              id="status"
-              v-model="filtroReclamacao.status"
-              @change="filtrarReclamacoes"
-            )
-              option(value="" selected) -- Selecione o Status --
-              option(value="EM_ANDAMENTO") Em andamento
-              option(value="EM_ANALISE") Em análise
-              option(value="EM_NOTIFICACAO") Em notificação
-              option(value="SOLUCIONADA") Solucionada
-              option(value="CANCELADA") Cancelada
-          button.btn-outline.btn-reset(@click="limparFiltros") Limpar Filtros
+  // Modal Confirmação Remoção
+  ModalConfirmarRemover(
+    v-if="modalConfirmarRemoverAberto"
+    :morador="moradorParaRemover"
+    @close="modalConfirmarRemoverAberto = false"
+    @confirmar="removerMoradorConfirmado"
+  )
 
-        table.lista-moradores
-          thead
-            tr
-              th Tipo
-              th Descrição
-              th Status
-              th Data
-              th Reclamante
-              th Empresa
-              th Anexos
-              th Acoes
-          tbody
-            tr(v-for="reclamacao in reclamacoesPagina" :key="reclamacao.id")
-              td {{ reclamacao.tipo }}
-              td {{ reclamacao.detalhes }}
-              td {{ formatarStatus(reclamacao.status) }}
-              td {{ formatarData(reclamacao.dataCriacao) }}
-              td
-                | {{ reclamacao.usuario.username }} -
-                | Bloco: {{ reclamacao.usuario.bloco }}, Apt: {{ reclamacao.usuario.apartamento }} -
-                | {{ reclamacao.usuario.tipoPerfil }}
-              td {{ reclamacao.empresa.name }}
-              td
-                span(v-for="anexo in reclamacao.anexos" :key="anexo.id")
-                  | {{ anexo.nomeArquivo }}
-                  br
-              td
-                .dropdown
-                  button.btn-outline.btn-acao(@click="toggleDropdown(reclamacao.id)") Ações ▾
-                  ul.dropdown-menu(v-if="dropdownAberto === reclamacao.id")
-                    li(@click="abrirModalDetalhesReclamacao(reclamacao); fecharDropdown()") Detalhes
-                    li(@click="abrirModalAcaoReclamacao(reclamacao); fecharDropdown()") Adicionar Ação
-                    li(@click="abrirModalSolucaoReclamacao(reclamacao); fecharDropdown()") Solucionar
+  // Modal Cadastro Completo Morador
+  ModalNovoMorador(
+    v-if="modalNovoMoradorCompletoAberto"
+    v-model="formMoradorCompleto"
+    :tipos-usuario="tiposUsuario"
+    :roles-usuario="rolesUsuario"
+    @close="modalNovoMoradorCompletoAberto = false"
+    @salvar="onSalvar"
+  )
 
-        .paginacao(v-if="totalPaginasReclamacoes > 1")
-          button.btn-outline.pag-btn(
-            :disabled="paginaAtualReclamacoes === 1"
-            @click="paginaAtualReclamacoes--"
-          ) ‹
-          button.btn-outline.pag-btn(
-            v-for="num in totalPaginasReclamacoes"
-            :key="num"
-            :class="{ ativo: num === paginaAtualReclamacoes }"
-            @click="paginaAtualReclamacoes = num"
-          ) {{ num }}
-          button.btn-outline.pag-btn(
-            :disabled="paginaAtualReclamacoes === totalPaginasReclamacoes"
-            @click="paginaAtualReclamacoes++"
-          ) ›
-
-// Modal Confirmação Remoção
-ModalConfirmarRemover(
-  v-if="modalConfirmarRemoverAberto"
-  :morador="moradorParaRemover"
-  @close="modalConfirmarRemoverAberto = false"
-  @confirmar="removerMoradorConfirmado"
-)
-
-// Modal Cadastro Completo Morador
-ModalNovoMorador(
-  v-if="modalNovoMoradorCompletoAberto"
-  v-model="formMoradorCompleto"
-  :tipos-usuario="tiposUsuario"
-  :roles-usuario="rolesUsuario"
-  @close="modalNovoMoradorCompletoAberto = false"
-  @salvar="onSalvar"
-)
-
-
-// Modal Detalhes do Morador
-ModalDetalhesMorador(
-  v-if="modalDetalhesAberto"
-  :tipos-usuario="tiposUsuario"
-  :roles-usuario="rolesUsuario"
-  :morador="moradorSelecionado"
-  @close="modalDetalhesAberto = false"
-)
-
-ModalDetalhesReclamacao(
-  v-if="modalDetalhesReclamacaoAberto"
-  :reclamacao="reclamacaoSelecionada"
-  @close="modalDetalhesReclamacaoAberto = false"
-)
-
-ModalAcaoReclamacao(
-  v-if="modalAcaoReclamacaoAberto"
-  :reclamacao="reclamacaoSelecionada"
-  @close="fecharModalAcao"
-)
-
-ModalSolucaoReclamacao(
-  v-if="modalSolucaoReclamacaoAberto"
-  :reclamacao="reclamacaoSelecionada"
-  @close="fecharModalSolucao"
-)
-
+  // Modal Detalhes do Morador
+  ModalDetalhesMorador(
+    v-if="modalDetalhesAberto"
+    :tipos-usuario="tiposUsuario"
+    :roles-usuario="rolesUsuario"
+    :morador="moradorSelecionado"
+    @close="modalDetalhesAberto = false"
+  )
 </template>
 
 <script setup lang="ts">

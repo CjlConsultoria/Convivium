@@ -1,7 +1,10 @@
 package br.com.convivium.controller;
 
+import br.com.convivium.dto.UserMapper;
 import br.com.convivium.dto.request.*;
 import br.com.convivium.dto.response.AuthResponse;
+import br.com.convivium.dto.response.UserResponseAuthDTO;
+import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.dto.response.UsuarioDTO;
 import br.com.convivium.entity.User;
 import br.com.convivium.service.AuthenticationService;
@@ -87,22 +90,20 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "401", description = "Unauthorized, invalid token")
     })
     @GetMapping("/user")
-    public ResponseEntity<User> getUserDetails() {
+    public ResponseEntity<UserResponseAuthDTO> getUserDetails() {
         String cpf = getCurrentUsername();
 
         if (cpf == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = authenticationService.getUserDetails(cpf); // busca usuário pelo CPF
+        User user = authenticationService.getUserDetails(cpf);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserMapper.toDTO(user));
     }
-
-
 
     @PutMapping("/usuario/update/{id}")
     public ResponseEntity<?> updateUser(

@@ -5,7 +5,8 @@ import MeusDados from '../views/MeusDados.vue'
 import Inicio from '../views/Home.vue'
 import Denuncia from '../views/DenunciaForm.vue'
 import Licenca from '../views/LicenseManagement.vue'
-
+import AdminMoradores from '@/views/AdminMoradores.vue'
+import AdminReclamacoes from '@/views/AdminReclamacoes.vue'
 import { fetchUserData } from '@/services/authService'
 
 const router = createRouter({
@@ -27,6 +28,12 @@ const router = createRouter({
       component: Login,
     },
     {
+      path: '/empresa/admin/admin',
+      name: 'painel-admin',
+      component: () => import('@/views/PainelAdministracao.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/denuncia',
       name: 'denuncia',
       component: Denuncia,
@@ -37,6 +44,18 @@ const router = createRouter({
       name: 'licenca',
       component: Licenca,
       meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
+    },
+    {
+      path: '/moradores',
+      name: 'moradores',
+      component: AdminMoradores,
+      meta: { requiresAuth: true, allowedRoles: ['ADMINISTRATIVO', 'ADMIN'] }, // permitir ADMIN aqui também
+    },
+    {
+      path: '/reclamacoes',
+      name: 'reclamacoes',
+      component: AdminReclamacoes,
+      meta: { requiresAuth: true, allowedRoles: ['ADMINISTRATIVO', 'ADMIN'] }, // permitir ADMIN aqui também
     },
     {
       path: '/empresa/:codigo/admin',
@@ -67,7 +86,6 @@ const router = createRouter({
     },
   ],
 })
-
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.meta.requiresAuth
   const token = localStorage.getItem('authToken')
@@ -82,16 +100,16 @@ router.beforeEach(async (to, from, next) => {
     const userData = await fetchUserData()
 
     localStorage.setItem('userName', userData.username)
-    localStorage.setItem('userPerfil', userData.role.name)
-    localStorage.setItem('userId', userData.id)
+    localStorage.setItem('userPerfil', userData.role) // <-- role é string direta
+    localStorage.setItem('userId', userData.id.toString())
     localStorage.setItem('userEmpresa', JSON.stringify(userData.empresa || {}))
     window.dispatchEvent(new Event('storage'))
 
-    const perfil = userData.role.name
+    const perfil = userData.role // <-- usar direto
+
     const allowedRoles = (to.meta?.allowedRoles || []) as string[]
     const codigoEmpresa = userData.empresa?.codigoPublico
 
-    // Redirecionamento ao acessar login/home já autenticado
     if (['home', 'login'].includes(to.name?.toString() || '')) {
       if (!codigoEmpresa) {
         localStorage.clear()
@@ -105,19 +123,9 @@ router.beforeEach(async (to, from, next) => {
         })
       }
 
-      if (perfil === 'ADMIN') {
-        return next({ name: 'licenca' })
-      }
-
-      if (perfil === 'ADMINISTRATIVO') {
-        return next({ name: 'adminPorEmpresa', params: { codigo: codigoEmpresa } })
-      }
-
-      // USUARIO → denúncia
-      return next({ name: 'denuncia' })
+      return next({ name: 'painel-admin' })
     }
 
-    // Validação com base nos allowedRoles definidos na rota
     if (allowedRoles.length > 0 && !allowedRoles.includes(perfil)) {
       if (perfil === 'ADMIN') return next({ name: 'licenca' })
       if (perfil === 'ADMINISTRATIVO')

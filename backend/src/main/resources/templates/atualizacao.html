@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Nova Denúncia</title>
+    <title>Atualização na Reclamação</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -45,26 +45,29 @@
 </head>
 <body>
 <div class="container">
-    <h2>Nova Denúncia Recebida</h2>
+    <h2>Atualização na Reclamação (ID: <span th:text="${reclamacao.id}">123</span>)</h2>
 
-    <p>Uma nova denúncia foi registrada com os seguintes dados:</p>
+    <p>Uma ação foi registrada na reclamação do condomínio com os seguintes detalhes:</p>
 
     <ul>
-        <li><strong>ID:</strong> <span th:text="${ocorrencia.id}">123</span></li>
-        <li><strong>Descrição:</strong> <span th:text="${ocorrencia.descricaoOcorrencia}">Roubo de veículo</span></li>
-        <li><strong>Data e Hora:</strong> <span th:text="${ocorrencia.dataHora}">2024-01-01T12:00</span></li>
-        <li><strong>Status:</strong> <span th:text="${ocorrencia.statusDenuncia}">Aberto</span></li>
+        <li><strong>Status Atualizado:</strong> <span th:text="${acao.status}">Em andamento</span></li>
+        <li><strong>Descrição da Ação:</strong> <span th:text="${acao.descricao}">Descrição da ação realizada</span></li>
+        <li><strong>Data da Atualização:</strong> <span th:text="${acao.dataCriacao}">2025-07-16 14:00</span></li>
     </ul>
 
-    <p><strong>Denunciante:</strong>
-        <span th:text="${denunciante.username}">Carlos</span>
-        (<span th:text="${denunciante.email}">carlos@email.com</span>)
-    </p>
+    <p><strong>Atualizado por:</strong></p>
+    <ul>
+        <li><strong>Nome:</strong> <span th:text="${usuario.username}">João Silva</span></li>
+        <li><strong>CPF:</strong> <span th:text="${usuario.cpf}">123.456.789-00</span></li>
+        <li><strong>E-mail:</strong> <span th:text="${usuario.email}">joao@email.com</span></li>
+    </ul>
 
-    <p>Por favor, acesse o sistema para mais detalhes.</p>
+    <p><strong>Empresa/Condomínio:</strong> <span th:text="${empresaNome}">Condomínio Exemplo</span> (CNPJ: <span th:text="${empresaCnpj}">42</span>)</p>
+
+    <p>Por favor, acesse o sistema para mais informações.</p>
 
     <div class="footer">
-        <p>Este é um e-mail automático enviado por WatchCar. Não responda.</p>
+        <p>Este é um e-mail automático enviado pelo sistema Convivium. Não responda.</p>
     </div>
 </div>
 </body>

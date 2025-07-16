@@ -87,8 +87,6 @@ public class AuthenticationService {
         }
     }
 
-
-
     public void register(RegisterRequest registerRequest) {
         userRepository.findByCpf(registerRequest.getCpf()).ifPresent(user -> {
             if (Boolean.TRUE.equals(user.getAtivo())) {
@@ -98,18 +96,19 @@ public class AuthenticationService {
             user.setStatus("pendente_ativacao");
             updateUserFromRegisterRequest(user, registerRequest);
             userRepository.save(user);
-            if(registerRequest.getAlerta()) {
+            if (registerRequest.getAlerta()) {
                 Map<String, Object> templateVariables = new HashMap<>();
-                templateVariables.put("usuario", user); // Trocar "usuario" em vez de "denunciante"
+                templateVariables.put("usuario", user);
 
                 emailService.enviarEmailComTemplate(
                         user.getEmail(),
-                        TipoTemplateEmail.BEM_VINDO, // Enum para identificar esse novo template
+                        TipoTemplateEmail.BEM_VINDO,
                         templateVariables
                 );
             }
             throw new ApiException.BadRequestException("Usuário reativado com sucesso.");
         });
+
         User user = new User();
         user.setAtivo(true);
         updateUserFromRegisterRequest(user, registerRequest);
@@ -123,32 +122,40 @@ public class AuthenticationService {
         Tipo tipo = tipoRepository.findById(registerRequest.getTipoUsuario())
                 .orElseThrow(() -> new ApiException.NotFoundException("Cargo não encontrado com ID: " + registerRequest.getTipoUsuario()));
 
-
         user.setStatus("pendente_ativacao");
         user.setTipo(tipo);
         user.setEmpresa(empresa);
         user.setRole(role);
+
+        if (empresa.getUsuarioResponsavel() == null) {
+            userRepository.save(user); // salvar o usuário antes
+
+            empresa.setUsuarioResponsavel(user);
+            empresaRepository.save(empresa);
+        } else {
+            userRepository.save(user); // salvar normalmente se já tem responsável
+        }
+
+
         userRepository.save(user);
 
+        Map<String, Object> usuarioMap = new HashMap<>();
+        usuarioMap.put("username", user.getUsername());
+        usuarioMap.put("cpf", user.getCpf());
+        usuarioMap.put("email", user.getEmail());
 
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("usuario", usuarioMap);
+        templateVariables.put("empresaId", user.getEmpresa().getId().toString());
+        templateVariables.put("empresaNome", user.getEmpresa().getCodigoPublico());
 
-            Map<String, Object> usuarioMap = new HashMap<>();
-            usuarioMap.put("username", user.getUsername());
-            usuarioMap.put("cpf", user.getCpf());
-            usuarioMap.put("email", user.getEmail());
-
-            Map<String, Object> templateVariables = new HashMap<>();
-            templateVariables.put("usuario", usuarioMap);
-            templateVariables.put("empresaId", user.getEmpresa().getId().toString());
-            templateVariables.put("empresaNome", user.getEmpresa().getCodigoPublico());
-
-            emailService.enviarEmailComTemplate(
-                    user.getEmail(),
-                    TipoTemplateEmail.BEM_VINDO,
-                    templateVariables
-            );
-
+        emailService.enviarEmailComTemplate(
+                user.getEmail(),
+                TipoTemplateEmail.BEM_VINDO,
+                templateVariables
+        );
     }
+
 
     private void updateUserFromRegisterRequest(User user, RegisterRequest req) {
         user.setCpf(req.getCpf().replaceAll("\\D", ""));

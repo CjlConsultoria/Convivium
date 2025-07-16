@@ -64,6 +64,7 @@ body {
   display: flex; /* Flexbox para ajustar o layout */
   flex-direction: column; /* Alinha o conteúdo em coluna */
   justify-content: space-between; /* Distribui o conteúdo, empurrando o rodapé para o fim */
+  background-color: #f9f7e8;
 }
 
 #app {

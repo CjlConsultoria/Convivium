@@ -1,5 +1,6 @@
 package br.com.convivium.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -51,6 +52,7 @@ public class Empresa {
     private String codigoPublico;
 
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "ID_USUARIO_RESPONSAVEL", referencedColumnName = "ID")
     private User usuarioResponsavel;
 

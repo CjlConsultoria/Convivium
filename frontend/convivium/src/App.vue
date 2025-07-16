@@ -4,20 +4,27 @@ import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import { buscarPerfisDoUsuario, type Perfil } from '@/services/perfilService.ts'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import 'vue3-toastify/dist/index.css'
+
+const mostrarDropdown = ref(false)
+const menuAberto = ref(false)
 
 const router = useRouter()
 
+// Dados do usuário e empresa, carregados do localStorage
 const authToken = ref(localStorage.getItem('authToken'))
 const userName = ref(localStorage.getItem('userName') || 'Usuário')
 const perfilUsuario = ref(localStorage.getItem('userPerfil') || 'PUBLICO')
 const empresa = ref(JSON.parse(localStorage.getItem('userEmpresa') || '{}'))
-const userEmpresa = computed(() => empresa.value.name || '')
+
+const userEmpresa = computed(() => empresa.value.nome || '')
 const userEmpresacnpj = computed(() => empresa.value.cnpj || '')
 
 const perfisUsuario = ref<Perfil[]>([])
 
 const isLoggedIn = computed(() => authToken.value !== null)
 
+// Atualiza dados do usuário com localStorage
 function updateUserData() {
   authToken.value = localStorage.getItem('authToken')
   userName.value = localStorage.getItem('userName') || 'Usuário'
@@ -28,11 +35,45 @@ function updateUserData() {
 onMounted(() => {
   updateUserData()
   window.addEventListener('storage', updateUserData)
+  document.addEventListener('click', onClickOutside)
 })
 
 onUnmounted(() => {
   window.removeEventListener('storage', updateUserData)
+  document.removeEventListener('click', onClickOutside)
 })
+
+const dropdownRef = ref<HTMLElement | null>(null)
+const buttonRef = ref<HTMLElement | null>(null)
+
+function onClickOutside(event: MouseEvent) {
+  if (
+    dropdownRef.value &&
+    buttonRef.value &&
+    !dropdownRef.value.contains(event.target as Node) &&
+    !buttonRef.value.contains(event.target as Node)
+  ) {
+    mostrarDropdown.value = false
+  }
+}
+
+const toggleDropdown = (event: MouseEvent) => {
+  event.stopPropagation()
+  mostrarDropdown.value = !mostrarDropdown.value
+  console.log('toggleDropdown chamado', mostrarDropdown.value)
+}
+
+const fecharDropdown = () => {
+  mostrarDropdown.value = false
+}
+
+const toggleMenu = () => {
+  menuAberto.value = !menuAberto.value
+}
+
+const fecharMenu = () => {
+  menuAberto.value = false
+}
 
 const podeVerEmpresa = (empresaAlvo: string) => {
   if (perfilUsuario.value === 'ADMIN') return true
@@ -76,17 +117,11 @@ const handleLogout = () => {
   userName.value = 'Usuário'
   perfilUsuario.value = 'PUBLICO'
   empresa.value = {}
+  fecharDropdown()
+  fecharMenu()
   if (router.currentRoute.value.name !== 'login') {
     router.push({ name: 'login' })
   }
-}
-
-const menuAberto = ref(false)
-const toggleMenu = () => {
-  menuAberto.value = !menuAberto.value
-}
-const fecharMenu = () => {
-  menuAberto.value = false
 }
 </script>
 
@@ -98,16 +133,16 @@ div.layout
       img.logo(src="@/assets/logocjl.png", alt="CJL logo", width="60", height="60")
 
       // Botão de abrir/fechar menu (visível no mobile)
-      button.menu-toggle(@click="toggleMenu")
+      button.menu-toggle(@click="toggleMenu" aria-label="Alternar menu")
         i.fas(:class="menuAberto ? 'fa-times' : 'fa-bars'")
 
-      // Menu completo (condicional no mobile)
+      // Menu completo (visível no desktop e aberto no mobile)
       nav.nav-content(:class="{ aberto: menuAberto }")
         nav.nav-menu
           RouterLink.nav-link(to="/Inicio" @click="fecharMenu") Início
           RouterLink.nav-link(to="/denuncia" @click="fecharMenu") Reclamacao/Denuncia
 
-          // Administração - só para SÍNDICO e ADMIN
+          // Administração - só para ADMINISTRATIVO e ADMIN, e empresa válida
           RouterLink.nav-link(
             v-if="(perfilUsuario === 'ADMINISTRATIVO' || perfilUsuario === 'ADMIN') && empresa?.codigoPublico"
             :to="`/empresa/${empresa.codigoPublico}/admin`"
@@ -121,31 +156,56 @@ div.layout
             @click="fecharMenu"
           ) Gestão de Licenças
 
-
-
-
-
         nav.nav-buttons
           div(v-if="!isLoggedIn")
             RouterLink.nav-button(to="/login" @click="fecharMenu") Login
-        div(v-if="isLoggedIn" class="nav-user-wrapper")
-          div.nav-user-info
-            span.nav-user-name {{ userName }}
-            div.nav-user-role {{ userEmpresa }}
-            div.nav-user-role {{ userEmpresacnpj }}
-            RouterLink.nav-button.small-button.ml(:to="`/empresa/${empresa.codigoPublico}/meus-dados`" @click="fecharMenu") Meus Dados
-          button.nav-button.primary(@click="() => { handleLogout(); fecharMenu() }") Sair
+          div(v-if="isLoggedIn" class="nav-user-wrapper")
+            button.nav-button.dropdown-toggle(
+              @click="toggleDropdown"
+              tabindex="0"
+              aria-haspopup="true"
+              :aria-expanded="mostrarDropdown.toString()"
+              type="button"
+              title="Menu usuário"
+              ref="buttonRef"
+            )
+              i.fas.fa-user-circle.icone-usuario
+              |  {{ userName }}
 
+            div.dropdown-menu(v-show="mostrarDropdown" ref="dropdownRef" tabindex="-1")
+              .dropdown-header
+                i.fas.fa-building
+                span Empresa
+              p.dropdown-info
+                strong Nome:&nbsp;
+                span {{ userEmpresa }}
+
+              p.dropdown-info
+                strong CNPJ:&nbsp;
+                span {{ userEmpresacnpj }}
+
+              hr.dropdown-divider
+
+              RouterLink.nav-button.small-button(
+                :to="`/empresa/${empresa.codigoPublico}/meus-dados`"
+                @click="() => { fecharDropdown(); fecharMenu() }"
+              )
+                i.fas.fa-user-cog
+                span Meus Dados
+
+              button.nav-button.primary(type="button" @click="handleLogout")
+                i.fas.fa-sign-out-alt
+                span Sair
 
 
   main.main-content
     RouterView
-    LoadingOverlay  <!-- Componente de Loader aqui -->
-    ToastContainer  <!-- Adicionado ToastContainer -->
+    LoadingOverlay
 
   footer.footer
     p © 2025 - Todos os direitos reservados
 </template>
+
 <style scoped>
 html,
 body {
@@ -162,7 +222,7 @@ body {
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* NAVBAR COMPACTA E BRANCA */
+/* NAVBAR */
 .navbar {
   background-color: #000000;
   padding: 0.2rem 1rem;
@@ -191,6 +251,7 @@ body {
   flex: 1;
   justify-content: center;
   gap: 2rem;
+  position: relative;
 }
 
 .nav-menu {
@@ -222,6 +283,7 @@ body {
   display: flex;
   gap: 1rem;
   margin-left: auto;
+  align-items: center;
 }
 
 .nav-button {
@@ -234,6 +296,7 @@ body {
   transition:
     background-color 0.2s,
     color 0.2s;
+  cursor: pointer;
 }
 
 .nav-button:hover {
@@ -248,50 +311,127 @@ body {
 }
 
 .nav-button.primary:hover {
-  background-color: #886f0d;
+  background-color: #a2850f;
 }
 
+/* Seção do usuário no navbar */
 .nav-user-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1rem;
+  min-width: 200px;
 }
 
-.nav-user-info {
+.nav-button.dropdown-toggle {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  color: #ffffff;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
 }
 
-.nav-user-name {
+.nav-button.dropdown-toggle i {
+  font-size: 1.3rem;
+}
+
+.nav-button.dropdown-toggle:focus {
+  outline: 2px solid #886f0d;
+  outline-offset: 2px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1c1c1c;
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+  padding: 1rem;
+  min-width: 260px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+  color: #f5f5f5;
+  margin-top: 6px;
+  font-size: 0.95rem;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: bold;
-  color: #ffffff;
+  font-size: 1rem;
+  color: #f0e68c;
+  margin-bottom: 0.75rem;
 }
 
-.nav-user-role {
-  font-size: 0.75rem;
-  color: #886f0d;
-  margin-top: 0.2rem;
-  text-align: center;
-}
-
-.main-content {
-  flex: 1;
-  padding-left: 0px;
-  padding-right: 0px;
-  padding-top: 0px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.footer {
-  background-color: #000000;
-  padding: 1.5rem 2rem;
-  text-align: center;
+.dropdown-info {
+  margin: 0.2rem 0;
   font-size: 0.9rem;
-  color: #555;
+  line-height: 1.4;
+}
+
+.dropdown-info strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.dropdown-divider {
+  border: none;
+  height: 1px;
+  background-color: #444;
+  margin: 0.8rem 0;
+}
+
+.dropdown-menu .nav-button {
   width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.dropdown-menu .nav-button i {
+  font-size: 1rem;
+}
+
+.dropdown-menu .nav-button.primary {
+  background-color: #d4af37;
+  color: #000;
+  border-color: #d4af37;
+}
+
+.dropdown-menu .nav-button.primary:hover {
+  background-color: #e5c94f;
+}
+
+.info-empresa {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #d4af37;
+}
+
+.info-empresa strong {
+  color: #fff;
+}
+
+.dropdown-menu .nav-button {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu .nav-button.primary {
+  margin-top: 0.75rem;
 }
 
 /* MOBILE */
@@ -337,16 +477,7 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
-  }
-
-  .main-content {
-    padding: 1rem;
-  }
-
-  .footer {
-    font-size: 0.8rem;
-    padding: 1rem;
-    text-align: center;
+    max-width: 100%;
   }
 }
 
@@ -365,38 +496,28 @@ body {
   }
 }
 
-.alerta-sistema {
-  background-color: #ffe5e5;
-  color: #a94442;
-  padding: 0.5rem 1rem;
+.main-content {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding-left: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+
+  padding-right: 0px;
+}
+
+footer.footer {
+  background-color: black;
+  color: white;
   text-align: center;
-  font-size: 0.85rem;
-  border-bottom: 1px solid #e0b4b4;
+  height: 50px;
+  line-height: 50px;
+  width: 100%;
 }
-
-.nav-button.ml {
-  margin-left: 0.5rem;
-}
-
-.small-button {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1.2;
-  border: 1px solid #886f0d;
-  color: #886f0d;
-  background-color: white;
-  border-radius: 4px;
-  text-align: center;
-  margin-top: 4%;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.small-button:hover {
-  background-color: #886f0d;
-  color: #000;
+.icone-usuario {
+  color: #d4af37;
+  font-size: 1.4rem;
 }
 </style>

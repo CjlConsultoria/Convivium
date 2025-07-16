@@ -1,162 +1,175 @@
 <template lang="pug">
-section.licenca-container
-  h2.text-xl.font-bold.mb-6 Gestão de Licenças
+section.app-container
+  MenuLateral(:itemSelecionado="itemSelecionado" @selecao="onMenuSelecionado")
+  section.licenca-container
+    h2.text-xl.font-bold.mb-6 Gestão de Licenças
 
-  // Empresas
-  .card.mb-8
-    h3.text-lg.font-semibold.mb-4 Empresas
-    .flex.mb-4
-      .div.input-container
-        i.fa.fa-search
-        input.input-pesquisa(
-          type="text"
-          placeholder="Buscar por nome ou CNPJ"
-          v-model="buscaEmpresa"
-          @input="carregarEmpresas(0)"
-        )
+    // Empresas
+    .card.mb-8
+      h3.text-lg.font-semibold.mb-4 Empresas
+      .flex.items-center.mb-4
+        .input-container.flex.items-center.flex-grow
+          i.fa.fa-search.mr-2
+          input.input-pesquisa(
+            type="text"
+            placeholder="Buscar por nome ou CNPJ"
+            v-model="buscaEmpresa"
+            @input="carregarEmpresas(0)"
+          )
+        button.btn.btn-yellow.ml-4(@click="abrirModalEmpresa()")
+          i.fa.fa-plus.mr-2
+          | Adicionar Empresa
 
-    button.btn.btn-yellow.mb-4(@click="abrirModalEmpresa()")
-      i.fa.fa-plus.mr-2
-      | Adicionar Empresa
-    table.table
-      thead
-        tr
-          th Nome
-          th CNPJ
-          th AçõesEmpresa 
-      tbody
-        tr(v-if="!empresas?.content || empresas.content.length === 0")
-          td(colspan="3") Nenhuma empresa cadastrada.
-        tr(v-for="empresa in empresas.content" :key="empresa.id")
-          td {{ empresa.name }}
-          td {{ empresa.cnpj }}
-          td
-            button.btn.btn-yellow.btn-sm(@click="abrirModalEmpresa(empresa)")
-              i.fa.fa-pencil-alt.mr-1
-              | Editar
-            button.btn.btn-danger.btn-sm(@click="confirmarExclusao('empresa', empresa)")
-              i.fa.fa-trash.mr-1
-              | Excluir
+      table.table
+        thead
+          tr
+            th Nome
+            th CNPJ
+            th Ações
+        tbody
+          tr(v-if="!empresas?.content || empresas.content.length === 0")
+            td(colspan="3") Nenhuma empresa cadastrada.
+          tr(v-for="empresa in empresas.content" :key="empresa.id")
+            td {{ empresa.name }}
+            td {{ empresa.cnpj }}
+            td
+              button.btn.btn-yellow.btn-sm(@click="abrirModalEmpresa(empresa)")
+                i.fa.fa-pencil-alt.mr-1
+                | Editar
+              button.btn.btn-danger.btn-sm(@click="confirmarExclusao('empresa', empresa)")
+                i.fa.fa-trash.mr-1
+                | Excluir
 
-    .pagination
-      button.btn.btn-sm(@click="carregarEmpresas(0)" :disabled="empresas?.first") « Primeira
-      button.btn.btn-sm(@click="carregarEmpresas(empresas.number - 1)" :disabled="empresas?.first") ‹
-      span Página {{ empresas.number + 1 }} de {{ empresas.totalPages }}
-      button.btn.btn-sm(@click="carregarEmpresas(empresas.number + 1)" :disabled="empresas?.last") ›
-      button.btn.btn-sm(@click="carregarEmpresas(empresas.totalPages - 1)" :disabled="empresas?.last") Última »
+      .pagination
+        button.btn.btn-sm(@click="carregarEmpresas(0)" :disabled="empresas?.first") « Primeira
+        button.btn.btn-sm(@click="carregarEmpresas(empresas.number - 1)" :disabled="empresas?.first") ‹
+        span Página {{ empresas.number + 1 }} de {{ empresas.totalPages }}
+        button.btn.btn-sm(@click="carregarEmpresas(empresas.number + 1)" :disabled="empresas?.last") ›
+        button.btn.btn-sm(@click="carregarEmpresas(empresas.totalPages - 1)" :disabled="empresas?.last") Última »
 
-  // Usuários
-  .card.mb-8
-    h3.text-lg.font-semibold.mb-4 Usuários
-    .flex.mb-4
-      .div.input-container
-        i.fa.fa-search
-        input.input-pesquisa(type="text" placeholder="Buscar por nome ou CPF" v-model="buscaUsuario" @input="carregarUsuariosCompletos(0)")
+    // Usuários
+    .card.mb-8
+      h3.text-lg.font-semibold.mb-4 Usuários
+      .flex.items-center.mb-4
+        .input-container.flex.items-center.flex-grow
+          i.fa.fa-search.mr-2
+          input.input-pesquisa(
+            type="text"
+            placeholder="Buscar por nome ou CPF"
+            v-model="buscaUsuario"
+            @input="carregarUsuariosCompletos(0)"
+          )
+        button.btn.btn-yellow.ml-4(@click="abrirModalUsuario()")
+          i.fa.fa-plus.mr-2
+          | Adicionar Usuário
 
-    button.btn.btn-yellow.mb-4(@click="abrirModalUsuario()")
-      i.fa.fa-plus.mr-2
-      | Adicionar Usuário
-    table.table
-      thead
-        tr
-          th Nome
-          th Email
-          th Empresa
-          th Ações
-      tbody
-        tr(v-if="usuariosCompletos?.content?.length === 0")
-          td(colspan="4") Nenhum usuário cadastrado.
-        tr(v-for="usuario in usuariosCompletos.content" :key="usuario.id")
-          td {{ usuario.username }}
-          td {{ usuario.email }}
-          td {{ usuario.empresa }}
-          td
-            button.btn.btn-yellow.btn-sm(@click="abrirModalUsuario(usuario)")
-              i.fa.fa-pencil-alt.mr-1
-              | Editar
-            button.btn.btn-danger.btn-sm(@click="confirmarExclusao('usuario', usuario)")
-              i.fa.fa-trash.mr-1
-              | Excluir
+      table.table
+        thead
+          tr
+            th Nome
+            th Email
+            th Empresa
+            th Ações
+        tbody
+          tr(v-if="usuariosCompletos?.content?.length === 0")
+            td(colspan="4") Nenhum usuário cadastrado.
+          tr(v-for="usuario in usuariosCompletos.content" :key="usuario.id")
+            td {{ usuario.username }}
+            td {{ usuario.email }}
+            td {{ usuario.empresa }}
+            td
+              button.btn.btn-yellow.btn-sm(@click="abrirModalUsuario(usuario)")
+                i.fa.fa-pencil-alt.mr-1
+                | Editar
+              button.btn.btn-danger.btn-sm(@click="confirmarExclusao('usuario', usuario)")
+                i.fa.fa-trash.mr-1
+                | Excluir
 
-    .pagination
-      button.btn.btn-sm(@click="carregarUsuariosCompletos(0)" :disabled="usuarios?.first") « Primeira
-      button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.number - 1)" :disabled="usuarios?.first") ‹
-      span Página {{ usuarios.number + 1 }} de {{ usuarios.totalPages }}
-      button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.number + 1)" :disabled="usuarios?.last") ›
-      button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.totalPages - 1)" :disabled="usuarios?.last") Última »
+      .pagination
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(0)" :disabled="usuarios?.first") « Primeira
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.number - 1)" :disabled="usuarios?.first") ‹
+        span Página {{ usuarios.number + 1 }} de {{ usuarios.totalPages }}
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.number + 1)" :disabled="usuarios?.last") ›
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.totalPages - 1)" :disabled="usuarios?.last") Última »
 
-  // Licenças
-  .card
-    h3.text-lg.font-semibold.mb-4 Licenças
-    .flex.mb-4
-      .div.input-container
-        i.fa.fa-search
-        input.input-pesquisa(type="text" placeholder="Buscar por nome da Empresa" v-model="buscalicenca" @input="carregarLicencas(0)")
-    button.btn.btn-yellow.mb-4(@click="abrirModalLicenca()")
-      i.fa.fa-plus.mr-2
-      | Adicionar Licença
-    table.table
-      thead
-        tr
-          th Empresa
-          th Tipo
-          th Data Início
-          th Data Fim
-          th Ações
-      tbody
-        tr(v-if="licencas?.content?.length === 0")
-          td(colspan="5") Nenhuma licença cadastrada.
-        tr(v-for="licenca in licencas.content" :key="licenca.id")
-          td {{ licenca.empresaNome }} ({{ formatarCnpj(licenca.empresaCnpj) }})
-          td {{ formatarTipo(licenca.tipo) }}
-          td {{ formatarData(licenca.dataInicio) }}
-          td {{ formatarData(licenca.dataFim) }}
-          td
-            button.btn.btn-yellow.btn-sm(@click="abrirModalLicenca(licenca)")
-              i.fa.fa-pencil-alt.mr-1
-              | Editar
-            button.btn.btn-danger.btn-sm(@click="confirmarExclusao('licenca', licenca)")
-              i.fa.fa-trash.mr-1
-              | Excluir
+    // Licenças
+    .card
+      h3.text-lg.font-semibold.mb-4 Licenças
+      .flex.items-center.mb-4
+        .input-container.flex.items-center.flex-grow
+          i.fa.fa-search.mr-2
+          input.input-pesquisa(
+            type="text"
+            placeholder="Buscar por nome da Empresa"
+            v-model="buscalicenca"
+            @input="carregarLicencas(0)"
+          )
+        button.btn.btn-yellow.ml-4(@click="abrirModalLicenca()")
+          i.fa.fa-plus.mr-2
+          | Adicionar Licença
 
-    .pagination
-      button.btn.btn-sm(@click="carregarLicencas(0)" :disabled="licencas?.first") « Primeira
-      button.btn.btn-sm(@click="carregarLicencas(licencas.number - 1)" :disabled="licencas?.first") ‹
-      span Página {{ licencas.number + 1 }} de {{ licencas.totalPages }}
-      button.btn.btn-sm(@click="carregarLicencas(licencas.number + 1)" :disabled="licencas?.last") ›
-      button.btn.btn-sm(@click="carregarLicencas(licencas.totalPages - 1)" :disabled="licencas?.last") Última »
+      table.table
+        thead
+          tr
+            th Empresa
+            th Tipo
+            th Data Início
+            th Data Fim
+            th Ações
+        tbody
+          tr(v-if="licencas?.content?.length === 0")
+            td(colspan="5") Nenhuma licença cadastrada.
+          tr(v-for="licenca in licencas.content" :key="licenca.id")
+            td {{ licenca.empresaNome }} ({{ formatarCnpj(licenca.empresaCnpj) }})
+            td {{ formatarTipo(licenca.tipo) }}
+            td {{ formatarData(licenca.dataInicio) }}
+            td {{ formatarData(licenca.dataFim) }}
+            td
+              button.btn.btn-yellow.btn-sm(@click="abrirModalLicenca(licenca)")
+                i.fa.fa-pencil-alt.mr-1
+                | Editar
+              button.btn.btn-danger.btn-sm(@click="confirmarExclusao('licenca', licenca)")
+                i.fa.fa-trash.mr-1
+                | Excluir
 
-  // Modais (sem alterações, mantidos íntegros)
-  ModalEmpresa(
-    v-if="modalEmpresaAberto"
-    :empresa="empresaSelecionada"
-    @close="fecharModalEmpresa"
-  )
+      .pagination
+        button.btn.btn-sm(@click="carregarLicencas(0)" :disabled="licencas?.first") « Primeira
+        button.btn.btn-sm(@click="carregarLicencas(licencas.number - 1)" :disabled="licencas?.first") ‹
+        span Página {{ licencas.number + 1 }} de {{ licencas.totalPages }}
+        button.btn.btn-sm(@click="carregarLicencas(licencas.number + 1)" :disabled="licencas?.last") ›
+        button.btn.btn-sm(@click="carregarLicencas(licencas.totalPages - 1)" :disabled="licencas?.last") Última »
 
-  ModalLicenca(
-    v-if="modalLicencaAberto"
-    :licenca="licencaSelecionada"
-    :usuarios="usuarios?.content || []"
-    :getEmpresaNome="getEmpresaNome"
-    @close="fecharModalLicenca"
-    @salvo="() => carregarLicencas(licencas.number)"
-  )
+    // Modais (sem alterações, mantidos íntegros)
+    ModalEmpresa(
+      v-if="modalEmpresaAberto"
+      :empresa="empresaSelecionada"
+      @close="fecharModalEmpresa"
+    )
 
-  ModalConfirmacao(
-    v-if="modalConfirmacaoAberto"
-    :item="itemParaExcluir"
-    :tipo="tipoParaExcluir"
-    @close="fecharModalConfirmacao"
-    @confirmar="excluirItem"
-  )
+    ModalLicenca(
+      v-if="modalLicencaAberto"
+      :licenca="licencaSelecionada"
+      :usuarios="usuarios?.content || []"
+      :getEmpresaNome="getEmpresaNome"
+      @close="fecharModalLicenca"
+      @salvo="() => carregarLicencas(licencas.number)"
+    )
 
-  ModalUsuario(
-    v-if="modalUsuarioAberto"
-    :usuario="usuarioSelecionado"
-    :empresas="empresas?.content || []"
-    @close="fecharModalUsuario"
-    @salvo="() => carregarUsuariosCompletos(usuarios.number)"
-  )
+    ModalConfirmacao(
+      v-if="modalConfirmacaoAberto"
+      :item="itemParaExcluir"
+      :tipo="tipoParaExcluir"
+      @close="fecharModalConfirmacao"
+      @confirmar="excluirItem"
+    )
+
+    ModalUsuario(
+      v-if="modalUsuarioAberto"
+      :usuario="usuarioSelecionado"
+      :empresas="empresas?.content || []"
+      @close="fecharModalUsuario"
+      @salvo="() => carregarUsuariosCompletos(usuarios.number)"
+    )
 </template>
 
 <script setup lang="ts">
@@ -171,11 +184,13 @@ import ModalConfirmacao from '@/views/components/ModalConfirmacao.vue'
 import { fetchEmpresas, excluirEmpresaService } from '@/services/empresaService'
 import { toast } from 'vue3-toastify'
 import { useLoadingStore } from '@/stores/loadingStore'
+import MenuLateral from '@/components/Layout/MenuLateral.vue'
 
 const store = useLoadingStore()
 const buscaEmpresa = ref('')
 const buscaUsuario = ref('')
 const buscalicenca = ref('')
+const itemSelecionado = ref('licencas') // ou o item padrão que quiser marcar ativo
 
 interface UsuarioCompleto {
   id: number
@@ -463,12 +478,13 @@ onMounted(() => {
 </script>
 <style scoped>
 .licenca-container {
-  max-width: 1100px;
-  margin: 2.5rem auto;
-  padding: 1.5rem 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9fafb;
-  border-radius: 10px;
+  flex-grow: 1;
+  padding: 2rem;
+  padding-bottom: 150px; /* reserva espaço para o footer */
+  box-sizing: border-box;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 h2.text-xl.font-bold.mb-6 {
@@ -480,13 +496,18 @@ h2.text-xl.font-bold.mb-6 {
 }
 
 .card {
-  background: #fff;
+  background-color: #ede9db; /* tom creme mais neutro e ameno */
   padding: 2rem 2.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e6dfb8; /* borda clara, tom pastel */
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
-  margin-bottom: 3.5rem; /* maior espaçamento entre cards */
-  align-items: center; /* centraliza o conteúdo do card */
+  box-shadow: 0 4px 12px rgba(214, 185, 78, 0.15); /* sombra leve amarelada */
+  margin-bottom: 3.5rem;
+  color: #374151; /* cinza escuro para o texto */
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(214, 185, 78, 0.3);
 }
 
 button.btn {
@@ -537,7 +558,22 @@ button.btn.btn-danger:hover:not(:disabled) {
   box-shadow: 0 4px 14px rgba(185, 28, 28, 0.6);
 }
 
-/* ... seu CSS anterior continua igual ... */
+.submenu-container {
+  position: relative;
+}
+
+.submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background-color: #f9f7e8;
+  z-index: 9999;
+  border: 1px solid #d9c877;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  min-width: 180px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
 button.btn.btn-yellow {
   background-color: #d6b94e;
@@ -578,7 +614,8 @@ table.table {
   border-collapse: separate;
   border-spacing: 0 8px;
   font-size: 0.95rem;
-  color: #374151;
+  color: #374151; /* texto cinza escuro */
+  background-color: transparent;
 }
 
 table.table th,
@@ -586,15 +623,32 @@ table.table td {
   padding: 0.8rem 1rem;
   text-align: left;
   vertical-align: middle;
-  background-color: #f3f4f6;
-  border: none;
+  background-color: #f4f1e7; /* fundo creme mais claro que o card */
+  border: 1px solid #e6dfb8; /* borda leve no mesmo tom da borda do card */
   border-radius: 8px;
+  transition: background-color 0.3s ease;
 }
 
 table.table th {
-  background-color: #e5e7eb;
+  background-color: #e9e5d8; /* tom creme claro para header */
   font-weight: 700;
-  color: #111827;
+  color: #5a5500; /* amarelo escuro para combinar com o tom dourado */
+}
+
+table.table tr:hover td {
+  background-color: #f0ecd9; /* fundo hover suave amarelo claro */
+}
+
+table.table th:first-child,
+table.table td:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+table.table th:last-child,
+table.table td:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .pagination {
@@ -602,6 +656,7 @@ table.table th {
   justify-content: center;
   gap: 0.4rem;
   margin-top: 1.5rem;
+  margin-bottom: 3rem;
   font-size: 0.9rem;
   font-weight: 600;
   color: #374151;
@@ -675,5 +730,34 @@ table.table th {
   border-color: #d6b94e;
   box-shadow: 0 0 6px #d6b94eaa;
   outline: none;
+}
+
+.app-container {
+  min-height: 100vh; /* garante altura mínima, mas permite crescer */
+  display: flex;
+  flex-direction: row;
+}
+
+.menu-lateral {
+  height: 100vh;
+  background-color: #f9f7e8;
+  border-right: 2px solid #d9c877;
+  padding: 1.5rem 1rem;
+  min-width: 180px;
+  max-width: 240px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  /* Remova ou comente esta linha ↓ */
+  /* overflow-y: auto; */
+  overflow: visible; /* permite que o submenu "escape" da lateral */
+}
+
+.licenca-container,
+.app-container {
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
 }
 </style>

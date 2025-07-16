@@ -1,5 +1,6 @@
 package br.com.convivium.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -90,6 +91,7 @@ public class User {
     private Role role;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonBackReference
     @JoinColumn(name = "EMPRESA", referencedColumnName = "ID")
     private Empresa empresa;
 

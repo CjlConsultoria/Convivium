@@ -118,8 +118,8 @@ const handleLogin = async () => {
       // Armazenamento
       localStorage.setItem('userName', userData.username)
       localStorage.setItem('user', JSON.stringify(userData))
-      localStorage.setItem('userPerfil', userData.role.name)
-      localStorage.setItem('userId', userData.id)
+      localStorage.setItem('userPerfil', userData.role) // ✅ ajustado (não usa .name)
+      localStorage.setItem('userId', userData.id.toString())
       localStorage.setItem('userEmpresa', JSON.stringify(userData.empresa || {}))
       window.dispatchEvent(new Event('storage'))
 
@@ -152,7 +152,7 @@ const handleLogin = async () => {
       const message = err.response.data?.message || 'Erro ao realizar login.'
 
       if (status === 401) {
-        toast.error(message) // Ex: CPF ou senha inválidos.
+        toast.error(message)
       } else {
         toast.error(`Erro ${status}: ${message}`)
       }

@@ -1,4 +1,6 @@
 <template lang="pug">
+.layout-admin
+  MenuLateral(:itemSelecionado="''")
   .meus-dados
     h2.titulo Meus Dados
 
@@ -56,7 +58,7 @@
         .linha
           .campo
             label Nome da Empresa
-            input(type="text" v-model="user.empresa.name" readonly)
+            input(type="text" v-model="user.empresa.nome" readonly)
           .campo
             label CNPJ
             input(type="text" v-model="user.empresa.cnpj" readonly)
@@ -69,10 +71,10 @@
         .linha
           .campo
             label Perfil
-            input(type="text" v-model="user.role.name" readonly)
+            input(type="text" v-model="user.role" readonly)
           .campo
             label Tipo
-            input(type="text" v-model="user.tipo.name" readonly)
+            input(type="text" v-model="user.tipo" readonly)
           .campo
             label Status
             input(type="text" v-model="user.status" readonly)
@@ -101,6 +103,7 @@
 import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import { updateUserData } from '@/services/authService'
+import MenuLateral from '@/components/Layout/MenuLateral.vue'
 
 // Carregar usuário do localStorage
 const storedUser = localStorage.getItem('user')
@@ -122,8 +125,8 @@ const salvarDados = async () => {
       user.value.bairro,
       user.value.cidade,
       user.value.estado,
-      user.value.role.id,
-      user.value.tipo.id,
+      user.value.role, // string
+      user.value.tipo, // string
       user.value.status,
       user.value.genero,
       user.value.bloco,
@@ -244,5 +247,10 @@ button:hover {
   .campo {
     flex: 1 1 100%;
   }
+}
+
+.layout-admin {
+  display: flex;
+  min-height: 100vh;
 }
 </style>

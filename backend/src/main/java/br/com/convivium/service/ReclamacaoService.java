@@ -9,6 +9,7 @@ import br.com.convivium.dto.response.ReclamacaoDTO;
 import br.com.convivium.dto.response.UsuarioDTO;
 import br.com.convivium.entity.*;
 import br.com.convivium.entity.enums.StatusReclamacao;
+import br.com.convivium.entity.enums.TipoTemplateEmail;
 import br.com.convivium.entity.specification.ReclamacaoSpecification;
 import br.com.convivium.repository.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -43,18 +48,21 @@ public class ReclamacaoService {
     private final EmpresaRepository empresaRepository;
     private final AnexoRepository anexoRepository;
     private final AcaoReclamacaoRepository acaoReclamacaoRepository;
+    private final EmailService emailService;
 
     public ReclamacaoService(ReclamacaoRepository reclamacaoRepository,
                              UserRepository userRepository,
                              EmpresaRepository empresaRepository,
-                             AnexoRepository anexoRepository, AcaoReclamacaoRepository acaoReclamacaoRepository) {
+                             AnexoRepository anexoRepository, AcaoReclamacaoRepository acaoReclamacaoRepository, EmailService emailService) {
         this.reclamacaoRepository = reclamacaoRepository;
         this.userRepository = userRepository;
         this.empresaRepository = empresaRepository;
         this.anexoRepository = anexoRepository;
         this.acaoReclamacaoRepository = acaoReclamacaoRepository;
+        this.emailService = emailService;
     }
 
+    @Transactional
     public Reclamacao criarReclamacao(String tipo, String detalhes, Long usuarioId, Long empresaId, MultipartFile[] arquivos) throws IOException {
         User usuario = userRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -86,6 +94,37 @@ public class ReclamacaoService {
                 anexoRepository.save(anexo);
                 reclamacao.getAnexos().add(anexo);
             }
+        }
+
+        // --- Enviar email de notificação ao síndico ---
+        Map<String, Object> usuarioMap = new HashMap<>();
+        usuarioMap.put("nome", usuario.getUsername());
+        usuarioMap.put("email", usuario.getEmail());
+
+        Map<String, Object> reclamacaoMap = new HashMap<>();
+        reclamacaoMap.put("id", reclamacao.getId());
+        reclamacaoMap.put("tipo", reclamacao.getTipo());
+        reclamacaoMap.put("detalhes", reclamacao.getDetalhes());
+        reclamacaoMap.put("status", reclamacao.getStatus().name());
+        reclamacaoMap.put("dataHora", reclamacao.getDataCriacao()); // se tiver createdAt ou data de criação
+
+        Map<String, Object> empresaMap = new HashMap<>();
+        empresaMap.put("nome", empresa.getName());
+        empresaMap.put("codigoPublico", empresa.getCodigoPublico());
+
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("usuario", usuarioMap);
+        templateVariables.put("reclamacao", reclamacaoMap);
+        templateVariables.put("empresa", empresaMap);
+
+        String emailSindico = empresa.getUsuarioResponsavel().getEmail();
+
+        if (emailSindico != null && !emailSindico.isEmpty()) {
+            emailService.enviarEmailComTemplate(
+                    emailSindico,
+                    TipoTemplateEmail.NOVA_DENUNCIA,
+                    templateVariables
+            );
         }
 
         return reclamacaoRepository.save(reclamacao);
@@ -149,6 +188,29 @@ public class ReclamacaoService {
         if(dto.getTipo().equals(StatusReclamacao.SOLUCIONADA)){
             reclamacao.setDescricaoSolucao(dto.getDescricao());
         }
+        Map<String, Object> usuarioMap = new HashMap<>();
+        usuarioMap.put("username", reclamacao.getUsuario().getUsername());
+        usuarioMap.put("cpf", reclamacao.getUsuario().getCpf());
+        usuarioMap.put("email", reclamacao.getUsuario().getEmail());
+
+        Map<String, Object> acaoMap = new HashMap<>();
+        acaoMap.put("status", dto.getTipo().name());
+        acaoMap.put("descricao", dto.getDescricao());
+        acaoMap.put("dataCriacao", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("usuario", usuarioMap);
+        templateVariables.put("acao", acaoMap);
+        templateVariables.put("reclamacao", reclamacao);
+        templateVariables.put("empresaNome", reclamacao.getUsuario().getEmpresa().getName());
+        templateVariables.put("empresaCnpj", reclamacao.getUsuario().getEmpresa().getCnpj());
+
+        emailService.enviarEmailComTemplate(
+                reclamacao.getUsuario().getEmail(),
+                TipoTemplateEmail.ATUALIZACAO,
+                templateVariables
+        );
+
         return acaoReclamacaoRepository.save(acao);
     }
 
@@ -165,6 +227,29 @@ public class ReclamacaoService {
         acao.setDescricao(dto.getDescricao());
         acao.setReclamacao(reclamacao);
         acaoReclamacaoRepository.save(acao);
+
+        Map<String, Object> usuarioMap = new HashMap<>();
+        usuarioMap.put("username", reclamacao.getUsuario().getUsername());
+        usuarioMap.put("cpf", reclamacao.getUsuario().getCpf());
+        usuarioMap.put("email", reclamacao.getUsuario().getEmail());
+
+        Map<String, Object> acaoMap = new HashMap<>();
+        acaoMap.put("status", StatusReclamacao.SOLUCIONADA);
+        acaoMap.put("descricao", dto.getDescricao());
+        acaoMap.put("dataCriacao", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("usuario", usuarioMap);
+        templateVariables.put("acao", acaoMap);
+        templateVariables.put("reclamacao", reclamacao);
+        templateVariables.put("empresaNome", reclamacao.getUsuario().getEmpresa().getName());
+        templateVariables.put("empresaCnpj", reclamacao.getUsuario().getEmpresa().getCnpj());
+
+        emailService.enviarEmailComTemplate(
+                reclamacao.getUsuario().getEmail(),
+                TipoTemplateEmail.ATUALIZACAO,
+                templateVariables
+        );
         return reclamacaoRepository.save(reclamacao);
     }
 
