@@ -116,7 +116,8 @@ router.beforeEach(async (to, from, next) => {
     const allowedRoles = (to.meta?.allowedRoles || []) as string[]
     const codigoEmpresa = userData.empresa?.codigoPublico
 
-    if (['home', 'login'].includes(to.name?.toString() || '')) {
+    const redirecionamentoInicial = ['home', 'login', 'inicio']
+    if (redirecionamentoInicial.includes(to.name?.toString() || '')) {
       if (!codigoEmpresa) {
         localStorage.clear()
         return next({ name: 'login' })
@@ -129,7 +130,11 @@ router.beforeEach(async (to, from, next) => {
         })
       }
 
-      return next({ name: 'painel-admin' })
+      if (['ADMIN', 'ADMINISTRATIVO'].includes(perfil)) {
+        return next({ name: 'painel-admin' })
+      }
+
+      return next({ name: 'denuncia' })
     }
 
     if (allowedRoles.length > 0 && !allowedRoles.includes(perfil)) {

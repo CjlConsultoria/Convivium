@@ -138,9 +138,7 @@ const handleLogin = async () => {
       }
 
       // Usuário ATIVO: redireciona para admin
-      await router.push({
-        path: `/empresa/${empresaCodigo}/admin`,
-      })
+      await router.push({ name: 'inicio' })
 
       window.location.reload()
     } else {
