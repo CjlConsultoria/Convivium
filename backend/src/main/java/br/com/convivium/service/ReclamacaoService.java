@@ -3,10 +3,7 @@ package br.com.convivium.service;
 import br.com.convivium.dto.request.AcaoReclamacaoDTO;
 import br.com.convivium.dto.request.ReclamacaoFiltroDTO;
 import br.com.convivium.dto.request.SolucaoReclamacaoDTO;
-import br.com.convivium.dto.response.AnexoDTO;
-import br.com.convivium.dto.response.EmpresaDTO;
-import br.com.convivium.dto.response.ReclamacaoDTO;
-import br.com.convivium.dto.response.UsuarioDTO;
+import br.com.convivium.dto.response.*;
 import br.com.convivium.entity.*;
 import br.com.convivium.entity.enums.StatusReclamacao;
 import br.com.convivium.entity.enums.TipoTemplateEmail;
@@ -28,11 +25,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -183,10 +183,12 @@ public class ReclamacaoService {
         acao.setStatus(dto.getTipo());
         acao.setDescricao(dto.getDescricao());
         acao.setReclamacao(reclamacao);
+        reclamacao.setDataAtualizacao(LocalDateTime.now());
 
         reclamacao.setStatus(dto.getTipo());
         if(dto.getTipo().equals(StatusReclamacao.SOLUCIONADA)){
             reclamacao.setDescricaoSolucao(dto.getDescricao());
+            reclamacao.setDataResolucao(LocalDateTime.now());
         }
         Map<String, Object> usuarioMap = new HashMap<>();
         usuarioMap.put("username", reclamacao.getUsuario().getUsername());
@@ -220,6 +222,7 @@ public class ReclamacaoService {
                 .orElseThrow(() -> new RuntimeException("Reclamação não encontrada"));
 
         reclamacao.setDescricaoSolucao(dto.getDescricao());
+        reclamacao.setDataResolucao(LocalDateTime.now());
         reclamacao.setStatus(StatusReclamacao.SOLUCIONADA);
 
         AcaoReclamacao acao = new AcaoReclamacao();
@@ -293,6 +296,154 @@ public class ReclamacaoService {
 
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao gerar ZIP", e);
+        }
+    }
+
+    //relatorio
+    public List<ReclamacaoResumoDTO> buscarReclamacoesPorPeriodo(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+
+        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+        return reclamacoes.stream()
+                .map(this::toResumoDTO)
+                .collect(Collectors.toList());
+    }
+
+    public long contarTotalReclamacoes(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+        return reclamacaoRepository.findByDataCriacaoBetween(start, end).size();
+    }
+
+    public long contarPendentes(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+
+        return reclamacaoRepository.findByDataCriacaoBetween(start, end).stream()
+                .filter(r -> r.getStatus() == StatusReclamacao.EM_ANALISE)
+                .count();
+    }
+
+    public double calcularTempoMedioResolucao(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+
+        List<Reclamacao> resolvidas = reclamacaoRepository.findByDataCriacaoBetween(start, end).stream()
+                .filter(r -> r.getStatus() == StatusReclamacao.SOLUCIONADA && r.getDataResolucao() != null)
+                .collect(Collectors.toList());
+
+        if (resolvidas.isEmpty()) return 0;
+
+        double somaDias = resolvidas.stream()
+                .mapToDouble(r -> ChronoUnit.DAYS.between(r.getDataCriacao(), r.getDataResolucao()))
+                .sum();
+
+        return somaDias / resolvidas.size();
+    }
+
+    public String unidadeComMaisReclamacoes(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+
+        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+
+        Map<String, Long> contagem = reclamacoes.stream()
+                .collect(Collectors.groupingBy(
+                        r -> {
+                            String bloco = Optional.ofNullable(r.getUsuario().getBloco()).orElse("-");
+                            String apt = Optional.ofNullable(r.getUsuario().getApartamento()).orElse("-");
+                            return "Bloco " + bloco + " Apart. " + apt;
+                        },
+                        Collectors.counting()));
+
+        return contagem.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(e -> e.getKey() + " (" + e.getValue() + ")")
+                .orElse("-");
+    }
+
+    public List<ReclamacaoResumoDTO> ultimas10ReclamacoesAbertas() {
+        // Ajuste no repository para buscar por status PENDENTE (Aberta)
+        List<Reclamacao> list = reclamacaoRepository.findTop10ByStatusOrderByDataCriacaoDesc(StatusReclamacao.EM_ANALISE);
+        return list.stream().map(this::toResumoDTO).collect(Collectors.toList());
+    }
+
+    public List<UnidadeQtdDTO> topUnidadesQueMaisReclamam(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+
+        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+
+        Map<String, Long> contagem = reclamacoes.stream()
+                .collect(Collectors.groupingBy(
+                        r -> {
+                            String bloco = Optional.ofNullable(r.getUsuario().getBloco()).orElse("-");
+                            String apt = Optional.ofNullable(r.getUsuario().getApartamento()).orElse("-");
+                            return "Bloco " + bloco + " Apart. " + apt;
+                        },
+                        Collectors.counting()));
+
+        return contagem.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(10)
+                .map(e -> new UnidadeQtdDTO(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
+    }
+    public List<UnidadeQtdDTO> topUnidadesMaisReclamadas(LocalDate inicio, LocalDate fim) {
+        LocalDateTime start = inicio.atStartOfDay();
+        LocalDateTime end = fim.atTime(23, 59, 59);
+
+        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+
+        Map<String, Long> contagem = reclamacoes.stream()
+                .collect(Collectors.groupingBy(
+                        r -> {
+                            String bloco = Optional.ofNullable(r.getUsuario().getBloco()).orElse("-");
+                            String apt = Optional.ofNullable(r.getUsuario().getApartamento()).orElse("-");
+                            return "Bloco " + bloco + " Apart. " + apt;
+                        },
+                        Collectors.counting()));
+
+        return contagem.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(10)
+                .map(e -> new UnidadeQtdDTO(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private ReclamacaoResumoDTO toResumoDTO(Reclamacao r) {
+        String bloco = Optional.ofNullable(r.getUsuario().getBloco()).orElse("-");
+        String apt = Optional.ofNullable(r.getUsuario().getApartamento()).orElse("-");
+        String unidade = bloco + " - " + apt;
+
+        return new ReclamacaoResumoDTO(
+                unidade,
+                r.getTipo(),
+                r.getStatus(),
+                r.getDataCriacao(),
+                r.getDataAtualizacao(),
+                r.getDetalhes()
+        );
+    }
+
+    // DTO para top unidades
+    public static class UnidadeQtdDTO {
+        private String unidade;
+        private Long qtd;
+
+        public UnidadeQtdDTO(String unidade, Long qtd) {
+            this.unidade = unidade;
+            this.qtd = qtd;
+        }
+
+        // getters e setters
+        public String getUnidade() {
+            return unidade;
+        }
+
+        public Long getQtd() {
+            return qtd;
         }
     }
 }

@@ -8,6 +8,7 @@ import Licenca from '../views/LicenseManagement.vue'
 import AdminMoradores from '@/views/AdminMoradores.vue'
 import AdminReclamacoes from '@/views/AdminReclamacoes.vue'
 import { fetchUserData } from '@/services/authService'
+import Relatorios from '@/views/RelatoriosView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login,
+    },
+    {
+      path: '/relatorio',
+      name: 'relatorio',
+      component: Relatorios,
     },
     {
       path: '/empresa/admin/admin',

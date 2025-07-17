@@ -26,6 +26,10 @@
           h3 Gestor de Licenças
           p Gerencie licenças de acesso e permissões do sistema.
 
+      RouterLink.card(to="/relatorio")
+        span.emoji 📊
+        h3 Relatórios
+        p Visualize indicadores e dados consolidados do condomínio.
 
       // Opções desativadas com cadeado
       .card.card-desativado

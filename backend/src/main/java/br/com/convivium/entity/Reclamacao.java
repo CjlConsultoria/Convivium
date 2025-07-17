@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -41,8 +43,17 @@ public class Reclamacao {
     @Column(name = "DESCRICAO_SOLUCAO", length = 2000)
     private String descricaoSolucao;
 
-    @Column(name = "DATA_CRIACAO", nullable = false)
+    @Column(name = "DATA_CRIACAO", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime dataCriacao;
+
+    @Column(name = "DATA_ATUALIZACAO")
+    @UpdateTimestamp
+    private LocalDateTime dataAtualizacao;
+
+    @Column(name = "DATA_RESOLUCAO")
+    private LocalDateTime dataResolucao;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_USUARIO", referencedColumnName = "ID", nullable = false)
