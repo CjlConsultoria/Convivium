@@ -137,9 +137,6 @@ const handleLogin = async () => {
         return
       }
 
-      // Usuário ATIVO: redireciona para admin
-      await router.push({ name: 'inicio' })
-
       window.location.reload()
     } else {
       toast.error('Erro ao fazer login. Verifique seu CPF e senha.')
