@@ -3,22 +3,19 @@ package br.com.convivium.service;
 import br.com.convivium.dto.request.RegisterRequest;
 import br.com.convivium.dto.request.UserUpdateRequest;
 import br.com.convivium.entity.*;
-import br.com.convivium.entity.enums.EmpresaType;
-import br.com.convivium.entity.enums.RoleType;
-import br.com.convivium.entity.enums.TipoCargo;
-import br.com.convivium.entity.enums.TipoTemplateEmail;
+import br.com.convivium.entity.enums.*;
 import br.com.convivium.exception.ApiException;
 import br.com.convivium.repository.*;
 import br.com.convivium.security.JwtTokenUtil;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AuthenticationService {
@@ -27,28 +24,31 @@ public class AuthenticationService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final RoleRepository roleRepository;
-    private final TokenRepository tokenRepository;
     private final EmpresaRepository empresaRepository;
     private final TipoRepository tipoRepository;
     private final EmailService emailService;
     private final LicencaRepository licencaRepository;
-
+    private final UserTokenRepository userTokenRepository;
     @Autowired
     public AuthenticationService(UserRepository userRepository,
                                  BCryptPasswordEncoder passwordEncoder,
                                  JwtTokenUtil jwtTokenUtil,
                                  RoleRepository roleRepository,
-                                 TokenRepository tokenRepository, EmpresaRepository empresaRepository, TipoRepository tipoRepository, EmailService emailService, LicencaRepository licencaRepository) {
+                                 EmpresaRepository empresaRepository, TipoRepository tipoRepository, EmailService emailService, LicencaRepository licencaRepository, UserTokenRepository userTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
         this.roleRepository = roleRepository;
-        this.tokenRepository = tokenRepository;
         this.empresaRepository = empresaRepository;
         this.tipoRepository = tipoRepository;
         this.emailService = emailService;
         this.licencaRepository = licencaRepository;
+        this.userTokenRepository = userTokenRepository;
     }
+
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     public String authenticate(String username, String password) {
         User user = userRepository.findByUsername(username)
@@ -138,7 +138,7 @@ public class AuthenticationService {
 
 
         userRepository.save(user);
-
+        String token = gerarToken(user, TipoToken.ATIVACAO_CONTA);
         Map<String, Object> usuarioMap = new HashMap<>();
         usuarioMap.put("username", user.getUsername());
         usuarioMap.put("cpf", user.getCpf());
@@ -146,6 +146,7 @@ public class AuthenticationService {
 
         Map<String, Object> templateVariables = new HashMap<>();
         templateVariables.put("usuario", usuarioMap);
+        templateVariables.put("token", token);
         templateVariables.put("empresaId", user.getEmpresa().getId().toString());
         templateVariables.put("empresaNome", user.getEmpresa().getCodigoPublico());
 
@@ -195,23 +196,13 @@ public class AuthenticationService {
                     .orElseThrow(() -> new ApiException.NotFoundException("Usuário com esse CPF não encontrado."));
         }
 
-        String token = UUID.randomUUID().toString();
+        String token = gerarToken(user, TipoToken.RESET_SENHA);
 
-        PasswordResetToken resetToken = new PasswordResetToken(
-                token,
-                user,
-                LocalDateTime.now().plusHours(1),
-                false
+        Map<String, Object> usuario = Map.of("nome", user.getUsername());
+        Map<String, Object> variables = Map.of(
+                "usuario", usuario,
+                "token", token
         );
-
-        tokenRepository.save(resetToken);
-
-        Map<String, Object> usuario = new HashMap<>();
-        usuario.put("nome", user.getUsername());
-
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("usuario", usuario);
-        variables.put("token", token);
 
         emailService.enviarEmailComTemplate(
                 user.getEmail(),
@@ -225,12 +216,55 @@ public class AuthenticationService {
         );
     }
 
-    public boolean resetarSenha(String token, String novaSenha) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new ApiException.NotFoundException("Token de redefinição de senha inválido."));
+
+
+
+    public String gerarToken(User user, TipoToken tipo) {
+        String token = UUID.randomUUID().toString();
+
+        UserToken userToken = new UserToken();
+        userToken.setToken(token);
+        userToken.setUser(user);
+        userToken.setTipo(tipo);
+        userToken.setExpiryDate(LocalDateTime.now().plusHours(2));
+        userToken.setUsed(false);
+
+        userTokenRepository.save(userToken);
+
+        return token;
+    }
+
+
+    public void enviarTokenComTemplate(User user, TipoToken tipoToken, TipoTemplateEmail tipoTemplate) {
+        String token = UUID.randomUUID().toString();
+
+        UserToken userToken = new UserToken();
+        userToken.setToken(token);
+        userToken.setUser(user);
+        userToken.setTipo(tipoToken);
+        userToken.setExpiryDate(LocalDateTime.now().plusHours(2));
+        userToken.setUsed(false);
+
+        userTokenRepository.save(userToken);
+
+        Map<String, Object> usuario = Map.of("nome", user.getUsername());
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("usuario", new HashMap<>(usuario));
+        variables.put("token", token);
+
+        emailService.enviarEmailComTemplate(
+                user.getEmail(),
+                tipoTemplate,
+                variables
+        );
+    }
+
+    public boolean resetarSenha(String token, String novaSenha, String cpf) {
+        UserToken resetToken = userTokenRepository.findByTokenAndTipo(token, TipoToken.RESET_SENHA)
+                .orElseThrow(() -> new ApiException.NotFoundException("Token inválido."));
 
         if (resetToken.isUsed()) {
-            throw new ApiException.BadRequestException("Token já foi utilizado.");
+            throw new ApiException.BadRequestException("Token já utilizado.");
         }
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
@@ -238,14 +272,20 @@ public class AuthenticationService {
         }
 
         User user = resetToken.getUser();
+        if (!user.getCpf().equals(cpf)) {
+            throw new ApiException.BadRequestException("CPF não corresponde ao token.");
+        }
+
         user.setPassword(passwordEncoder.encode(novaSenha));
         userRepository.save(user);
 
         resetToken.setUsed(true);
-        tokenRepository.save(resetToken);
+        userTokenRepository.save(resetToken);
 
         return true;
     }
+
+
 
     public boolean updateUserData(String id, RegisterRequest request) {
         User user = userRepository.findById(Long.valueOf(id))

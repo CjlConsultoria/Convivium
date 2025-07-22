@@ -52,7 +52,8 @@ const handleSubmit = async () => {
 
   try {
     store.startLoading()
-    await resetPassword(token.value, newPassword.value)
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    await resetPassword(token.value, newPassword.value, user.cpf)
     toast.success('Senha redefinida com sucesso!')
     store.stopLoading()
     setTimeout(() => {

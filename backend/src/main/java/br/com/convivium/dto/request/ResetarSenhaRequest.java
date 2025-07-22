@@ -10,6 +10,7 @@ import lombok.Setter;
 public class ResetarSenhaRequest {
     private String token;
     private String novaSenha;
-
+    private String cpf;
 }
+
 

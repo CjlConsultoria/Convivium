@@ -89,9 +89,9 @@ export const buscarUsuarioPorId = async (id: number) => {
     throw error
   }
 }
-export const ativarConta = async (idUsuario: string | number, senha: string) => {
+export const ativarConta = async (idUsuario: string | number, senha: string, token: string) => {
   try {
-    await api.put(`/user/ativar-conta/${idUsuario}`, { senha })
+    await api.put(`/user/ativar-conta/${idUsuario}`, { senha, token })
   } catch (error) {
     console.error('Erro ao ativar conta:', error)
     throw error

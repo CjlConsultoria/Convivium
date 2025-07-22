@@ -86,9 +86,10 @@ public class UserController {
     @PutMapping("/ativar-conta/{idUsuario}")
     public ResponseEntity<?> ativarConta(@PathVariable Long idUsuario, @RequestBody AtivacaoContaRequest request) {
         String senhaCriptografada = passwordEncoder.encode(request.getSenha());
-        userService.ativarConta(idUsuario, senhaCriptografada);
+        userService.ativarConta(idUsuario, senhaCriptografada, request.getToken());
         return ResponseEntity.ok().build();
     }
+
 
     @GetMapping("/listar-simples/{idEmpresa}")
     public ResponseEntity<Page<UserResponseDTO>> listarSemSenha(

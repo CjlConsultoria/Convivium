@@ -35,6 +35,7 @@ const erro = ref('')
 const loading = ref(false)
 const router = useRouter()
 const route = useRoute()
+const token = typeof route.query.token === 'string' ? route.query.token : ''
 
 const idCondominioParam = route.params.id
 const idCondominio = Array.isArray(idCondominioParam) ? idCondominioParam[0] : idCondominioParam
@@ -93,6 +94,8 @@ async function verificarCPF() {
       erro.value = 'Seu CPF já está ativo no sistema. Faça login normalmente.'
     } else if (data.status === 'pendente_ativacao') {
       const idUsuario = data.idUsuario || data.usuario?.id
+      localStorage.setItem('tokenConta', token)
+
       router.push(`/ativar-conta/${idUsuario}`)
     } else if (data.status === 'nao_encontrado') {
       erro.value = 'Seu CPF não está no sistema.'

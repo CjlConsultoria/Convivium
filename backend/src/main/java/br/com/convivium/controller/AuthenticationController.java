@@ -76,7 +76,7 @@ public class AuthenticationController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> redefinirSenha(@RequestBody ResetarSenhaRequest request) {
-        boolean sucesso = authenticationService.resetarSenha(request.getToken(), request.getNovaSenha());
+        boolean sucesso = authenticationService.resetarSenha(request.getToken(), request.getNovaSenha(), request.getCpf());
         if (sucesso) {
             return ResponseEntity.ok("Senha redefinida com sucesso.");
         } else {

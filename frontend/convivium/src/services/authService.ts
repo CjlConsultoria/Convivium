@@ -80,9 +80,9 @@ export const forgotPassword = async (emailCpf: string) => {
   }
 }
 
-export const resetPassword = async (token: string, novaSenha: string) => {
+export const resetPassword = async (token: string, novaSenha: string, cpf: string) => {
   try {
-    const response = await api.post('/auth/reset-password', { token, novaSenha })
+    const response = await api.post('/auth/reset-password', { token, novaSenha, cpf })
     return response.data
   } catch (error) {
     console.error('Erro ao redefinir senha:', error)

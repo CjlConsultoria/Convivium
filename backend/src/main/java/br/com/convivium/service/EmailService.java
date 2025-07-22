@@ -10,6 +10,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.mail.internet.MimeMessage;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -28,33 +29,41 @@ public class EmailService {
     private String frontendUrl;
 
     public void enviarEmailComTemplate(String to, TipoTemplateEmail tipo, Map<String, Object> variables) {
-        if (variables.containsKey("token")) {
-            String token = (String) variables.get("token");
+        // Garante que 'variables' seja mutável
+        Map<String, Object> varsMutaveis = new HashMap<>(variables);
+
+        if (tipo.equals(TipoTemplateEmail.ESQUECEU_SENHA)) {
+            String token = (String) varsMutaveis.get("token");
             String url = frontendUrl + "/redefinir-senha?token=" + token;
-            variables.put("url", url); // opcional
+            varsMutaveis.put("url", url); // opcional
 
             // Insere a URL também dentro do mapa "usuario"
-            Object usuarioObj = variables.get("usuario");
+            Object usuarioObj = varsMutaveis.get("usuario");
             if (usuarioObj instanceof Map) {
                 @SuppressWarnings("unchecked")
-                Map<String, Object> usuarioMap = (Map<String, Object>) usuarioObj;
-                usuarioMap.put("url", url); // ✅ aqui resolve o problema
-            }
-        }if (tipo.equals(TipoTemplateEmail.BEM_VINDO)) {
-            String empresaId = (String) variables.get("empresaId");
-            String empresaNome = (String) variables.get("empresaNome");
-            String url = frontendUrl + "/empresa/" + empresaNome + "/cadastro-condominio/" + empresaId;
-            variables.put("url", url);
-
-            Object usuarioObj = variables.get("usuario");
-            if (usuarioObj instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> usuarioMap = (Map<String, Object>) usuarioObj;
-                usuarioMap.put("url", url); // Agora funcionará!
+                Map<String, Object> usuarioMap = new HashMap<>((Map<String, Object>) usuarioObj);
+                usuarioMap.put("url", url);
+                varsMutaveis.put("usuario", usuarioMap); // atualiza o mapa principal com o novo mapa mutável
             }
         }
-        enviarTemplate(to, tipo.getTitulo(), tipo.getTemplateNome(), variables);
+        if (tipo.equals(TipoTemplateEmail.BEM_VINDO)) {
+            String token = (String) varsMutaveis.get("token");
+            String empresaId = (String) varsMutaveis.get("empresaId");
+            String empresaNome = (String) varsMutaveis.get("empresaNome");
+            String url = frontendUrl + "/empresa/" + empresaNome + "/cadastro-condominio/" + empresaId + "?token=" + token;
+            varsMutaveis.put("url", url);
+
+            Object usuarioObj = varsMutaveis.get("usuario");
+            if (usuarioObj instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> usuarioMap = new HashMap<>((Map<String, Object>) usuarioObj);
+                usuarioMap.put("url", url);
+                varsMutaveis.put("usuario", usuarioMap);
+            }
+        }
+        enviarTemplate(to, tipo.getTitulo(), tipo.getTemplateNome(), varsMutaveis);
     }
+
 
 
     public void enviarTemplate(String to, String subject, String templateName, Map<String, Object> variables) {

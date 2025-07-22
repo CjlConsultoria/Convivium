@@ -35,7 +35,6 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ativarConta } from '@/services/userService'
-
 const senha = ref('')
 const confirmarSenha = ref('')
 const erro = ref('')
@@ -43,6 +42,7 @@ const loading = ref(false)
 
 const route = useRoute()
 const router = useRouter()
+
 const idUsuario = Array.isArray(route.params.id) ? route.params.id[0] : (route.params.id ?? '')
 
 const senhasBatem = computed(() => senha.value === confirmarSenha.value && senha.value.length > 0)
@@ -64,7 +64,8 @@ async function ativarContaForm() {
 
   loading.value = true
   try {
-    await ativarConta(idUsuario, senha.value)
+    const token = localStorage.getItem('tokenConta')!
+    await ativarConta(idUsuario, senha.value, token)
     router.push({ path: '/login', query: { ativado: 'true' } })
   } catch (e) {
     erro.value = 'Erro ao ativar conta. Tente novamente.'
