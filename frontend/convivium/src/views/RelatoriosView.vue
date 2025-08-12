@@ -328,14 +328,20 @@ function exportarXLS() {
 .layout-admin {
   display: flex;
   min-height: 100vh;
+  /* Em telas pequenas o menu pode virar topo, mas se não quiser mudar estrutura, só ajustar scroll */
+  overflow-x: hidden;
 }
+
 .relatorios-container {
   padding: 2rem;
   background: #fffde8;
   min-height: 100vh;
   font-family: Arial, sans-serif;
+  flex-grow: 1;
+  box-sizing: border-box;
 }
 
+/* Título */
 .titulo-dashboard {
   font-size: 1.8rem;
   font-weight: bold;
@@ -343,21 +349,25 @@ function exportarXLS() {
   color: #4b4b0e;
 }
 
+/* Filtros */
 .filtros {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .filtros label {
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .filtros input {
   padding: 0.3rem 0.5rem;
   border-radius: 5px;
   border: 1px solid #ccc;
+  min-width: 140px;
 }
 
 .btn-filtrar {
@@ -368,12 +378,14 @@ function exportarXLS() {
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s;
+  white-space: nowrap;
 }
 
 .btn-filtrar:hover {
   background: #e0b300;
 }
 
+/* Métricas */
 .metricas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -399,11 +411,13 @@ function exportarXLS() {
   color: #3e3e10;
 }
 
+/* Botões exportar */
 .botoes-relatorios {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .btn-xls {
@@ -417,6 +431,7 @@ function exportarXLS() {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
 }
 
 .btn-xls:hover::after {
@@ -431,6 +446,7 @@ function exportarXLS() {
   transform: translateY(-120%);
 }
 
+/* Gráficos */
 .graficos {
   display: flex;
   flex-wrap: wrap;
@@ -450,13 +466,11 @@ function exportarXLS() {
   text-align: center;
 }
 
-/* A altura base do canvas */
 .grafico canvas {
   width: 100% !important;
   height: 200px !important;
 }
 
-/* Em telas maiores, aumenta a altura e largura */
 @media (min-width: 1200px) {
   .grafico {
     min-width: 350px;
@@ -472,6 +486,7 @@ function exportarXLS() {
   margin-bottom: 1rem;
 }
 
+/* Histórico */
 .historicos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -504,5 +519,86 @@ function exportarXLS() {
 .lista-historico li {
   margin-bottom: 0.5rem;
   line-height: 1.3;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+
+/* Ajusta layout para telas pequenas */
+@media (max-width: 900px) {
+  .layout-admin {
+    flex-direction: column;
+  }
+
+  .relatorios-container {
+    padding: 1rem;
+    min-height: auto;
+  }
+
+  /* Filtros empilhados */
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .filtros label {
+    margin-bottom: 0.25rem;
+  }
+
+  .filtros input,
+  .btn-filtrar {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* Métricas em 1 ou 2 colunas */
+  .metricas-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  /* Gráficos em 1 coluna */
+  .graficos {
+    flex-direction: column;
+  }
+
+  .grafico {
+    max-width: 100%;
+    min-width: auto;
+  }
+
+  /* Histórico em 1 coluna */
+  .historicos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Botões exportar centralizados */
+  .botoes-relatorios {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .titulo-dashboard {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-metrica h3 {
+    font-size: 1rem;
+  }
+
+  .valor {
+    font-size: 1.5rem;
+  }
+
+  .card-historico h3 {
+    font-size: 1.1rem;
+  }
+
+  .lista-historico {
+    font-size: 0.9rem;
+  }
 }
 </style>
