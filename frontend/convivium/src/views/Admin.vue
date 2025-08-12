@@ -1212,4 +1212,57 @@ modal input:focus {
   padding: 2rem 2.5rem;
   overflow-x: auto;
 }
+
+/* Layout base */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Menu lateral fixo na lateral */
+.menu-lateral {
+  width: 220px;
+  min-width: 200px;
+  background-color: #f9f7e8;
+  border-right: 2px solid #d9c877;
+  padding: 1.5rem 1rem;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* Conteúdo à direita */
+.area-conteudo {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  overflow-x: auto;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 768px) {
+  /* Empilha menu e conteúdo verticalmente */
+  .layout-container {
+    flex-direction: column;
+  }
+
+  /* Menu lateral ocupa largura total e altura automática */
+  .menu-lateral {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    border-right: none;
+    border-bottom: 2px solid #d9c877;
+    position: relative; /* tira sticky no mobile */
+    padding: 1rem 1rem;
+  }
+
+  /* Conteúdo ocupa 100% e com padding menor */
+  .area-conteudo {
+    width: 100%;
+    padding: 1.5rem 1rem;
+    overflow-x: visible;
+  }
+}
 </style>
