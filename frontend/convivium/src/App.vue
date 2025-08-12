@@ -133,10 +133,6 @@ div.layout
       // Logo
       img.logo(src="@/assets/logocjl.png", alt="CJL logo", width="60", height="60")
 
-      // Botão de abrir/fechar menu (visível no mobile)
-      button.menu-toggle(@click="toggleMenu" aria-label="Alternar menu")
-        i.fas(:class="menuAberto ? 'fa-times' : 'fa-bars'")
-
       // Menu completo (visível no desktop e aberto no mobile)
       nav.nav-content(:class="{ aberto: menuAberto }")
         nav.nav-menu
@@ -198,6 +194,9 @@ div.layout
                 i.fas.fa-sign-out-alt
                 span Sair
 
+      // Botão de abrir/fechar menu (visível no mobile) - fica no FINAL da .container para ficar no topo direita
+      button.menu-toggle(@click="toggleMenu" aria-label="Alternar menu")
+        i.fas(:class="menuAberto ? 'fa-times' : 'fa-bars'")
 
   main.main-content
     RouterView
@@ -240,10 +239,38 @@ body {
 .container {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* espaço entre logo e botão */
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #886f0d;
+}
+
+/* Mostra só no mobile/tablet */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Opcional: faz o menu abrir/fechar verticalmente */
+  .nav-content {
+    display: none;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .nav-content.aberto {
+    display: flex;
+  }
 }
 
 .nav-content {
@@ -444,8 +471,6 @@ body {
   }
 
   .container {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 1rem;
   }
 
