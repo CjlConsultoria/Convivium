@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Atualização na Reclamação</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8f5e9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 650px;
+            margin: 0 auto;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            border-left: 8px solid #2e7d32;
+        }
+
+        h2 {
+            color: #1b5e20;
+        }
+
+        p, li {
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Atualização na Reclamação (ID: <span th:text="${reclamacao.id}">123</span>)</h2>
+
+    <p>Uma ação foi registrada na reclamação do condomínio com os seguintes detalhes:</p>
+
+    <ul>
+        <li><strong>Status Atualizado:</strong> <span th:text="${acao.status}">Em andamento</span></li>
+        <li><strong>Descrição da Ação:</strong> <span th:text="${acao.descricao}">Descrição da ação realizada</span></li>
+        <li><strong>Data da Atualização:</strong> <span th:text="${acao.dataCriacao}">2025-07-16 14:00</span></li>
+    </ul>
+
+    <p><strong>Atualizado por:</strong></p>
+    <ul>
+        <li><strong>Nome:</strong> <span th:text="${usuario.username}">João Silva</span></li>
+        <li><strong>CPF:</strong> <span th:text="${usuario.cpf}">123.456.789-00</span></li>
+        <li><strong>E-mail:</strong> <span th:text="${usuario.email}">joao@email.com</span></li>
+    </ul>
+
+    <p><strong>Empresa/Condomínio:</strong> <span th:text="${empresaNome}">Condomínio Exemplo</span> (CNPJ: <span th:text="${empresaCnpj}">42</span>)</p>
+
+    <p>Por favor, acesse o sistema para mais informações.</p>
+
+    <div class="footer">
+        <p>Este é um e-mail automático enviado pelo sistema Convivium. Não responda.</p>
+    </div>
+</div>
+</body>
+</html>
