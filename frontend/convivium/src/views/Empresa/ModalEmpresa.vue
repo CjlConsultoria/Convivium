@@ -270,11 +270,13 @@ async function onSubmit() {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.15); /* mais suave */
+  background-color: rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
+  padding: 1rem; /* para dar espaçamento nas laterais no mobile */
+  overflow-y: auto; /* permite scroll vertical em telas pequenas */
 }
 
 .modal-container {
@@ -287,14 +289,21 @@ async function onSubmit() {
   box-shadow: 0 4px 10px rgba(245, 197, 24, 0.3);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
+  box-sizing: border-box;
+  max-height: 90vh; /* limitar altura para evitar overflow */
+  overflow-y: auto; /* scroll interno se conteúdo for maior que a altura */
 }
 
+/* Header */
 .modal-header h3 {
   margin-bottom: 1rem;
   color: #b37f00;
   font-weight: 700;
+  font-size: 1.6rem;
+  text-align: center;
 }
 
+/* Body */
 .modal-body form {
   display: flex;
   flex-direction: column;
@@ -304,6 +313,7 @@ label {
   margin-top: 1rem;
   font-weight: 600;
   color: #b37f00;
+  font-size: 1rem;
 }
 
 input {
@@ -325,9 +335,14 @@ input:focus {
   background: #fff9db;
 }
 
+/* Footer */
 .modal-footer {
   margin-top: 1.5rem;
   text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 button.btn {
@@ -337,12 +352,14 @@ button.btn {
   cursor: pointer;
   border: none;
   transition: background-color 0.3s ease;
+  min-width: 100px;
+  text-align: center;
+  flex-grow: 1; /* para distribuir igual espaço no mobile */
 }
 
 button.btn-primary {
   background-color: #f5c518;
   color: #4a3200;
-  margin-left: 0.5rem;
 }
 
 button.btn-primary:hover {
@@ -358,5 +375,34 @@ button.btn-secondary {
 button.btn-secondary:hover {
   background-color: #f5c518;
   color: #4a3200;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .modal-container {
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .modal-header h3 {
+    font-size: 1.4rem;
+  }
+
+  label {
+    font-size: 0.95rem;
+  }
+
+  input {
+    font-size: 0.95rem;
+  }
+
+  .modal-footer {
+    justify-content: center;
+  }
+
+  button.btn {
+    min-width: 140px;
+    flex-grow: 0;
+  }
 }
 </style>

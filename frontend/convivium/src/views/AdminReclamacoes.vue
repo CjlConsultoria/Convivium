@@ -880,7 +880,7 @@ const abrirModalNovoMoradorCompleto = () => {
   color: #333333;
   background-color: transparent;
   box-shadow: 0 2px 8px rgba(217, 165, 0, 0.1);
-  table-layout: fixed; /* Ajuda a forçar colunas proporcionais */
+  table-layout: fixed;
 }
 
 .lista-moradores th,
@@ -916,7 +916,70 @@ const abrirModalNovoMoradorCompleto = () => {
   cursor: pointer;
 }
 
-/* Dropdown ações */
+@media (max-width: 600px) {
+  .lista-moradores th,
+  .lista-moradores td {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .lista-moradores thead {
+    display: none; /* opcional: esconder cabeçalho para facilitar no mobile */
+  }
+
+  .lista-moradores tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #d9c877;
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+
+  .lista-moradores tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0.6rem;
+    border: none;
+    border-bottom: 1px solid #f0eec9;
+  }
+
+  .lista-moradores tbody tr td:last-child {
+    border-bottom: none;
+  }
+
+  /* Adiciona um label para cada td via pseudo-elemento (se quiser) */
+  .lista-moradores tbody tr td:nth-child(1)::before {
+    content: 'Nome:';
+    font-weight: 700;
+  }
+  .lista-moradores tbody tr td:nth-child(2)::before {
+    content: 'Tipo:';
+    font-weight: 700;
+  }
+  .lista-moradores tbody tr td:nth-child(3)::before {
+    content: 'Unidade:';
+    font-weight: 700;
+  }
+  .lista-moradores tbody tr td:nth-child(4)::before {
+    content: 'Email:';
+    font-weight: 700;
+  }
+  .lista-moradores tbody tr td:nth-child(5)::before {
+    content: 'Contato:';
+    font-weight: 700;
+  }
+  .lista-moradores tbody tr td:nth-child(6)::before {
+    content: 'Ações:';
+    font-weight: 700;
+  }
+
+  .lista-moradores tbody tr td::before {
+    flex-basis: 40%;
+    color: #b38600;
+    white-space: nowrap;
+  }
+}
+
 .dropdown-menu {
   position: absolute;
   background: white;
@@ -924,12 +987,16 @@ const abrirModalNovoMoradorCompleto = () => {
   border-radius: 8px;
   margin-top: 6px;
   min-width: 140px;
+  max-width: 90vw; /* não ultrapassa 90% da tela */
   box-shadow: 0 4px 12px rgba(217, 165, 0, 0.15);
   z-index: 20;
   padding: 0.3rem 0;
   user-select: none;
   color: #333333;
   font-weight: 600;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .dropdown-menu li {
@@ -937,11 +1004,28 @@ const abrirModalNovoMoradorCompleto = () => {
   list-style: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  white-space: normal; /* permite quebra de texto */
+  font-size: 1rem;
 }
 
 .dropdown-menu li:hover {
   background-color: #b38600;
   color: #fff;
+}
+
+/* Ajuste em telas pequenas */
+@media (max-width: 600px) {
+  .dropdown-menu {
+    min-width: 120px;
+    max-width: 80vw;
+    font-size: 0.9rem;
+    padding: 0.2rem 0;
+  }
+
+  .dropdown-menu li {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 
 /* Paginação */
@@ -1129,5 +1213,36 @@ modal input:focus {
   flex: 1;
   padding: 2rem 2.5rem;
   overflow-x: auto;
+}
+
+.btn-acao {
+  padding: 0.3rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #b38600;
+  background: transparent;
+  border: 2px solid #b38600;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s ease;
+  min-width: 70px;
+  text-align: center;
+}
+
+.btn-acao:hover,
+.btn-acao:focus {
+  background-color: #b38600;
+  color: white;
+  outline: none;
+}
+
+/* Ajuste para telas pequenas */
+@media (max-width: 600px) {
+  .btn-acao {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    min-width: 60px;
+  }
 }
 </style>

@@ -19,26 +19,26 @@ section.app-container
         button.btn.btn-yellow.ml-4(@click="abrirModalEmpresa()")
           i.fa.fa-plus.mr-2
           | Adicionar Empresa
-
-      table.table
-        thead
-          tr
-            th Nome
-            th CNPJ
-            th Ações
-        tbody
-          tr(v-if="!empresas?.content || empresas.content.length === 0")
-            td(colspan="3") Nenhuma empresa cadastrada.
-          tr(v-for="empresa in empresas.content" :key="empresa.id")
-            td {{ empresa.name }}
-            td {{ empresa.cnpj }}
-            td
-              button.btn.btn-yellow.btn-sm(@click="abrirModalEmpresa(empresa)")
-                i.fa.fa-pencil-alt.mr-1
-                | Editar
-              button.btn.btn-danger.btn-sm(@click="confirmarExclusao('empresa', empresa)")
-                i.fa.fa-trash.mr-1
-                | Excluir
+      .table-wrapper-empresa
+        table.table
+          thead
+            tr
+              th Nome
+              th CNPJ
+              th Ações
+          tbody
+            tr(v-if="!empresas?.content || empresas.content.length === 0")
+              td(colspan="3") Nenhuma empresa cadastrada.
+            tr(v-for="empresa in empresas.content" :key="empresa.id")
+              td(data-label="Nome") {{ empresa.name }}
+              td(data-label="CNPJ") {{ empresa.cnpj }}
+              td
+                button.btn.btn-yellow.btn-sm(@click="abrirModalEmpresa(empresa)")
+                  i.fa.fa-pencil-alt.mr-1
+                  | Editar
+                button.btn.btn-danger.btn-sm(@click="confirmarExclusao('empresa', empresa)")
+                  i.fa.fa-trash.mr-1
+                  | Excluir
 
       .pagination
         button.btn.btn-sm(@click="carregarEmpresas(0)" :disabled="empresas?.first") « Primeira
@@ -63,27 +63,28 @@ section.app-container
           i.fa.fa-plus.mr-2
           | Adicionar Usuário
 
-      table.table
-        thead
-          tr
-            th Nome
-            th Email
-            th Empresa
-            th Ações
-        tbody
-          tr(v-if="usuariosCompletos?.content?.length === 0")
-            td(colspan="4") Nenhum usuário cadastrado.
-          tr(v-for="usuario in usuariosCompletos.content" :key="usuario.id")
-            td {{ usuario.username }}
-            td {{ usuario.email }}
-            td {{ usuario.empresa }}
-            td
-              button.btn.btn-yellow.btn-sm(@click="abrirModalUsuario(usuario)")
-                i.fa.fa-pencil-alt.mr-1
-                | Editar
-              button.btn.btn-danger.btn-sm(@click="confirmarExclusao('usuario', usuario)")
-                i.fa.fa-trash.mr-1
-                | Excluir
+      .table-wrapper-usuario
+        table.table
+          thead
+            tr
+              th Nome
+              th Email
+              th Empresa
+              th Ações
+          tbody
+            tr(v-if="usuariosCompletos?.content?.length === 0")
+              td(colspan="4") Nenhum usuário cadastrado.
+            tr(v-for="usuario in usuariosCompletos.content" :key="usuario.id")
+              td(data-label="Nome") {{ usuario.username }}
+              td(data-label="Email") {{ usuario.email }}
+              td(data-label="Empresa") {{ usuario.empresa }}
+              td(data-label="Ações")
+                button.btn.btn-yellow.btn-sm(@click="abrirModalUsuario(usuario)")
+                  i.fa.fa-pencil-alt.mr-1
+                  | Editar
+                button.btn.btn-danger.btn-sm(@click="confirmarExclusao('usuario', usuario)")
+                  i.fa.fa-trash.mr-1
+                  | Excluir
 
       .pagination
         button.btn.btn-sm(@click="carregarUsuariosCompletos(0)" :disabled="usuarios?.first") « Primeira
@@ -107,30 +108,30 @@ section.app-container
         button.btn.btn-yellow.ml-4(@click="abrirModalLicenca()")
           i.fa.fa-plus.mr-2
           | Adicionar Licença
-
-      table.table
-        thead
-          tr
-            th Empresa
-            th Tipo
-            th Data Início
-            th Data Fim
-            th Ações
-        tbody
-          tr(v-if="licencas?.content?.length === 0")
-            td(colspan="5") Nenhuma licença cadastrada.
-          tr(v-for="licenca in licencas.content" :key="licenca.id")
-            td {{ licenca.empresaNome }} ({{ formatarCnpj(licenca.empresaCnpj) }})
-            td {{ formatarTipo(licenca.tipo) }}
-            td {{ formatarData(licenca.dataInicio) }}
-            td {{ formatarData(licenca.dataFim) }}
-            td
-              button.btn.btn-yellow.btn-sm(@click="abrirModalLicenca(licenca)")
-                i.fa.fa-pencil-alt.mr-1
-                | Editar
-              button.btn.btn-danger.btn-sm(@click="confirmarExclusao('licenca', licenca)")
-                i.fa.fa-trash.mr-1
-                | Excluir
+      .table-wrapper-licencas
+        table.table
+          thead
+            tr
+              th Empresa
+              th Tipo
+              th Data Início
+              th Data Fim
+              th Ações
+          tbody
+            tr(v-if="licencas?.content?.length === 0")
+              td(colspan="5") Nenhuma licença cadastrada.
+            tr(v-for="licenca in licencas.content" :key="licenca.id")
+              td(data-label="Licenca") {{ licenca.empresaNome }} ({{ formatarCnpj(licenca.empresaCnpj) }})
+              td(data-label="Tipo") {{ formatarTipo(licenca.tipo) }}
+              td(data-label="Data Inicio") {{ formatarData(licenca.dataInicio) }}
+              td(data-label="Data Fim") {{ formatarData(licenca.dataFim) }}
+              td
+                button.btn.btn-yellow.btn-sm(@click="abrirModalLicenca(licenca)")
+                  i.fa.fa-pencil-alt.mr-1
+                  | Editar
+                button.btn.btn-danger.btn-sm(@click="confirmarExclusao('licenca', licenca)")
+                  i.fa.fa-trash.mr-1
+                  | Excluir
 
       .pagination
         button.btn.btn-sm(@click="carregarLicencas(0)" :disabled="licencas?.first") « Primeira
@@ -477,32 +478,38 @@ onMounted(() => {
 })
 </script>
 <style scoped>
+/* Container geral */
 .licenca-container {
   flex-grow: 1;
   padding: 2rem;
-  padding-bottom: 150px; /* reserva espaço para o footer */
+  padding-bottom: 150px;
   box-sizing: border-box;
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
 }
 
+/* Título */
 h2.text-xl.font-bold.mb-6 {
   text-align: center;
   margin-bottom: 3rem;
-  color: #374151; /* cinza escuro */
+  color: #374151;
   font-weight: 700;
   font-size: 2rem;
 }
 
+/* Cards */
 .card {
-  background-color: #ede9db; /* tom creme mais neutro e ameno */
+  background-color: #ede9db;
   padding: 2rem 2.5rem;
-  border: 1px solid #e6dfb8; /* borda clara, tom pastel */
+  border: 1px solid #e6dfb8;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(214, 185, 78, 0.15); /* sombra leve amarelada */
+  box-shadow: 0 4px 12px rgba(214, 185, 78, 0.15);
   margin-bottom: 3.5rem;
-  color: #374151; /* cinza escuro para o texto */
+  color: #374151;
   transition: box-shadow 0.3s ease;
 }
 
@@ -510,9 +517,10 @@ h2.text-xl.font-bold.mb-6 {
   box-shadow: 0 8px 20px rgba(214, 185, 78, 0.3);
 }
 
+/* Botões padrão */
 button.btn {
-  background: #d6b94e; /* amarelo pastel escuro */
-  color: #1f2937; /* cinza escuro */
+  background: #d6b94e;
+  color: #1f2937;
   padding: 0.55rem 1.4rem;
   border: none;
   border-radius: 0.45rem;
@@ -521,25 +529,29 @@ button.btn {
   font-weight: 600;
   display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
   transition:
     background-color 0.3s ease,
     box-shadow 0.3s ease;
   box-shadow: 0 2px 6px rgba(214, 185, 78, 0.3);
+  margin-right: 0.6rem; /* Espaço entre botões */
 }
 
 button.btn:hover:not(:disabled) {
-  background-color: #b8952f; /* amarelo pastel mais escuro no hover */
+  background-color: #b8952f;
   box-shadow: 0 4px 14px rgba(184, 149, 47, 0.6);
 }
 
+/* Botões pequenos */
 button.btn.btn-sm {
   padding: 0.35rem 0.9rem;
   font-size: 0.85rem;
   border-radius: 0.4rem;
 }
 
+/* Botões de exclusão */
 button.btn.btn-danger {
-  background: #dc2626; /* vermelho forte */
+  background: #dc2626;
   color: white;
   padding: 0.35rem 0.85rem;
   border-radius: 0.4rem;
@@ -551,6 +563,7 @@ button.btn.btn-danger {
     background-color 0.3s ease,
     box-shadow 0.3s ease;
   box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+  margin-right: 0; /* remover margem direita para o último botão */
 }
 
 button.btn.btn-danger:hover:not(:disabled) {
@@ -558,6 +571,7 @@ button.btn.btn-danger:hover:not(:disabled) {
   box-shadow: 0 4px 14px rgba(185, 28, 28, 0.6);
 }
 
+/* Container do submenu */
 .submenu-container {
   position: relative;
 }
@@ -575,6 +589,7 @@ button.btn.btn-danger:hover:not(:disabled) {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Botão amarelo */
 button.btn.btn-yellow {
   background-color: #d6b94e;
   color: #1f2937;
@@ -586,7 +601,7 @@ button.btn.btn-yellow {
   transition:
     background-color 0.3s ease,
     box-shadow 0.3s ease;
-  margin-right: 0.6rem; /* Espaço para separar do botão Excluir */
+  margin-right: 0.6rem;
 }
 
 button.btn.btn-yellow:hover {
@@ -609,34 +624,45 @@ button.btn.btn-yellow.btn-sm {
   font-size: 0.85rem;
 }
 
+/* Wrappers para tabelas com scroll horizontal */
+.table-wrapper-empresa,
+.table-wrapper-usuario,
+.table-wrapper-licencas {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.5rem;
+}
+
+/* Estilos comuns para todas as tabelas */
 table.table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 8px;
   font-size: 0.95rem;
-  color: #374151; /* texto cinza escuro */
+  color: #374151;
   background-color: transparent;
+  table-layout: auto;
+  border-spacing: 0 8px;
 }
 
-table.table th,
-table.table td {
-  padding: 0.8rem 1rem;
-  text-align: left;
-  vertical-align: middle;
-  background-color: #f4f1e7; /* fundo creme mais claro que o card */
-  border: 1px solid #e6dfb8; /* borda leve no mesmo tom da borda do card */
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
+/* Cabeçalho */
+table.table thead {
+  display: table-header-group;
 }
 
 table.table th {
-  background-color: #e9e5d8; /* tom creme claro para header */
+  background-color: #e9e5d8;
   font-weight: 700;
-  color: #5a5500; /* amarelo escuro para combinar com o tom dourado */
+  color: #5a5500;
+  white-space: nowrap;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e6dfb8;
 }
 
 table.table tr:hover td {
-  background-color: #f0ecd9; /* fundo hover suave amarelo claro */
+  background-color: #f0ecd9;
 }
 
 table.table th:first-child,
@@ -651,56 +677,140 @@ table.table td:last-child {
   border-bottom-right-radius: 8px;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
-  margin-top: 1.5rem;
-  margin-bottom: 3rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
+table.table th,
+table.table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.8rem 1rem;
+  background-color: #f4f1e7;
+  border: 1px solid #e6dfb8;
+  border-radius: 8px;
 }
 
-.pagination button.btn-sm {
-  padding: 0.3rem 0.7rem;
-  font-size: 0.85rem;
-  border-radius: 0.35rem;
-  background-color: #d6b94e;
-  color: #1f2937;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(214, 185, 78, 0.3);
-  transition:
-    background-color 0.25s ease,
-    box-shadow 0.25s ease;
+/* Remove o padding-left extra da célula "Ações" para o mobile */
+@media (max-width: 768px) {
+  table.table td[data-label='Ações'] {
+    padding-left: 1rem; /* menor padding para caber botões */
+    position: relative;
+  }
+
+  /* Label “Ações” acima dos botões, como um título */
+  table.table td[data-label='Ações']::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 0.5rem;
+    left: 1rem;
+    font-weight: 700;
+    color: #5a5500;
+    white-space: nowrap;
+    width: auto;
+    transform: none;
+  }
+
+  /* Espaçamento para o grupo de botões (empilhados verticalmente) */
+  table.table td[data-label='Ações'] > button {
+    display: block; /* empilhar */
+    width: 100%; /* largura total */
+    margin: 2rem 0 0 0; /* distância de 2rem do label */
+  }
+
+  /* Remove margem superior do primeiro botão para não empurrar muito */
+  table.table td[data-label='Ações'] > button:first-child {
+    margin-top: 1.5rem; /* menor que os outros */
+  }
+
+  /* Remove margem inferior do último botão */
+  table.table td[data-label='Ações'] > button:last-child {
+    margin-bottom: 0;
+  }
 }
 
-.pagination button.btn-sm:disabled {
-  background-color: #f3f4f6;
-  color: #9ca3af;
-  cursor: not-allowed;
-  box-shadow: none;
+/* Responsividade: tabela vira cards no mobile */
+@media (max-width: 768px) {
+  table.table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+
+  /* Esconde cabeçalho */
+  table.table thead tr {
+    position: absolute !important;
+    top: -9999px;
+    left: -9999px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* Cada linha vira card */
+  table.table tr {
+    margin-bottom: 1.5rem;
+    border: 1px solid #e6dfb8;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    background: #f4f1e7;
+    box-shadow: 0 2px 8px rgba(214, 185, 78, 0.15);
+  }
+
+  /* Células vira linhas com label */
+  table.table td {
+    position: relative;
+    padding-left: 45%;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    border: none;
+    border-bottom: 1px solid #e6dfb8;
+    white-space: normal;
+    text-align: left;
+  }
+
+  table.table td:last-child {
+    border-bottom: 0;
+  }
+
+  /* Label antes do conteúdo */
+  table.table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    color: #5a5500;
+    white-space: nowrap;
+    width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Ajuste para a coluna ações com botões */
+  table.table td[data-label='Ações'] {
+    padding-left: 1rem;
+  }
+
+  /* Botões na coluna ações ficam em bloco, espaçados e largura total */
+  table.table td[data-label='Ações'] > button {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Remove margem direita dos botões para não quebrar layout */
+  table.table td[data-label='Ações'] > button:last-child {
+    margin-bottom: 0;
+  }
 }
 
-.pagination button.btn-sm:not(:disabled):hover {
-  background-color: #b8952f;
-  box-shadow: 0 4px 14px rgba(184, 149, 47, 0.6);
-}
-
-.pagination span {
-  display: flex;
-  align-items: center;
-  padding: 0 0.6rem;
-  user-select: none;
-  color: #374151;
-}
-
+/* Ajuste para input de busca */
 .input-container {
   position: relative;
   max-width: 450px;
   width: 100%;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-container i.fa-search {
@@ -709,13 +819,13 @@ table.table td:last-child {
   left: 14px;
   transform: translateY(-50%);
   color: #9ca3af;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   pointer-events: none;
 }
 
 .input-pesquisa {
   width: 100%;
-  padding: 11px 14px 11px 40px;
+  padding: 11px 14px 11px 42px; /* padding left maior para ícone */
   border: 1.5px solid #d1d5db;
   border-radius: 10px;
   font-size: 1.05rem;
@@ -732,32 +842,79 @@ table.table td:last-child {
   outline: none;
 }
 
-.app-container {
-  min-height: 100vh; /* garante altura mínima, mas permite crescer */
+.pagination {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem; /* espaço entre botões e texto */
+  margin-top: 1.5rem;
+  margin-bottom: 3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  user-select: none;
 }
 
-.menu-lateral {
-  height: 100vh;
-  background-color: #f9f7e8;
-  border-right: 2px solid #d9c877;
-  padding: 1.5rem 1rem;
-  min-width: 180px;
-  max-width: 240px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
-  /* Remova ou comente esta linha ↓ */
-  /* overflow-y: auto; */
-  overflow: visible; /* permite que o submenu "escape" da lateral */
+.pagination button.btn-sm {
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 0.4rem;
+  background-color: #d6b94e;
+  color: #1f2937;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(214, 185, 78, 0.4);
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  user-select: none;
 }
 
-.licenca-container,
-.app-container {
-  overflow: visible !important;
-  position: relative;
-  z-index: 1;
+.pagination button.btn-sm:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.pagination button.btn-sm:not(:disabled):hover {
+  background-color: #b8952f;
+  box-shadow: 0 5px 15px rgba(184, 149, 47, 0.7);
+  transform: scale(1.05);
+}
+
+.pagination span {
+  padding: 0 0.8rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  min-width: 50px;
+  justify-content: center;
+  user-select: none;
+}
+
+/* Responsividade para mobile: botões maiores e mais espaçamento */
+@media (max-width: 480px) {
+  .pagination {
+    gap: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .pagination button.btn-sm {
+    padding: 0.5rem 1.2rem;
+    min-width: 45px;
+    font-size: 1rem;
+  }
+
+  .pagination span {
+    min-width: 55px;
+    padding: 0 1rem;
+  }
 }
 </style>

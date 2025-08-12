@@ -270,4 +270,46 @@ function fecharMenu() {
 .btn-sair:hover {
   background-color: #ffe0e0;
 }
+
+@media (max-width: 768px) {
+  .menu-lateral {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    padding-top: 3rem;
+    z-index: 150;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .menu-lateral.fechado {
+    transform: translateX(-100%);
+    width: 220px;
+    padding: 0;
+    background-color: transparent;
+    border-right: none;
+  }
+
+  .btn-toggle-menu {
+    top: 12px !important;
+    left: 12px !important;
+    right: auto !important;
+    font-size: 2rem !important;
+    width: 36px !important;
+    height: 36px !important;
+    background-color: #b38600 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Nova regra para esconder menu lateral em telas até 1024px */
+@media (max-width: 1024px) {
+  .menu-lateral {
+    display: none !important;
+  }
+}
 </style>

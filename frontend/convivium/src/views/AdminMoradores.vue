@@ -1067,4 +1067,160 @@ modal input:focus {
   padding: 2rem 2.5rem;
   overflow-x: auto;
 }
+
+/* --- MOBILE (até 600px) --- */
+@media (max-width: 600px) {
+  .layout-container {
+    flex-direction: column; /* empilha vertical */
+  }
+
+  .menu-lateral {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 220px;
+    background-color: #f9f7e8;
+    border-right: 2px solid #d9c877;
+    padding: 1.5rem 1rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+
+  /* Classe para abrir o menu */
+  .menu-lateral.aberto {
+    transform: translateX(0);
+  }
+
+  /* Overlay escuro atrás do menu */
+  .overlay-menu {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    display: none;
+  }
+
+  .overlay-menu.ativo {
+    display: block;
+  }
+
+  .area-conteudo {
+    padding: 1rem;
+  }
+}
+
+/* --- TABLET (entre 601px e 1024px) --- */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .layout-container {
+    flex-direction: row;
+  }
+
+  .menu-lateral {
+    width: 80px; /* menu lateral estreito */
+    padding: 1.5rem 0.5rem;
+    overflow: visible;
+  }
+
+  .menu-lateral h3,
+  .menu-lateral ul {
+    display: none; /* esconde título e lista */
+  }
+
+  .menu-lateral li {
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .area-conteudo {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* --- DESKTOP (mais que 1024px) --- */
+@media (min-width: 1025px) {
+  .layout-container {
+    flex-direction: row;
+  }
+
+  .menu-lateral {
+    width: 220px;
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 0;
+  }
+
+  .menu-lateral h3,
+  .menu-lateral ul {
+    display: block;
+  }
+
+  .area-conteudo {
+    padding: 2rem 2.5rem;
+  }
+}
+
+.lista-moradores {
+  width: 100%; /* tabela ocupa toda largura do container */
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #d9c877;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 1rem;
+  color: #333333;
+  background-color: transparent;
+  box-shadow: 0 2px 8px rgba(217, 165, 0, 0.1);
+  /* REMOVA table-layout: fixed; */
+}
+
+.lista-moradores th,
+.lista-moradores td {
+  padding: 0.8rem 0.9rem; /* diminua padding para caber mais colunas */
+  border-bottom: 1px solid #f0eec9;
+  border-right: 1px solid #f0eec9;
+  vertical-align: middle;
+  word-break: break-word; /* permite quebra de palavra */
+  white-space: normal; /* permite quebrar linhas */
+  max-width: 150px; /* limite máximo para colunas - ajuste conforme necessário */
+}
+
+.lista-moradores th:last-child,
+.lista-moradores td:last-child {
+  border-right: none;
+}
+
+/* Para que as colunas se ajustem à largura da tela */
+@media (max-width: 600px) {
+  .lista-moradores th,
+  .lista-moradores td {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 600px) {
+  .btn-acao {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.3rem;
+    min-width: 50px;
+    white-space: normal; /* permite quebra de linha se necessário */
+  }
+}
+
+@media (max-width: 600px) {
+  .dropdown-menu {
+    min-width: 120px;
+    max-width: 80vw;
+    font-size: 0.9rem;
+    padding: 0.2rem 0;
+  }
+
+  .dropdown-menu li {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+}
 </style>
