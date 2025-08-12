@@ -5,6 +5,7 @@ import { toast } from 'vue3-toastify'
 import { buscarPerfisDoUsuario, type Perfil } from '@/services/perfilService.ts'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
 import 'vue3-toastify/dist/index.css'
+import CookieBanner from '@/components/CookieBanner.vue'
 
 const mostrarDropdown = ref(false)
 const menuAberto = ref(false)
@@ -201,7 +202,7 @@ div.layout
   main.main-content
     RouterView
     LoadingOverlay
-
+    CookieBanner
   footer.footer
     p © 2025 - Todos os direitos reservados
 </template>

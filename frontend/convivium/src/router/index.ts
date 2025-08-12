@@ -52,6 +52,11 @@ const router = createRouter({
       meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
     },
     {
+      path: '/politica-de-privacidade',
+      name: 'PoliticaPrivacidade',
+      component: () => import('@/views/PoliticaPrivacidade.vue'),
+    },
+    {
       path: '/moradores',
       name: 'moradores',
       component: AdminMoradores,

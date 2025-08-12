@@ -478,18 +478,18 @@ onMounted(() => {
 })
 </script>
 <style scoped>
-/* Container geral */
 .licenca-container {
   flex-grow: 1;
   padding: 2rem;
-  padding-bottom: 150px;
+  min-height: 100vh;
+  /* Se menu fixo, add margin-left igual à largura do menu */
+  /* margin-left: 250px; */
   box-sizing: border-box;
-  min-height: 100%;
+  overflow: auto;
+}
+.app-container {
   display: flex;
-  flex-direction: column;
-  overflow: visible !important;
-  position: relative;
-  z-index: 1;
+  min-height: 100vh; /* garante que ocupe a altura total da tela */
 }
 
 /* Título */
