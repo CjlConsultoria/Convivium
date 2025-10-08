@@ -1,5 +1,6 @@
 package br.com.convivium.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,4 +64,10 @@ public class Empresa {
     @UpdateTimestamp
     @Column(name = "DATA_ATUALIZACAO")
     private LocalDateTime dataAtualizacao;
+
+    @OneToOne(mappedBy = "condominio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private CondominioInfo infoCondominio;
+
+
 }

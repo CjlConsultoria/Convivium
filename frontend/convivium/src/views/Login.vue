@@ -1,5 +1,5 @@
 <template lang="pug">
-  section.container
+  section.page-login
     div.login-container
       h2 Login
       form(@submit.prevent="handleLogin")
@@ -162,35 +162,6 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-/* Fundo geral preto */
-body,
-html {
-  height: 100%;
-  margin: 0;
-  background-color: #000000;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-/* Container principal do login */
-.container {
-  display: flex;
-  justify-content: center;
-  padding: 3rem 2rem 2rem;
-  min-height: calc(100vh - 60px);
-  box-sizing: border-box;
-}
-
-/* Caixa do login */
-.login-container {
-  background-color: #121212;
-  border-radius: 12px;
-  padding: 2.5rem 3rem;
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 0 15px rgba(179, 134, 0, 0.6); /* sombra amarela mais escura */
-  color: #b38600; /* amarelo escuro */
-}
-
 /* Títulos e textos */
 h2 {
   text-align: center;
@@ -350,5 +321,111 @@ button {
 button:hover {
   background-color: #d9a500;
   color: #000;
+}
+
+/* Garante que ocupe toda a altura da tela e centralize vertical/horizontal */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page-login {
+  display: flex;
+  justify-content: center; /* centraliza na horizontal */
+  align-items: center; /* centraliza na vertical */
+  min-height: 100vh; /* ocupa altura da tela */
+}
+
+.container {
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  padding: 1rem;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Caixa do login */
+.login-container {
+  background-color: #121212;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px; /* agora fica pequena */
+  box-shadow: 0 0 15px rgba(179, 134, 0, 0.6);
+  color: #b38600;
+}
+
+/* Título */
+h2 {
+  text-align: center;
+  color: #b38600;
+  margin-bottom: 1.5rem;
+}
+
+/* Inputs */
+input,
+button {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background-color: #222;
+  color: #b38600;
+}
+
+input:focus {
+  outline: none;
+  border-color: #d9a500;
+  box-shadow: 0 0 8px #d9a500;
+}
+
+/* Erro */
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Botão */
+button {
+  background-color: #b38600;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff9d1;
+  text-shadow: 0 0 4px rgba(255, 255, 224, 0.8);
+  padding: 0.9rem;
+  border-radius: 8px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+button:hover {
+  background-color: #d9a500;
+  color: #000;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1.5rem;
+    max-width: 95%;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  input,
+  button {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
 }
 </style>

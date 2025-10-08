@@ -134,4 +134,11 @@ public class EmpresaService {
         return true;
     }
 
+    public Empresa validarOuBuscar(Long id) {
+        return empresaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Condomínio não encontrado."));
+    }
+
+
+
 }
