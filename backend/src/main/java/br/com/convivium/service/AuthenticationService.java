@@ -12,6 +12,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ import java.util.*;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final RoleRepository roleRepository;
     private final EmpresaRepository empresaRepository;
@@ -31,7 +32,7 @@ public class AuthenticationService {
     private final UserTokenRepository userTokenRepository;
     @Autowired
     public AuthenticationService(UserRepository userRepository,
-                                 BCryptPasswordEncoder passwordEncoder,
+                                 PasswordEncoder passwordEncoder,
                                  JwtTokenUtil jwtTokenUtil,
                                  RoleRepository roleRepository,
                                  EmpresaRepository empresaRepository, TipoRepository tipoRepository, EmailService emailService, LicencaRepository licencaRepository, UserTokenRepository userTokenRepository) {
