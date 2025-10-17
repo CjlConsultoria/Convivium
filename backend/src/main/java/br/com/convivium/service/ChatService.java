@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 public class ChatService {
@@ -23,6 +24,9 @@ public class ChatService {
     @Autowired
     private ReclamacaoService reclamacaoService;
 
+    @Autowired
+    private ChatAprendizadoService aprendizadoService;
+
     @Value("${gemini.api.url}")
     private String geminiApiUrl;
 
@@ -31,6 +35,7 @@ public class ChatService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    // === Processa a mensagem recebida ===
     public ChatResponse processMessage(ChatRequest request) {
         String msg = request.getMessage().toLowerCase();
         Long condominioId = request.getCondominioId();
@@ -42,146 +47,202 @@ public class ChatService {
 
             // ===== Login =====
             if (matchesLogin(msg)) {
-                return new ChatResponse("Clique aqui para acessar o sistema: http://meucondominio.com/login");
+                return new ChatResponse("Você pode acessar o sistema aqui: https://meucondominio.com/login");
             }
 
             // ===== Reclamações =====
             if (matchesReclamacao(msg)) {
                 String tipo = detectTipoReclamacao(msg);
                 Reclamacao r = reclamacaoService.criarReclamacao(tipo, request.getMessage(), usuarioId, condominio.getId(), null);
-                return new ChatResponse("Sua reclamação foi registrada com sucesso! ID: " + r.getId());
+                return new ChatResponse("Sua reclamação de tipo '" + tipo + "' foi registrada com sucesso! Protocolo: " + r.getId());
             }
 
-            // ===== Áreas do condomínio =====
-            if (matchesPiscina(msg)) return respostaFlex(info, "piscina", info != null ? info.getHorarioPiscina() : null, condominio.getName(), msg);
-            if (matchesAcademia(msg)) return respostaFlex(info, "academia", info != null ? info.getHorarioAcademia() : null, condominio.getName(), msg);
-            if (matchesChurrasqueira(msg)) return respostaFlex(info, "churrasqueira", info != null ? info.getHorarioChurrasco() : null, condominio.getName(), msg);
-            if (matchesSalao(msg)) return respostaFlex(info, "salão de festas", info != null ? info.getHorarioSalaoFestas() : null, condominio.getName(), msg);
-            if (matchesPortaria(msg)) return respostaFlex(info, "telefone da portaria", info != null ? info.getTelefonePortaria() : null, condominio.getName(), msg);
-            if (matchesSindico(msg)) return respostaFlex(info, "contato do síndico", info != null ? info.getContatoSindico() : null, condominio.getName(), msg);
-            if (matchesBarulho(msg)) return respostaFlex(info, "horário de barulho", info != null ? info.getHorarioBarulho() : null, condominio.getName(), msg);
-            if (matchesQuadra(msg)) return respostaFlex(info, "horário da quadra", info != null ? info.getHorarioQuadra() : null, condominio.getName(), msg);
-            if (matchesElevador(msg)) return respostaFlex(info, "horário do elevador", info != null ? info.getHorarioElevador() : null, condominio.getName(), msg);
-            if (matchesPlayground(msg)) return respostaFlex(info, "horário do playground", info != null ? info.getHorarioPlayground() : null, condominio.getName(), msg);
+            // ===== Áreas do condomínio (respostas locais, sem Gemini) =====
+            if (matchesPiscina(msg)) return respostaLocal(info, "piscina", info != null ? info.getHorarioPiscina() : null);
+            if (matchesAcademia(msg)) return respostaLocal(info, "academia", info != null ? info.getHorarioAcademia() : null);
+            if (matchesChurrasqueira(msg)) return respostaLocal(info, "churrasqueira", info != null ? info.getHorarioChurrasco() : null);
+            if (matchesSalao(msg)) return respostaLocal(info, "salão de festas", info != null ? info.getHorarioSalaoFestas() : null);
+            if (matchesQuadra(msg)) return respostaLocal(info, "quadra", info != null ? info.getHorarioQuadra() : null);
+            if (matchesPlayground(msg)) return respostaLocal(info, "playground", info != null ? info.getHorarioPlayground() : null);
+            if (matchesElevador(msg)) return respostaLocal(info, "elevador", info != null ? info.getHorarioElevador() : null);
+            if (matchesPortaria(msg)) return respostaLocal(info, "portaria", info != null ? info.getTelefonePortaria() : null);
+            if (matchesSindico(msg)) return respostaLocal(info, "síndico", info != null ? info.getContatoSindico() : null);
+            if (matchesBarulho(msg)) return respostaLocal(info, "horário de silêncio", info != null ? info.getHorarioBarulho() : null);
+            if (matchesLixo(msg)) return respostaLocal(info, "coleta de lixo", info != null ? info.getColetaLixo() : null);
+            if (matchesManutencao(msg)) return respostaLocal(info, "manutenção", info != null ? info.getManutencao() : null);
+            if (matchesIluminacao(msg)) return respostaLocal(info, "iluminação", info != null ? info.getIluminacao() : null);
+            if (matchesAgua(msg)) return respostaLocal(info, "água", info != null ? info.getAgua() : null);
+            if (matchesBoleto(msg)) return respostaLocal(info, "boleto do condomínio", info != null ? info.getBoletoLink() : null);
+            if (matchesReserva(msg)) return respostaLocal(info, "reservas", info != null ? info.getReservaLink() : null);
+            if (matchesRegra(msg)) return respostaLocal(info, "regras do condomínio", info != null ? info.getRegrasGerais() : null);
+            if (matchesContato(msg)) return respostaLocal(info, "contatos administrativos", info != null ? info.getContatoSindico() : null);
 
-            // ===== Perguntas gerais → Gemini =====
+            // ===== Consultar banco dinamicamente antes de Gemini =====
+            ChatResponse respostaBanco = aprendizadoService.buscarResposta(info, msg);
+            if (respostaBanco != null) return respostaBanco;
+
+            // ===== Fallback → Gemini =====
             String geminiReply = sendToGemini(msg);
             return new ChatResponse(simplificarRespostaGemini(geminiReply));
 
+
         } catch (IllegalArgumentException e) {
-            return new ChatResponse("Condomínio inválido.");
+            return new ChatResponse("Condomínio inválido ou não encontrado.");
         } catch (Exception e) {
             return new ChatResponse("Erro ao processar sua solicitação: " + e.getMessage());
         }
     }
 
-    // === Detecção de intenções flexível ===
+    // === Detecção de intenções ===
     private boolean matchesLogin(String msg) {
-        return msg.contains("login") || msg.contains("entrar no sistema");
+        return Pattern.compile("\\b(login|entrar|acessar|meu condominio|painel|senha|usu[aá]rio)\\b").matcher(msg).find();
     }
 
     private boolean matchesReclamacao(String msg) {
-        return msg.contains("denuncia") || msg.contains("reclamacao");
+        return Pattern.compile("\\b(reclam[açc][aã]o|den[uú]ncia|denunciar|reportar|problema|ocorr[êe]ncia|queixa|elogio|sugest[aã]o)\\b").matcher(msg).find();
     }
 
     private boolean matchesPiscina(String msg) {
-        return msg.contains("piscina") && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
+        return Pattern.compile("\\b(piscina|pool)\\b").matcher(msg).find();
     }
 
     private boolean matchesAcademia(String msg) {
-        return msg.contains("academia") && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
+        return Pattern.compile("\\b(academia|gin[áa]sio|muscula[cç][aã]o|fitness|gym)\\b").matcher(msg).find();
     }
 
     private boolean matchesChurrasqueira(String msg) {
-        return msg.contains("churrasqueira") && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
+        return Pattern.compile("\\b(churrasqueira|churras|churrasquinho|espa[cç]o gourmet)\\b").matcher(msg).find();
     }
 
     private boolean matchesSalao(String msg) {
-        return (msg.contains("salão") || msg.contains("salao")) && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
-    }
-
-    private boolean matchesPortaria(String msg) {
-        return msg.contains("portaria") && (msg.contains("telefone") || msg.contains("contato"));
-    }
-
-    private boolean matchesSindico(String msg) {
-        return (msg.contains("síndico") || msg.contains("sindico")) && (msg.contains("telefone") || msg.contains("contato"));
-    }
-
-    private boolean matchesBarulho(String msg) {
-        return msg.contains("barulho") || msg.contains("até que horas pode fazer barulho") || msg.contains("permitido");
+        return Pattern.compile("\\b(sal[aã]o|sal[aã]o de festas|salao de festas|eventos|festa)\\b").matcher(msg).find();
     }
 
     private boolean matchesQuadra(String msg) {
-        return msg.contains("quadra") && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
-    }
-
-    private boolean matchesElevador(String msg) {
-        return msg.contains("elevador") && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
+        return Pattern.compile("\\b(quadra|campo|futebol|basquete|v[oô]lei|esporte)\\b").matcher(msg).find();
     }
 
     private boolean matchesPlayground(String msg) {
-        return msg.contains("playground") && (msg.contains("horário") || msg.contains("funciona") || msg.contains("abre") || msg.contains("até que horas"));
+        return Pattern.compile("\\b(playground|parquinho|brinquedos|brinquedoteca|parque infantil)\\b").matcher(msg).find();
     }
 
+    private boolean matchesElevador(String msg) {
+        return Pattern.compile("\\b(elevador|ascensor)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesPortaria(String msg) {
+        return Pattern.compile("\\b(portaria|porteiro|port[eã]o)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesSindico(String msg) {
+        return Pattern.compile("\\b(s[íi]ndico|sindico|administrador do condominio)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesBarulho(String msg) {
+        return Pattern.compile("\\b(barulho|som alto|ru[ií]do|sil[êe]ncio|m[úu]sica|festa|perturba[cç][aã]o)\\b").matcher(msg).find();
+    }
+    // === Novas intenções ===
+    private boolean matchesGaragem(String msg) {
+        return Pattern.compile("\\b(garagem|estacionamento|vaga|carro|port[ãa]o|controle|acesso garagem)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesLixo(String msg) {
+        return Pattern.compile("\\b(lixo|coleta|entulho|reciclagem|sujeira)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesManutencao(String msg) {
+        return Pattern.compile("\\b(manuten[cç][aã]o|reparo|conserto|defeito|problema|pane|estragou)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesIluminacao(String msg) {
+        return Pattern.compile("\\b(ilumina[cç][aã]o|l[uú]z|lampada|poste|escuro)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesAgua(String msg) {
+        return Pattern.compile("\\b([aá]gua|torneira|vazamento|hidr[oô]metro|encanamento)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesBoleto(String msg) {
+        return Pattern.compile("\\b(boleto|pagamento|mensalidade|taxa|condom[ií]nio|segunda via|financeiro)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesReserva(String msg) {
+        return Pattern.compile("\\b(reservar|reserva|agendar|agendamento|locar|usar o sal[aã]o|usar a churrasqueira|usar a quadra)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesRegra(String msg) {
+        return Pattern.compile("\\b(regra|regras|normas|pode|n[aã]o pode|permitido|proibido|conduta)\\b").matcher(msg).find();
+    }
+
+    private boolean matchesContato(String msg) {
+        return Pattern.compile("\\b(contato|telefone|email|administradora|s[íi]ndico|portaria)\\b").matcher(msg).find();
+    }
+
+    // === Tipo de reclamação ===
     private String detectTipoReclamacao(String msg) {
-        if (msg.contains("barulho")) return "Barulho";
-        if (msg.contains("limpeza")) return "Limpeza";
-        if (msg.contains("manutenção")) return "Manutenção";
+        msg = msg.toLowerCase();
+
+        if (Pattern.compile("\\b(barulho|som alto|ru[ií]do|festa|m[úu]sica)\\b").matcher(msg).find()) return "Barulho";
+        if (Pattern.compile("\\b(limpeza|lixo|sujeira|entulho|faxina)\\b").matcher(msg).find()) return "Limpeza";
+        if (Pattern.compile("\\b(manuten[cç][aã]o|reparo|conserto|defeito|quebrado)\\b").matcher(msg).find()) return "Manutenção";
+        if (Pattern.compile("\\b(ilumina[cç][aã]o|l[âa]mpada|poste|l[uú]z)\\b").matcher(msg).find()) return "Iluminação";
+        if (Pattern.compile("\\b(seguran[cç]a|roubo|furto|suspeito|portaria|vigil[âa]ncia)\\b").matcher(msg).find()) return "Segurança";
+        if (Pattern.compile("\\b(garagem|vaga|estacionamento|carro|port[ãa]o)\\b").matcher(msg).find()) return "Garagem";
+        if (Pattern.compile("\\b(elevador|ascensor|pane|travou)\\b").matcher(msg).find()) return "Elevador";
+
         return "Geral";
     }
 
-    // === Resposta flexível ou fallback Gemini ===
-    private ChatResponse respostaFlex(CondominioInfo info, String campoNome, String valorCampo, String condominioName, String userMessage) {
-        if (valorCampo != null && !valorCampo.isEmpty()) {
-            return new ChatResponse("O " + campoNome + " do condomínio " + condominioName + " é: " + valorCampo + ".");
+    // === Respostas automáticas locais (sem Gemini) ===
+    private ChatResponse respostaLocal(CondominioInfo info, String campo, String valor) {
+        if (valor != null && !valor.isEmpty()) {
+            return new ChatResponse("O " + campo + " funciona nos seguintes horários: " + valor + ".");
         } else {
-            return new ChatResponse(sendToGeminiFallback(userMessage, condominioName, campoNome));
+            return new ChatResponse("No momento não há informações cadastradas sobre o(a) " + campo + ". Verifique com a administração ou o síndico.");
         }
     }
 
+    // === Gemini apenas para perguntas genéricas ===
     private String sendToGemini(String message) {
-        return callGeminiApi(message);
-    }
+        try {
+            Map<String, Object> contents = Map.of(
+                    "contents", List.of(Map.of("parts", List.of(Map.of("text", message))))
+            );
 
-    private String sendToGeminiFallback(String userMessage, String condominioName, String campoNome) {
-        String prompt = "Responda em UMA FRASE CURTA, DIRETA E OBJETIVA. " +
-                "Não há informações cadastradas sobre " + campoNome +
-                " para o condomínio '" + condominioName + "'. " +
-                "Informe isso claramente ao usuário. Pergunta do usuário: " + userMessage;
-        return callGeminiApi(prompt);
-    }
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-    // Simplificação da resposta do Gemini → deixa curta e objetiva
-    private String simplificarRespostaGemini(String geminiReply) {
-        if (geminiReply == null || geminiReply.isEmpty()) return "Desculpe, não consegui encontrar uma resposta.";
-        // Remove parágrafos longos, quebras e excesso de texto
-        String simplified = geminiReply.replaceAll("\\s+", " ").trim();
-        // Pode cortar depois de uma frase completa
-        int endIdx = simplified.indexOf(". ");
-        if (endIdx != -1 && endIdx < 150) {
-            simplified = simplified.substring(0, endIdx + 1);
+            String fullUrl = geminiApiUrl + "?key=" + geminiApiKey;
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(contents, headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(fullUrl, HttpMethod.POST, entity, Map.class);
+
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
+            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
+            List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
+            return (String) parts.get(0).get("text");
+
+        } catch (Exception e) {
+            return "Desculpe, não consegui encontrar uma resposta no momento.";
         }
-        return simplified;
     }
 
-    // === Chamadas à API Gemini ===
-    private String callGeminiApi(String message) {
-        Map<String, Object> contents = Map.of(
-                "contents", List.of(Map.of("parts", List.of(Map.of("text", message))))
-        );
+    private String simplificarRespostaGemini(String geminiReply) {
+        if (geminiReply == null || geminiReply.isEmpty()) {
+            return "Desculpe, não consegui encontrar uma resposta no momento.";
+        }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        String simplified = geminiReply.replaceAll("\\s+", " ").trim();
 
-        String fullUrl = geminiApiUrl + "?key=" + geminiApiKey;
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(contents, headers);
+        if (simplified.matches("(?i).*\\b(é uma palavra|significa|origem|idioma|latim)\\b.*")) {
+            return "Posso te ajudar apenas com informações do condomínio. Verifique com a administração, por favor.";
+        }
 
-        ResponseEntity<Map> response = restTemplate.exchange(fullUrl, HttpMethod.POST, entity, Map.class);
+        if (simplified.length() > 200) {
+            simplified = simplified.substring(0, 200).trim();
+            if (!simplified.endsWith(".")) simplified += "...";
+        }
 
-        List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
-        Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
-        List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
-        return (String) parts.get(0).get("text");
+        return simplified;
     }
 }
