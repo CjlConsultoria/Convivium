@@ -19,7 +19,11 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        String databaseUrl = environment.getProperty(DATABASE_URL);
+        // Ler direto do sistema (Render/Heroku injetam assim); fallback para Environment
+        String databaseUrl = System.getenv(DATABASE_URL);
+        if (databaseUrl == null || databaseUrl.isBlank()) {
+            databaseUrl = environment.getProperty(DATABASE_URL);
+        }
         if (databaseUrl == null || databaseUrl.isBlank()) {
             return;
         }
@@ -29,7 +33,6 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
         }
 
         try {
-            // URI não lida bem com user:password se password tiver caracteres especiais; usar parsing manual
             String jdbcUrl = parseJdbcUrl(databaseUrl);
             String username = parseUsername(databaseUrl);
             String password = parsePassword(databaseUrl);
@@ -42,7 +45,7 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
                 environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, map));
             }
         } catch (Exception ignored) {
-            // Se falhar o parse, deixa as outras configs (SPRING_DATASOURCE_*) valerem
+            // Se falhar o parse, deixa as outras configs valerem
         }
     }
 
