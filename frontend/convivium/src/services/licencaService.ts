@@ -3,61 +3,60 @@ import api from './api'
 export interface LicencaDTO {
   id?: number
   empresaId: number
-  dataInicio: string // formato ISO yyyy-MM-dd
+  dataInicio: string
   dataFim: string
   ativa?: boolean
   tipo: string
   limiteUsuarios: number
 }
 
-export const salvarLicenca = async (dto: LicencaDTO): Promise<LicencaDTO> => {
-  try {
-    const response = await api.post<LicencaDTO>('/licencas', dto)
-    return response.data
-  } catch (error) {
-    console.error('Erro ao salvar licença:', error)
-    throw error
-  }
+/** Resposta paginada da busca de licenças (search) */
+export interface LicencaDetalhadaDTO {
+  id: number
+  empresaId: number
+  empresaNome: string
+  empresaCnpj: string
+  dataInicio: string
+  dataFim: string
+  ativa: boolean
+  tipo: string
+  limiteUsuarios: number
+  responsavelId?: number
+  responsavelNome?: string
+  responsavelCpf?: string
+  perfil?: string
+  validadeExpirada: boolean
+  diasRestantes: number
 }
 
-export const buscarLicencaPorId = async (id: number): Promise<LicencaDTO> => {
-  try {
-    const response = await api.get<LicencaDTO>(`/licencas/${id}`)
-    return response.data
-  } catch (error) {
-    console.error('Erro ao buscar licença:', error)
-    throw error
-  }
+export interface PageLicencas {
+  content: LicencaDetalhadaDTO[]
+  totalPages: number
+  number: number
+  first: boolean
+  last: boolean
+}
+
+export const salvarLicenca = async (dto: LicencaDTO): Promise<LicencaDTO> => {
+  const response = await api.post<LicencaDTO>('/licencas', dto)
+  return response.data
 }
 
 export const listarLicencas = async (
   page = 0,
   size = 10,
   empresaNome?: string,
-): Promise<{ content: LicencaDTO[]; totalPages: number }> => {
-  try {
-    const response = await api.get<{ content: LicencaDTO[]; totalPages: number }>(
-      '/licencas/search',
-      {
-        params: {
-          page,
-          size,
-          empresaNome,
-        },
-      },
-    )
-    return response.data
-  } catch (error) {
-    console.error('Erro ao listar licenças:', error)
-    throw error
-  }
+  usuarioNome?: string,
+  cpf?: string,
+): Promise<PageLicencas> => {
+  const params: Record<string, string | number> = { page, size }
+  if (empresaNome) params.empresaNome = empresaNome
+  if (usuarioNome) params.usuarioNome = usuarioNome
+  if (cpf) params.cpf = cpf
+  const response = await api.get<PageLicencas>('/licencas/search', { params })
+  return response.data
 }
 
 export async function excluirLicenca(id: number): Promise<void> {
-  try {
-    await api.delete(`/licencas/${id}`)
-  } catch (error) {
-    console.error('Erro ao excluir licença:', error)
-    throw error
-  }
+  await api.delete(`/licencas/${id}`)
 }

@@ -125,9 +125,9 @@ onMounted(() => {
 <style scoped>
 .presentation-container {
   width: 100%;
-  color: #000;
+  color: var(--color-primary-text-on);
   font-family: 'Segoe UI', sans-serif;
-  background-color: #fff;
+  background-color: var(--color-surface-card);
 }
 
 /* HERO */
@@ -174,7 +174,7 @@ onMounted(() => {
   width: 100%;
   max-width: 400px;
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(242, 194, 0, 0.4);
+  box-shadow: 0 0 20px rgba(201, 162, 39, 0.35);
 }
 
 /* FEATURES */
@@ -190,11 +190,11 @@ onMounted(() => {
 }
 
 .feature-card {
-  background-color: #000;
+  background-color: var(--color-primary-text-on);
   color: #fff;
   border-radius: 12px;
   padding: 2rem 1rem;
-  box-shadow: 0 0 15px rgba(242, 194, 0, 0.3);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
@@ -202,7 +202,7 @@ onMounted(() => {
 
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 0 25px rgba(242, 194, 0, 0.5);
+  box-shadow: 0 0 25px rgba(201, 162, 39, 0.4);
 }
 
 .feature-card img {
@@ -224,8 +224,8 @@ onMounted(() => {
 /* ESTATÍSTICAS */
 .statistics {
   padding: 4rem 2rem;
-  background-color: #121212;
-  color: #fff;
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
   text-align: center;
 }
 
@@ -238,10 +238,10 @@ onMounted(() => {
 
 .stat-card {
   flex: 1 1 150px;
-  background-color: #000;
+  background-color: var(--color-primary-text-on);
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 0 15px rgba(242, 194, 0, 0.3);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
 }
 
 .stat-card h3 {
@@ -263,11 +263,11 @@ onMounted(() => {
 }
 
 .diff-card {
-  background-color: #000;
+  background-color: var(--color-primary-text-on);
   color: #fff;
   border-radius: 12px;
   padding: 2rem 1rem;
-  box-shadow: 0 0 15px rgba(242, 194, 0, 0.3);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
 }
 
 .diff-card img {
@@ -289,8 +289,8 @@ onMounted(() => {
 /* DEPOIMENTOS */
 .testimonials {
   padding: 4rem 2rem;
-  background-color: #121212;
-  color: #fff;
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
   text-align: center;
 }
 
@@ -301,10 +301,10 @@ onMounted(() => {
 }
 
 .testimonial-card {
-  background-color: #000;
+  background-color: var(--color-primary-text-on);
   padding: 2rem 1rem;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(242, 194, 0, 0.3);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
   font-style: italic;
 }
 
@@ -331,11 +331,11 @@ onMounted(() => {
 .pros,
 .cons {
   flex: 1 1 250px;
-  background-color: #000;
+  background-color: var(--color-primary-text-on);
   color: #fff;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 0 15px rgba(242, 194, 0, 0.3);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
 }
 
 .pros ul,
@@ -371,7 +371,7 @@ onMounted(() => {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: #000;
+  color: var(--color-primary-text-on);
 }
 
 .btn-primary:hover {
@@ -385,7 +385,7 @@ onMounted(() => {
 }
 
 .btn-secondary:hover {
-  background-color: rgba(242, 194, 0, 0.1);
+  background-color: var(--color-primary-light);
 }
 
 /* RESPONSIVO */

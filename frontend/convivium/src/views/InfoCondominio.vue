@@ -143,6 +143,6 @@ onMounted(async () => {
   color: var(--color-primary);
 }
 .info-vazio {
-  color: #666;
+  color: var(--color-text-muted);
 }
 </style>

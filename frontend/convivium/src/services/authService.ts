@@ -151,7 +151,7 @@ export const updateUserData = async (
   }
 }
 
-export async function deletarUsuario(id: string) {
+export async function deletarUsuario(id: string | number) {
   return await api.delete(`/auth/usuario/delete/${id}`)
 }
 

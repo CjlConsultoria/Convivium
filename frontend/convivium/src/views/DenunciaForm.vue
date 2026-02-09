@@ -169,12 +169,12 @@ section.container
   padding: 2rem;
   width: 100%;
   max-width: 600px;
-  box-shadow: 0 2px 8px rgba(179, 134, 0, 0.1); /* sombra amarela leve */
+  box-shadow: var(--shadow-amber-sm); /* sombra amarela leve */
 }
 
 h2 {
   text-align: center;
-  color: #222; /* texto preto escuro */
+  color: var(--color-text); /* texto preto escuro */
   margin-bottom: 2rem;
 }
 
@@ -236,7 +236,7 @@ textarea:focus,
 input[type='file']:focus {
   border-color: var(--color-primary); /* amarelo médio */
   outline: none;
-  box-shadow: 0 0 8px rgba(179, 134, 0, 0.25);
+  box-shadow: 0 0 8px var(--shadow-amber-sm);
 }
 
 textarea {
@@ -247,7 +247,7 @@ textarea {
 h3 {
   font-size: 1.125rem;
   margin-bottom: 1rem;
-  color: #222;
+  color: var(--color-text);
 }
 
 p {

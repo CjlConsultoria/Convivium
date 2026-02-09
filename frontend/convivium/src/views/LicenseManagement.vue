@@ -14,7 +14,7 @@ section.app-container
             type="text"
             placeholder="Buscar por nome ou CNPJ"
             v-model="buscaEmpresa"
-            @input="carregarEmpresas(0)"
+            @input="debounceEmpresa()"
           )
         button.btn.btn-yellow.ml-4(@click="abrirModalEmpresa()")
           i.fa.fa-plus.mr-2
@@ -57,7 +57,7 @@ section.app-container
             type="text"
             placeholder="Buscar por nome ou CPF"
             v-model="buscaUsuario"
-            @input="carregarUsuariosCompletos(0)"
+            @input="debounceUsuario()"
           )
         button.btn.btn-yellow.ml-4(@click="abrirModalUsuario()")
           i.fa.fa-plus.mr-2
@@ -87,11 +87,11 @@ section.app-container
                   | Excluir
 
       .pagination
-        button.btn.btn-sm(@click="carregarUsuariosCompletos(0)" :disabled="usuarios?.first") « Primeira
-        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.number - 1)" :disabled="usuarios?.first") ‹
-        span Página {{ usuarios.number + 1 }} de {{ usuarios.totalPages }}
-        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.number + 1)" :disabled="usuarios?.last") ›
-        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuarios.totalPages - 1)" :disabled="usuarios?.last") Última »
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(0)" :disabled="usuariosCompletos?.first") « Primeira
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuariosCompletos.number - 1)" :disabled="usuariosCompletos?.first") ‹
+        span Página {{ (usuariosCompletos?.number ?? 0) + 1 }} de {{ usuariosCompletos?.totalPages ?? 0 }}
+        button.btn.btn-sm(@click="carregarUsuariosCompletos(usuariosCompletos.number + 1)" :disabled="usuariosCompletos?.last") ›
+        button.btn.btn-sm(@click="carregarUsuariosCompletos((usuariosCompletos?.totalPages ?? 1) - 1)" :disabled="usuariosCompletos?.last") Última »
 
     // Licenças
     .card
@@ -103,7 +103,7 @@ section.app-container
             type="text"
             placeholder="Buscar por nome da Empresa"
             v-model="buscalicenca"
-            @input="carregarLicencas(0)"
+            @input="debounceLicenca()"
           )
         button.btn.btn-yellow.ml-4(@click="abrirModalLicenca()")
           i.fa.fa-plus.mr-2
@@ -150,7 +150,6 @@ section.app-container
     ModalLicenca(
       v-if="modalLicencaAberto"
       :licenca="licencaSelecionada"
-      :usuarios="usuarios?.content || []"
       :getEmpresaNome="getEmpresaNome"
       @close="fecharModalLicenca"
       @salvo="() => carregarLicencas(licencas.number)"
@@ -175,6 +174,15 @@ section.app-container
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+
+const DEBOUNCE_MS = 350
+function debounce(fn: () => void, ms: number) {
+  let t: ReturnType<typeof setTimeout>
+  return () => {
+    clearTimeout(t)
+    t = setTimeout(fn, ms)
+  }
+}
 import { fetchUsuarios, deletarUsuario } from '@/services/authService' // ajuste o caminho se necessário
 import { listarLicencas, excluirLicenca } from '@/services/licencaService' // já está importado no seu código
 
@@ -234,10 +242,13 @@ interface Usuario {
 
 interface Licenca {
   id: number
-  usuarioId: number
+  empresaId: number
+  empresaNome?: string
+  empresaCnpj?: string
   tipo: string
   dataInicio: string
   dataFim: string
+  ativa?: boolean
 }
 
 interface PaginatedResponse<T> {
@@ -425,6 +436,10 @@ async function excluirItem() {
   }
 }
 
+const debounceEmpresa = debounce(() => carregarEmpresas(0), DEBOUNCE_MS)
+const debounceUsuario = debounce(() => carregarUsuariosCompletos(0), DEBOUNCE_MS)
+const debounceLicenca = debounce(() => carregarLicencas(0), DEBOUNCE_MS)
+
 function getEmpresaNome(id: number): string {
   return mapaEmpresasPorId[id] || '—'
 }
@@ -496,31 +511,31 @@ onMounted(() => {
 h2.text-xl.font-bold.mb-6 {
   text-align: center;
   margin-bottom: 3rem;
-  color: #374151;
+  color: var(--color-text);
   font-weight: 700;
   font-size: 2rem;
 }
 
 /* Cards */
 .card {
-  background-color: #ede9db;
+  background-color: var(--color-surface-card);
   padding: 2rem 2.5rem;
-  border: 1px solid #e6dfb8;
+  border: 1px solid var(--color-primary-border);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(214, 185, 78, 0.15);
+  box-shadow: var(--shadow-amber-sm);
   margin-bottom: 3.5rem;
-  color: #374151;
+  color: var(--color-text);
   transition: box-shadow 0.3s ease;
 }
 
 .card:hover {
-  box-shadow: 0 8px 20px rgba(214, 185, 78, 0.3);
+  box-shadow: var(--shadow-amber);
 }
 
 /* Botões padrão */
 button.btn {
   background: var(--color-primary);
-  color: #1f2937;
+  color: var(--color-primary-text-on);
   padding: 0.55rem 1.4rem;
   border: none;
   border-radius: 0.45rem;
@@ -530,11 +545,9 @@ button.btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
-  box-shadow: 0 2px 6px rgba(214, 185, 78, 0.3);
-  margin-right: 0.6rem; /* Espaço entre botões */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-amber-sm);
+  margin-right: 0.6rem;
 }
 
 button.btn:hover:not(:disabled) {
@@ -551,24 +564,20 @@ button.btn.btn-sm {
 
 /* Botões de exclusão */
 button.btn.btn-danger {
-  background: #dc2626;
-  color: white;
+  background: var(--color-danger);
+  color: var(--color-text-light);
   padding: 0.35rem 0.85rem;
   border-radius: 0.4rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
-  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
-  margin-right: 0; /* remover margem direita para o último botão */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-right: 0;
 }
 
 button.btn.btn-danger:hover:not(:disabled) {
-  background-color: #b91c1c;
-  box-shadow: 0 4px 14px rgba(185, 28, 28, 0.6);
+  background-color: var(--color-danger-hover);
 }
 
 /* Container do submenu */
@@ -580,27 +589,25 @@ button.btn.btn-danger:hover:not(:disabled) {
   position: absolute;
   left: 100%;
   top: 0;
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-card);
   z-index: 9999;
   border: 1px solid var(--color-primary-border);
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   min-width: 180px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-amber-sm);
 }
 
 /* Botão amarelo */
 button.btn.btn-yellow {
   background-color: var(--color-primary);
-  color: #1f2937;
+  color: var(--color-primary-text-on);
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(214, 185, 78, 0.3);
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
+  box-shadow: var(--shadow-amber-sm);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   margin-right: 0.6rem;
 }
 
@@ -612,7 +619,7 @@ button.btn.btn-yellow:hover {
 .card > h3.text-lg.font-semibold.mb-2 {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--color-text);
   text-align: center;
   margin: 0 auto 1.5rem auto;
   max-width: fit-content;
@@ -640,10 +647,9 @@ table.table {
   border-collapse: separate;
   border-spacing: 0 8px;
   font-size: 0.95rem;
-  color: #374151;
+  color: var(--color-text);
   background-color: transparent;
   table-layout: auto;
-  border-spacing: 0 8px;
 }
 
 /* Cabeçalho */
@@ -652,17 +658,17 @@ table.table thead {
 }
 
 table.table th {
-  background-color: #e9e5d8;
+  background-color: var(--color-surface-alt);
   font-weight: 700;
   color: var(--color-primary-text-on);
   white-space: nowrap;
   padding: 0.8rem 1rem;
   border-radius: 8px;
-  border: 1px solid #e6dfb8;
+  border: 1px solid var(--color-primary-border);
 }
 
 table.table tr:hover td {
-  background-color: #f0ecd9;
+  background-color: var(--color-primary-light);
 }
 
 table.table th:first-child,
@@ -683,8 +689,8 @@ table.table td {
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0.8rem 1rem;
-  background-color: #f4f1e7;
-  border: 1px solid #e6dfb8;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-primary-border);
   border-radius: 8px;
 }
 
@@ -749,11 +755,11 @@ table.table td {
   /* Cada linha vira card */
   table.table tr {
     margin-bottom: 1.5rem;
-    border: 1px solid #e6dfb8;
+    border: 1px solid var(--color-primary-border);
     border-radius: 12px;
     padding: 1rem 1.25rem;
-    background: #f4f1e7;
-    box-shadow: 0 2px 8px rgba(214, 185, 78, 0.15);
+    background: var(--color-surface-card);
+    box-shadow: var(--shadow-amber-sm);
   }
 
   /* Células vira linhas com label */
@@ -763,7 +769,7 @@ table.table td {
     padding-top: 0.7rem;
     padding-bottom: 0.7rem;
     border: none;
-    border-bottom: 1px solid #e6dfb8;
+    border-bottom: 1px solid var(--color-primary-border);
     white-space: normal;
     text-align: left;
   }
@@ -818,22 +824,20 @@ table.table td {
   top: 50%;
   left: 14px;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-size: 1.2rem;
   pointer-events: none;
 }
 
 .input-pesquisa {
   width: 100%;
-  padding: 11px 14px 11px 42px; /* padding left maior para ícone */
-  border: 1.5px solid #d1d5db;
+  padding: 11px 14px 11px 42px;
+  border: 1.5px solid var(--color-primary-border);
   border-radius: 10px;
   font-size: 1.05rem;
-  color: #374151;
+  color: var(--color-text);
   box-shadow: none;
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .input-pesquisa:focus {
@@ -846,12 +850,12 @@ table.table td {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem; /* espaço entre botões e texto */
+  gap: 0.5rem;
   margin-top: 1.5rem;
   margin-bottom: 3rem;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
   user-select: none;
 }
 
@@ -860,14 +864,11 @@ table.table td {
   font-size: 0.9rem;
   border-radius: 0.4rem;
   background-color: var(--color-primary);
-  color: #1f2937;
+  color: var(--color-primary-text-on);
   border: none;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(214, 185, 78, 0.4);
-  transition:
-    background-color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.15s ease;
+  box-shadow: var(--shadow-amber-sm);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -876,8 +877,8 @@ table.table td {
 }
 
 .pagination button.btn-sm:disabled {
-  background-color: #f3f4f6;
-  color: #9ca3af;
+  background-color: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
@@ -885,13 +886,13 @@ table.table td {
 
 .pagination button.btn-sm:not(:disabled):hover {
   background-color: var(--color-primary-hover);
-  box-shadow: 0 5px 15px rgba(184, 149, 47, 0.7);
+  box-shadow: var(--shadow-amber);
   transform: scale(1.05);
 }
 
 .pagination span {
   padding: 0 0.8rem;
-  color: #374151;
+  color: var(--color-text);
   display: flex;
   align-items: center;
   min-width: 50px;

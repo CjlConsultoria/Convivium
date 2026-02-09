@@ -55,6 +55,10 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public Optional<UserResponseDTO> buscarPorIdComDTO(Long id) {
+        return userRepository.findByIdWithRelations(id).map(this::mapToDTO);
+    }
+
     public void ativarConta(Long idUsuario, String senhaCriptografada, String token) {
         // Buscar o token do tipo ATIVACAO
         UserToken userToken = userTokenRepository.findByTokenAndTipo(token, TipoToken.ATIVACAO_CONTA)

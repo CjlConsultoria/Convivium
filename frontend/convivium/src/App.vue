@@ -220,13 +220,13 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #ffffff;
-  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--color-surface);
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
 /* NAVBAR */
 .navbar {
-  background-color: #000000;
+  background-color: var(--color-nav-bg);
   padding: 0.2rem 1rem;
   display: flex;
   justify-content: space-between;
@@ -254,7 +254,7 @@ body {
   border: none;
   font-size: 1.8rem;
   cursor: pointer;
-  color: var(--color-primary);
+  color: var(--color-nav-accent);
 }
 
 /* Mostra só no mobile/tablet */
@@ -294,18 +294,16 @@ body {
 
 .nav-link {
   text-decoration: none;
-  color: #ffffff;
+  color: var(--color-nav-text);
   font-weight: 500;
   padding: 0.4rem 0.6rem;
-  transition:
-    color 0.2s,
-    background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
   background-color: transparent;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .nav-link:hover {
-  background-color: var(--color-primary);
+  background-color: var(--color-nav-accent);
   color: var(--color-primary-text-on);
 }
 
@@ -319,23 +317,23 @@ body {
 .nav-button {
   text-decoration: none;
   padding: 0.4rem 0.8rem;
-  border: 1px solid var(--color-primary);
-  border-radius: 4px;
-  color: #fff;
+  border: 1px solid var(--color-nav-accent);
+  border-radius: 6px;
+  color: var(--color-nav-text);
   background-color: transparent;
   transition: background-color 0.2s, color 0.2s;
   cursor: pointer;
 }
 
 .nav-button:hover {
-  background-color: var(--color-primary);
+  background-color: var(--color-nav-accent);
   color: var(--color-primary-text-on);
 }
 
 .nav-button.primary {
-  background-color: var(--color-primary);
+  background-color: var(--color-nav-accent);
   color: var(--color-primary-text-on);
-  border-color: var(--color-primary);
+  border-color: var(--color-nav-accent);
 }
 
 .nav-button.primary:hover {
@@ -357,12 +355,12 @@ body {
   gap: 0.4rem;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--color-nav-text);
   cursor: pointer;
   font-weight: 600;
   font-size: 1rem;
   padding: 0.3rem 0.6rem;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .nav-button.dropdown-toggle i {
@@ -370,7 +368,7 @@ body {
 }
 
 .nav-button.dropdown-toggle:focus {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-nav-accent);
   outline-offset: 2px;
 }
 
@@ -378,14 +376,14 @@ body {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #1c1c1c;
+  background-color: var(--color-nav-bg);
   border: 1px solid var(--color-primary-border);
   border-radius: 10px;
   padding: 1rem;
   min-width: 260px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-amber-lg);
   z-index: 1000;
-  color: #f5f5f5;
+  color: var(--color-nav-text);
   margin-top: 6px;
   font-size: 0.95rem;
 }
@@ -407,15 +405,16 @@ body {
 }
 
 .dropdown-info strong {
-  color: #fff;
+  color: var(--color-nav-text);
   font-weight: 600;
 }
 
 .dropdown-divider {
   border: none;
   height: 1px;
-  background-color: #444;
+  background-color: var(--color-primary-border);
   margin: 0.8rem 0;
+  opacity: 0.6;
 }
 
 .dropdown-menu .nav-button {
@@ -450,7 +449,7 @@ body {
 }
 
 .info-empresa strong {
-  color: #fff;
+  color: var(--color-nav-text);
 }
 
 .dropdown-menu .nav-button {
@@ -513,7 +512,7 @@ body {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--color-primary);
+  color: var(--color-nav-accent);
 }
 
 @media (max-width: 768px) {
@@ -533,15 +532,15 @@ body {
 }
 
 footer.footer {
-  background-color: black;
-  color: white;
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
   text-align: center;
   height: 50px;
   line-height: 50px;
   width: 100%;
 }
 .icone-usuario {
-  color: var(--color-primary);
+  color: var(--color-nav-accent);
   font-size: 1.4rem;
 }
 </style>

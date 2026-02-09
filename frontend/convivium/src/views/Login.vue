@@ -177,13 +177,13 @@ button {
   margin-top: 0.5rem;
   font-size: 1rem;
   border-radius: 6px;
-  border: 1px solid #333;
-  background-color: #222;
+  border: 1px solid var(--color-primary-border);
+  background-color: var(--color-nav-bg);
   color: var(--color-primary);
 }
 
 input::placeholder {
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 button {
@@ -225,10 +225,10 @@ RouterLink {
 .password-wrapper input {
   flex-grow: 1;
   padding-right: 2.5rem;
-  background-color: #222;
+  background-color: var(--color-nav-bg);
   color: var(--color-primary);
   border-radius: 6px;
-  border: 1px solid #333;
+  border: 1px solid var(--color-primary-border);
   font-size: 1rem;
 }
 
@@ -270,31 +270,28 @@ RouterLink {
 label {
   display: block;
   font-weight: 700;
-  color: var(--color-primary-hover); /* amarelo vivo para destaque */
-  margin-bottom: 0.5rem; /* espaço maior do label para o input */
-  text-shadow: 0 0 3px rgba(217, 165, 0, 0.8); /* leve brilho amarelo */
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
 }
 
 /* Inputs com destaque ao redor */
 input {
   width: 100%;
   padding: 0.8rem;
-  margin-top: 0.25rem; /* espaçamento menor pois já tem do label */
+  margin-top: 0.25rem;
   font-size: 1rem;
   border-radius: 6px;
-  border: 2px solid transparent;
-  background-color: #222;
+  border: 2px solid var(--color-primary-border);
+  background-color: var(--color-nav-bg);
   color: var(--color-primary);
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-  box-shadow: inset 0 0 5px var(--color-primary); /* brilho interno suave */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: inset 0 0 6px rgba(201, 162, 39, 0.15);
 }
 
 input:focus {
   outline: none;
-  border-color: var(--color-primary-hover); /* contorno amarelo vivo ao focar */
-  box-shadow: 0 0 8px var(--color-primary-hover); /* brilho externo amarelo */
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(201, 162, 39, 0.35);
 }
 
 /* Mantém o espaçamento dos grupos */
@@ -302,25 +299,22 @@ input:focus {
   margin-bottom: 1.5rem;
 }
 
-/* Botão Entrar com texto mais visível */
+/* Botão Entrar */
 button {
   background-color: var(--color-primary);
   border: none;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--color-primary-light); /* amarelo clarinho para texto */
-  text-shadow: 0 0 4px rgba(255, 255, 224, 0.8);
+  color: var(--color-primary-text-on);
   padding: 0.9rem;
   border-radius: 8px;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 button:hover {
   background-color: var(--color-primary-hover);
-  color: #000;
+  color: var(--color-primary-text-on);
 }
 
 /* Garante que ocupe toda a altura da tela e centralize vertical/horizontal */
@@ -348,12 +342,12 @@ body {
 
 /* Caixa do login */
 .login-container {
-  background-color: #121212;
+  background-color: var(--color-nav-bg);
   border-radius: 12px;
   padding: 2rem;
   width: 100%;
-  max-width: 400px; /* agora fica pequena */
-  box-shadow: 0 0 15px rgba(179, 134, 0, 0.6);
+  max-width: 400px;
+  box-shadow: var(--shadow-amber-lg);
   color: var(--color-primary);
 }
 
@@ -364,51 +358,12 @@ h2 {
   margin-bottom: 1.5rem;
 }
 
-/* Inputs */
-input,
-button {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background-color: #222;
-  color: var(--color-primary);
-}
-
-input:focus {
-  outline: none;
-  border-color: var(--color-primary-hover);
-  box-shadow: 0 0 8px var(--color-primary-hover);
-}
-
+/* Inputs (bloco duplicado removido – ver acima) */
 /* Erro */
 .error-message {
-  color: #ff6b6b;
+  color: var(--color-danger);
   font-size: 0.875rem;
   margin-top: 0.25rem;
-}
-
-/* Botão */
-button {
-  background-color: var(--color-primary);
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--color-primary-light);
-  text-shadow: 0 0 4px rgba(255, 255, 224, 0.8);
-  padding: 0.9rem;
-  border-radius: 8px;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
-}
-
-button:hover {
-  background-color: var(--color-primary-hover);
-  color: #000;
 }
 
 /* Responsividade */

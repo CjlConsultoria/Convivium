@@ -1,35 +1,51 @@
-/* Paleta Convivium – amarelo/dourado padronizado */
+/* Paleta Convivium – amarelo/dourado harmoniosa */
 :root {
-  /* Primária (ações principais, links, destaque) */
-  --color-primary: #c49a2b;
-  --color-primary-hover: #a88222;
-  --color-primary-active: #8c6b1a;
-  --color-primary-light: #faf3e2;
-  --color-primary-border: #e0d0a0;
-  --color-primary-text-on: #1a1508;
+  /* Primária (botões, links, destaque) */
+  --color-primary: #c9a227;
+  --color-primary-hover: #b8921f;
+  --color-primary-active: #9a7b1a;
+  --color-primary-light: #fbf5e6;
+  --color-primary-border: #e2cf8a;
+  --color-primary-text-on: #1c1810;
 
   /* Superfícies */
-  --color-surface: #faf8f1;
-  --color-surface-alt: #f2efe5;
-  --color-surface-card: #fdfcf8;
-  --color-surface-input: #f9fafb;
+  --color-surface: #faf7f0;
+  --color-surface-alt: #f5f0e3;
+  --color-surface-card: #fdfbf5;
+  --color-surface-input: #faf8f3;
 
   /* Texto */
-  --color-text: #2c2c2c;
-  --color-text-muted: #555;
+  --color-text: #2d2a24;
+  --color-text-muted: #5c5749;
   --color-text-light: #fff;
 
-  /* Bordas e divisores */
-  --color-border: #e0d0a0;
+  /* Bordas */
+  --color-border: #e2cf8a;
   --color-border-focus: var(--color-primary);
 
+  /* Navbar e footer (tom escuro que combina com amarelo) */
+  --color-nav-bg: #252119;
+  --color-nav-text: #f5f0e3;
+  --color-nav-accent: var(--color-primary);
+  --color-footer-bg: #1e1b15;
+  --color-footer-text: #e8e2d5;
+
+  /* Overlay (modais) */
+  --color-overlay: rgba(28, 24, 16, 0.55);
+
   /* Estados */
-  --color-danger: #b91c1c;
-  --color-danger-hover: #991b1b;
-  --color-danger-bg: #fef2f2;
-  --color-success: #15803d;
-  --color-disabled-bg: #e5e7eb;
-  --color-disabled-text: #9ca3af;
+  --color-danger: #c0392b;
+  --color-danger-hover: #a93226;
+  --color-danger-bg: #fdeded;
+  --color-success: #1e7b3a;
+  --color-success-bg: #e8f5e9;
+  --color-disabled-bg: #e8e4db;
+  --color-disabled-text: #8a8578;
+
+  /* Sombras (amber) */
+  --shadow-amber-sm: 0 2px 8px rgba(201, 162, 39, 0.12);
+  --shadow-amber: 0 4px 14px rgba(201, 162, 39, 0.2);
+  --shadow-amber-lg: 0 8px 24px rgba(201, 162, 39, 0.25);
 
   /* Legado (compatibilidade) */
   --cor-botoes-cjl: var(--color-primary);

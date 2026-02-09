@@ -88,7 +88,7 @@ function recusar() {
   margin: 2rem auto;
   padding: 0 1rem;
   font-family: Arial, sans-serif;
-  color: #333;
+  color: var(--color-text);
 }
 
 h1 {
@@ -98,7 +98,7 @@ h1 {
 }
 
 h2 {
-  color: #4b4b0e;
+  color: var(--color-primary-active);
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-weight: 600;

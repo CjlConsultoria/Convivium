@@ -81,13 +81,14 @@
       h4.secao-form Empresa
       p
         strong Empresa:
-        |  {{ morador.empresa?.name || '' }}
-      p
-        strong CNPJ da Empresa:
-        |  {{ morador.empresa?.cnpj || '' }}
-      p
-        strong Endereço da Empresa:
-        |  {{ morador.empresa?.logradouro }}, {{ morador.empresa?.numero }} - {{ morador.empresa?.bairro }}, {{ morador.empresa?.cidade }} - {{ morador.empresa?.estado }}
+        |  {{ typeof morador.empresa === 'string' ? morador.empresa : (morador.empresa?.name ?? '') }}
+      template(v-if="morador.empresa && typeof morador.empresa === 'object'")
+        p
+          strong CNPJ da Empresa:
+          |  {{ morador.empresa?.cnpj || '' }}
+        p
+          strong Endereço da Empresa:
+          |  {{ morador.empresa?.logradouro }}, {{ morador.empresa?.numero }} - {{ morador.empresa?.bairro }}, {{ morador.empresa?.cidade }} - {{ morador.empresa?.estado }}
 
       h4.secao-form Status e Perfil
       .form-grid
@@ -235,7 +236,7 @@ const formatCpf = (cpf: string) => {
 
 .modal-header {
   padding: 1.25rem 2rem;
-  background: #b38600;
+  background: var(--color-primary);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -262,7 +263,7 @@ const formatCpf = (cpf: string) => {
 
 .modal-body {
   padding: 2rem;
-  color: #333;
+  color: var(--color-text);
   font-size: 1.05rem;
   overflow-y: auto;
   max-height: 70vh;
@@ -272,7 +273,7 @@ const formatCpf = (cpf: string) => {
 .modal-footer {
   padding: 1.25rem 2rem;
   background: #f6f6f6;
-  color: #333;
+  color: var(--color-text);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -281,8 +282,8 @@ const formatCpf = (cpf: string) => {
 
 .btn-outline.btn-principal {
   background-color: transparent;
-  border: 2px solid #b38600;
-  color: #b38600;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 0.8rem 1.6rem;
   font-weight: 600;
   border-radius: 10px;
@@ -294,7 +295,7 @@ const formatCpf = (cpf: string) => {
 
 .btn-outline.btn-principal:hover,
 .btn-outline.btn-principal:focus {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   box-shadow: 0 0 10px rgba(66, 185, 131, 0.5);
 }
@@ -322,7 +323,7 @@ const formatCpf = (cpf: string) => {
 h4.secao-form {
   margin-top: 1.5rem;
   font-size: 1.2rem;
-  color: #b38600;
+  color: var(--color-primary);
   border-bottom: 1px solid #ddd;
   padding-bottom: 0.4rem;
   margin-bottom: 0.8rem;
@@ -336,8 +337,8 @@ h4.secao-form {
 
 .btn-edit {
   background-color: transparent;
-  border: 2px solid #f1c40f;
-  color: #f1c40f;
+  border: 2px solid var(--color-primary-hover);
+  color: var(--color-primary-hover);
   font-weight: bold;
   padding: 0.4rem 1rem;
   border-radius: 10px;
@@ -346,13 +347,13 @@ h4.secao-form {
 }
 
 .btn-edit:hover {
-  background-color: #f1c40f;
+  background-color: var(--color-primary-hover);
   color: white;
 }
 
 .btn-secundario {
   border-color: #999;
-  color: #333;
+  color: var(--color-text);
 }
 
 .btn-secundario:hover {
@@ -374,15 +375,15 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #b38600;
+  border-color: var(--color-primary);
   box-shadow: 0 0 5px rgba(66, 185, 131, 0.3);
 }
 
 /* Botão Cancelar */
 .btn-outline.btn-cancelar {
   background-color: transparent;
-  border: 2px solid #e74c3c;
-  color: #e74c3c;
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
   padding: 0.8rem 1.6rem;
   font-weight: 600;
   border-radius: 10px;
@@ -394,7 +395,7 @@ input:focus {
 
 .btn-outline.btn-cancelar:hover,
 .btn-outline.btn-cancelar:focus {
-  background-color: #e74c3c;
+  background-color: var(--color-danger);
   color: white;
   box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
 }
@@ -411,7 +412,7 @@ select {
     border-color 0.2s ease,
     box-shadow 0.2s ease;
   background-color: white;
-  color: #333;
+  color: var(--color-text);
   appearance: none;
   background-image: url('data:image/svg+xml;charset=US-ASCII,<svg fill="gray" height="16" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 7l5 5 5-5z"/></svg>');
   background-repeat: no-repeat;
@@ -421,7 +422,7 @@ select {
 
 select:focus {
   outline: none;
-  border-color: #b38600;
+  border-color: var(--color-primary);
   box-shadow: 0 0 5px rgba(66, 185, 131, 0.3);
 }
 
@@ -436,6 +437,6 @@ label {
   display: block;
   font-weight: 600;
   margin-bottom: 0.25rem;
-  color: #333;
+  color: var(--color-text);
 }
 </style>

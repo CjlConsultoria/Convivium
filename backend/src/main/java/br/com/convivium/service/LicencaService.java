@@ -7,7 +7,6 @@ import br.com.convivium.entity.Empresa;
 import br.com.convivium.entity.Licenca;
 import br.com.convivium.entity.User;
 import br.com.convivium.entity.specification.LicencaSpecification;
-import br.com.convivium.exception.ApiException;
 import br.com.convivium.repository.EmpresaRepository;
 import br.com.convivium.repository.LicencaRepository;
 import br.com.convivium.repository.UserRepository;
@@ -67,25 +66,23 @@ public class LicencaService {
     }
 
     public boolean excedeuLimiteUsuarios(Long empresaId) {
-        Licenca licenca = licencaRepository.findTopByEmpresaIdAndAtivaTrueOrderByDataFimDesc(empresaId)
-                .orElseThrow(() -> new RuntimeException("Licença não encontrada"));
-
-        long usuariosAtivos = userRepository.countByEmpresaIdAndAtivoTrue(empresaId);
-        return usuariosAtivos > licenca.getLimiteUsuarios();
+        return licencaRepository.findTopByEmpresaIdAndAtivaTrueOrderByDataFimDesc(empresaId)
+                .map(lic -> userRepository.countByEmpresaIdAndAtivoTrue(empresaId) > lic.getLimiteUsuarios())
+                .orElse(false);
     }
 
     public LicencaStatusDTO getStatusLicenca(Long empresaId) {
-        Licenca licenca = licencaRepository.findTopByEmpresaIdAndAtivaTrueOrderByDataFimDesc(empresaId)
-                .orElseThrow(() -> new RuntimeException("Licença não encontrada"));
-
-        LocalDate hoje = LocalDate.now();
-        boolean valida = licenca.isValida();
-        boolean expirada = hoje.isAfter(licenca.getDataFim());
-        long diasRestantes = ChronoUnit.DAYS.between(hoje, licenca.getDataFim());
-
-        boolean excedeu = excedeuLimiteUsuarios(empresaId);
-
-        return new LicencaStatusDTO(valida, expirada, diasRestantes, excedeu);
+        return licencaRepository.findTopByEmpresaIdAndAtivaTrueOrderByDataFimDesc(empresaId)
+                .map(licenca -> {
+                    LocalDate hoje = LocalDate.now();
+                    boolean valida = licenca.isValida();
+                    boolean expirada = hoje.isAfter(licenca.getDataFim());
+                    long diasRestantes = Math.max(0, ChronoUnit.DAYS.between(hoje, licenca.getDataFim()));
+                    long usuariosAtivos = userRepository.countByEmpresaIdAndAtivoTrue(empresaId);
+                    boolean excedeu = usuariosAtivos > (licenca.getLimiteUsuarios() != null ? licenca.getLimiteUsuarios() : 0);
+                    return new LicencaStatusDTO(valida, expirada, diasRestantes, excedeu);
+                })
+                .orElse(new LicencaStatusDTO(false, true, 0, false));
     }
 
     public Page<LicencaDetalhadaDTO> buscarLicencasPaginadas(String empresaNome, String usuarioNome, String cpf, Pageable pageable) {

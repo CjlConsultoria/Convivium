@@ -286,7 +286,7 @@ async function onSubmit() {
   padding: 1.5rem;
   width: 100%;
   max-width: 600px;
-  box-shadow: 0 4px 10px rgba(245, 197, 24, 0.3);
+  box-shadow: 0 4px 10px var(--shadow-amber);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   box-sizing: border-box;
@@ -332,7 +332,7 @@ input {
 input:focus {
   outline: none;
   border-color: var(--color-primary-border);
-  background: #fff9db;
+  background: var(--color-primary-light);
 }
 
 /* Footer */

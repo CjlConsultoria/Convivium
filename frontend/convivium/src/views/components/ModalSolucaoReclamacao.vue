@@ -148,7 +148,7 @@ textarea {
 }
 
 .btn-primary {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
 }
 
@@ -158,7 +158,7 @@ textarea {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #b38600;
+  background-color: var(--color-primary);
 }
 
 .btn-cancel {

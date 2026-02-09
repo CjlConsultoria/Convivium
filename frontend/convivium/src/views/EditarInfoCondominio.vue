@@ -236,7 +236,7 @@ onMounted(carregar)
 }
 .subtitulo {
   margin: -0.5rem 0 1rem 0;
-  color: #666;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
 }
 .bloco {
@@ -265,12 +265,12 @@ onMounted(carregar)
 }
 .campo label {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-muted);
 }
 .campo input,
 .campo textarea {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-primary-border);
   border-radius: 4px;
 }
 .acoes-form {

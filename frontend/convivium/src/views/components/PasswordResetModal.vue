@@ -113,7 +113,7 @@ const closeModal = () => {
 h2 {
   text-align: center;
   margin-bottom: 25px;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 .form-group {
@@ -138,13 +138,13 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #b38600;
+  border-color: var(--color-primary);
 }
 
 button[type='submit'] {
   width: 100%;
   padding: 12px;
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -155,17 +155,17 @@ button[type='submit'] {
 }
 
 button[type='submit']:hover {
-  background-color: #c2a757;
+  background-color: var(--color-primary-hover);
 }
 
 .error {
-  color: #d32f2f;
+  color: var(--color-danger);
   font-size: 14px;
   margin-bottom: 15px;
 }
 
 .success {
-  color: #388e3c;
+  color: var(--color-success);
   font-size: 14px;
   margin-bottom: 15px;
 }

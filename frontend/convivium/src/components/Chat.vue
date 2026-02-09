@@ -116,7 +116,7 @@ watch(
 
 .chat-header {
   background-color: var(--color-primary);
-  color: #000;
+  color: var(--color-primary-text-on);
   padding: 0.5rem 0.8rem;
   border-radius: 8px 8px 0 0;
   cursor: pointer;
@@ -124,8 +124,8 @@ watch(
 }
 
 .chat-body {
-  background-color: #1c1c1c;
-  border: 1px solid #d4af37;
+  background-color: var(--color-nav-bg);
+  border: 1px solid var(--color-primary);
   border-top: none;
   border-radius: 0 0 8px 8px;
   display: flex;
@@ -150,13 +150,13 @@ watch(
 .chat-message.usuario {
   align-self: flex-end;
   background-color: var(--color-primary);
-  color: #000;
+  color: var(--color-primary-text-on);
 }
 
 .chat-message.sistema {
   align-self: flex-start;
-  background-color: #333;
-  color: #fff;
+  background-color: var(--color-text);
+  color: var(--color-text-light);
 }
 
 /* Animação "pensando" */
@@ -194,22 +194,22 @@ watch(
   flex: 1;
   padding: 0.4rem 0.6rem;
   border-radius: 4px;
-  border: 1px solid #d4af37;
-  background-color: #222;
-  color: #fff;
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-nav-bg);
+  color: var(--color-nav-text);
 }
 
 .chat-input button {
   padding: 0.4rem 1rem;
   border: none;
   border-radius: 4px;
-  background-color: #d4af37;
-  color: #000;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
   cursor: pointer;
   font-weight: bold;
 }
 
 .chat-input button:hover {
-  background-color: #e5c94f;
+  background-color: var(--color-primary-hover);
 }
 </style>

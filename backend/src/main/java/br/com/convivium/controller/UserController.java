@@ -5,7 +5,6 @@ import br.com.convivium.dto.request.UsuarioFiltroDTO;
 import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.entity.Role;
 import br.com.convivium.entity.Tipo;
-import br.com.convivium.entity.User;
 import br.com.convivium.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,11 +41,11 @@ public class UserController {
             @ApiResponse(responseCode = "422", description = "Invalid username/password supplied")
     })
     @GetMapping("/list/{idEmpresa}")
-    public ResponseEntity<Page<User>> listarPaginado(
+    public ResponseEntity<Page<UserResponseDTO>> listarPaginado(
             @PathVariable Long idEmpresa,
             @PageableDefault(page = 0, size = 10, sort = "username") Pageable pageable) {
 
-        Page<User> page = userService.listAll(idEmpresa, pageable);
+        Page<UserResponseDTO> page = userService.listarUsuariosSemSenha(idEmpresa, pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -79,8 +78,8 @@ public class UserController {
             @ApiResponse(responseCode = "422", description = "Invalid username/password supplied")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> listarPermissao(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.buscarUserId(id));
+    public ResponseEntity<Optional<UserResponseDTO>> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.buscarPorIdComDTO(id));
     }
 
     @PutMapping("/ativar-conta/{idUsuario}")

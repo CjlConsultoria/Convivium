@@ -305,12 +305,11 @@ const fetchMoradores = async (page = 0, size = itensPorPagina, filtro = '') => {
       unidade: (m.bloco ? 'Bloco ' + m.bloco + ' - ' : '') + (m.apartamento ?? ''),
       email: m.email,
       telefone: formatarTelefoneUI(m.telefone),
-      tipo: m.tipo?.name ?? '',
-      empresa: m.empresa?.name ?? '',
-      role: m.role?.name ?? '',
+      tipo: typeof m.tipo === 'string' ? m.tipo : (m.tipo?.name ?? ''),
+      empresa: typeof m.empresa === 'string' ? m.empresa : (m.empresa?.name ?? ''),
+      role: typeof m.role === 'string' ? m.role : (m.role?.name ?? ''),
       bloco: m.bloco,
       apartamento: m.apartamento,
-      // demais campos que quiser usar
     }))
 
     paginaAtual.value = data.pageable.pageNumber + 1
@@ -644,7 +643,7 @@ const abrirModalNovoMoradorCompleto = () => {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  color: #222;
+  color: var(--color-text);
   flex-direction: row;
 }
 
@@ -654,18 +653,18 @@ const abrirModalNovoMoradorCompleto = () => {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   text-align: center;
-  color: #222; /* preto */
+  color: var(--color-text); /* preto */
 }
 
 /* Caixa de link condomínio */
 .link-condominio {
-  background: #f9fafb;
-  border: 1px solid var(--color-primary-border); /* amarelo suave */
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-primary-border);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
   font-weight: 600;
-  color: #555;
+  color: var(--color-text-muted);
   word-break: break-word;
 }
 
@@ -703,14 +702,14 @@ const abrirModalNovoMoradorCompleto = () => {
   border: 1.5px solid var(--color-primary-border); /* amarelo suave */
   border-radius: 8px;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--color-text);
   background-color: white;
   transition: border-color 0.3s;
   appearance: none;
 }
 
 .input-group input::placeholder {
-  color: #999;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
@@ -718,7 +717,7 @@ const abrirModalNovoMoradorCompleto = () => {
 .input-group select:focus {
   outline: none;
   border-color: var(--color-primary); /* amarelo médio */
-  box-shadow: 0 0 8px rgba(179, 134, 0, 0.3);
+  box-shadow: var(--shadow-amber-sm);
 }
 
 .input-group .icon {
@@ -800,7 +799,7 @@ const abrirModalNovoMoradorCompleto = () => {
   color: white;
   cursor: default;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(179, 134, 0, 0.6);
+  box-shadow: var(--shadow-amber);
 }
 
 /* Tabela com bordas suaves e linhas diferenciadas */
@@ -814,17 +813,17 @@ const abrirModalNovoMoradorCompleto = () => {
   border-radius: 12px;
   overflow: hidden;
   font-size: 1rem;
-  color: #333333;
+  color: var(--color-text);
   background-color: transparent;
-  box-shadow: 0 2px 8px rgba(217, 165, 0, 0.1);
+  box-shadow: var(--shadow-amber-sm);
   table-layout: fixed; /* Ajuda a forçar colunas proporcionais */
 }
 
 .lista-moradores th,
 .lista-moradores td {
   padding: 1rem 1.2rem;
-  border-bottom: 1px solid #f0eec9;
-  border-right: 1px solid #f0eec9;
+  border-bottom: 1px solid var(--color-primary-border);
+  border-right: 1px solid var(--color-primary-border);
   vertical-align: middle;
   word-break: break-word;
   white-space: normal;
@@ -837,7 +836,7 @@ const abrirModalNovoMoradorCompleto = () => {
 
 .lista-moradores thead th {
   background-color: var(--color-surface);
-  color: #222;
+  color: var(--color-text);
   font-weight: 700;
   text-align: left;
   user-select: none;
@@ -845,7 +844,7 @@ const abrirModalNovoMoradorCompleto = () => {
 }
 
 .lista-moradores tbody tr:nth-child(even) {
-  background-color: #fffef7;
+  background-color: var(--color-surface-card);
 }
 
 .lista-moradores tbody tr:hover {
@@ -878,7 +877,7 @@ const abrirModalNovoMoradorCompleto = () => {
 
 .dropdown-menu li:hover {
   background-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-text-light);
 }
 
 /* Paginação */
@@ -906,8 +905,8 @@ const abrirModalNovoMoradorCompleto = () => {
 .pag-btn:hover:not(:disabled),
 .pag-btn.ativo {
   background-color: var(--color-primary);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(179, 134, 0, 0.6);
+  color: var(--color-text-light);
+  box-shadow: var(--shadow-amber);
 }
 
 .pag-btn:disabled {
@@ -920,7 +919,7 @@ const abrirModalNovoMoradorCompleto = () => {
 modal {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -943,14 +942,14 @@ modal h3 {
   font-weight: 700;
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #222;
+  color: var(--color-text);
 }
 
 modal label {
   display: block;
   margin-bottom: 0.3rem;
   font-weight: 600;
-  color: #444;
+  color: var(--color-text-muted);
 }
 
 modal input {
@@ -958,16 +957,16 @@ modal input {
   padding: 0.45rem 0.8rem;
   margin-bottom: 1.1rem;
   border-radius: 8px;
-  border: 1.5px solid #ccc;
+  border: 1.5px solid var(--color-primary-border);
   font-size: 1rem;
-  color: #333;
+  color: var(--color-text);
   transition: border-color 0.3s;
 }
 
 modal input:focus {
   border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 6px rgba(179, 134, 0, 0.3);
+  box-shadow: var(--shadow-amber-sm);
 }
 
 /* Botões no modal alinhados */
@@ -1047,7 +1046,7 @@ modal input:focus {
   padding: 0.6rem 1rem;
   border-radius: 8px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
   transition: background 0.2s ease;
 }
 
@@ -1097,7 +1096,7 @@ modal input:focus {
   .overlay-menu {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--color-overlay);
     z-index: 999;
     display: none;
   }
@@ -1169,17 +1168,16 @@ modal input:focus {
   border-radius: 12px;
   overflow: hidden;
   font-size: 1rem;
-  color: #333333;
+  color: var(--color-text);
   background-color: transparent;
-  box-shadow: 0 2px 8px rgba(217, 165, 0, 0.1);
-  /* REMOVA table-layout: fixed; */
+  box-shadow: var(--shadow-amber-sm);
 }
 
 .lista-moradores th,
 .lista-moradores td {
   padding: 0.8rem 0.9rem; /* diminua padding para caber mais colunas */
-  border-bottom: 1px solid #f0eec9;
-  border-right: 1px solid #f0eec9;
+  border-bottom: 1px solid var(--color-primary-border);
+  border-right: 1px solid var(--color-primary-border);
   vertical-align: middle;
   word-break: break-word; /* permite quebra de palavra */
   white-space: normal; /* permite quebrar linhas */

@@ -125,7 +125,7 @@ function formatarStatus(status: string) {
 }
 
 .modal-header {
-  background: #b38600;
+  background: var(--color-primary);
   padding: 1.25rem 1.5rem;
   color: white;
   font-weight: 700;
@@ -148,7 +148,7 @@ function formatarStatus(status: string) {
   min-width: 110px;
   display: inline-block;
   font-weight: 600;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 .anexos {
@@ -165,12 +165,12 @@ function formatarStatus(status: string) {
 .historico {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 2px solid #b38600;
+  border-top: 2px solid var(--color-primary);
 }
 
 .historico strong {
   font-size: 1.1rem;
-  color: #b38600;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
   display: block;
 }
@@ -212,14 +212,14 @@ function formatarStatus(status: string) {
   justify-content: space-between;
   font-weight: 700;
   font-size: 0.9rem;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 .status {
   text-transform: uppercase;
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: #fff;
   user-select: none;
   flex-shrink: 0;
@@ -250,7 +250,7 @@ function formatarStatus(status: string) {
 }
 
 .acao-corpo strong {
-  color: #b38600;
+  color: var(--color-primary);
   min-width: 110px;
   display: inline-block;
 }
@@ -294,12 +294,12 @@ function formatarStatus(status: string) {
   transition: background-color 0.3s ease;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
   user-select: none;
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
 }
 
 .btn:hover {
-  background-color: #b38600;
+  background-color: var(--color-primary);
 }
 
 /* Responsividade */

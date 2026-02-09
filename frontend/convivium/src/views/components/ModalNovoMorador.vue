@@ -458,7 +458,7 @@ function gerarSenha() {
 
 .modal-header {
   padding: 1.25rem 2rem;
-  background: #b38600;
+  background: var(--color-primary);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -504,8 +504,8 @@ function gerarSenha() {
 
 .btn-outline.btn-principal {
   background-color: transparent;
-  border: 2px solid #b38600;
-  color: #b38600;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 0.8rem 1.6rem;
   font-weight: 600;
   border-radius: 10px;
@@ -517,7 +517,7 @@ function gerarSenha() {
 
 .btn-outline.btn-principal:hover,
 .btn-outline.btn-principal:focus {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   box-shadow: 0 0 10px rgba(66, 185, 131, 0.5);
 }
@@ -545,7 +545,7 @@ function gerarSenha() {
 h4.secao-form {
   margin-top: 1.5rem;
   font-size: 1.2rem;
-  color: #b38600;
+  color: var(--color-primary);
   border-bottom: 1px solid #ddd;
   padding-bottom: 0.4rem;
   margin-bottom: 0.8rem;
@@ -559,8 +559,8 @@ h4.secao-form {
 
 .btn-edit {
   background-color: transparent;
-  border: 2px solid #f1c40f;
-  color: #f1c40f;
+  border: 2px solid var(--color-primary-hover);
+  color: var(--color-primary-hover);
   font-weight: bold;
   padding: 0.4rem 1rem;
   border-radius: 10px;
@@ -569,7 +569,7 @@ h4.secao-form {
 }
 
 .btn-edit:hover {
-  background-color: #f1c40f;
+  background-color: var(--color-primary-hover);
   color: white;
 }
 
@@ -597,15 +597,15 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #b38600;
+  border-color: var(--color-primary);
   box-shadow: 0 0 5px rgba(66, 185, 131, 0.3);
 }
 
 /* Botão Cancelar */
 .btn-outline.btn-cancelar {
   background-color: transparent;
-  border: 2px solid #e74c3c;
-  color: #e74c3c;
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
   padding: 0.8rem 1.6rem;
   font-weight: 600;
   border-radius: 10px;
@@ -617,7 +617,7 @@ input:focus {
 
 .btn-outline.btn-cancelar:hover,
 .btn-outline.btn-cancelar:focus {
-  background-color: #e74c3c;
+  background-color: var(--color-danger);
   color: white;
   box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
 }
@@ -644,7 +644,7 @@ select {
 
 select:focus {
   outline: none;
-  border-color: #b38600;
+  border-color: var(--color-primary);
   box-shadow: 0 0 5px rgba(66, 185, 131, 0.3);
 }
 
@@ -711,8 +711,8 @@ label {
 
 .btn-gerar-senha {
   background-color: transparent;
-  border: 2px solid #b38600;
-  color: #b38600;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
   font-weight: 600;
   padding: 0.4rem 0.8rem;
   border-radius: 10px;
@@ -734,7 +734,7 @@ label {
 
 .btn-gerar-senha:hover:not(:disabled),
 .btn-gerar-senha:focus:not(:disabled) {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   box-shadow: 0 0 10px rgba(66, 185, 131, 0.5);
   outline: none;
