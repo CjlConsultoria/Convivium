@@ -2,6 +2,7 @@ package br.com.convivium.entity.enums;
 
 public enum TipoCargo {
     SINDICO(1L, "Síndico"),
+    SUB_SINDICO(11L, "Sub Síndico"),
     CONSELHEIRO(2L, "Conselheiro"),
     ZELADOR(3L, "Zelador"),
     ADMINISTRATIVO(4L, "Administrativo"),

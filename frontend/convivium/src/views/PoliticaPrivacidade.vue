@@ -92,7 +92,7 @@ function recusar() {
 }
 
 h1 {
-  color: #b37f00;
+  color: var(--color-primary);
   margin-bottom: 1.5rem;
   font-weight: 700;
 }
@@ -117,11 +117,11 @@ ul {
 }
 
 a {
-  color: #f5c518;
+  color: var(--color-primary);
   text-decoration: underline;
 }
 
 a:hover {
-  color: #d4af37;
+  color: var(--color-primary-hover);
 }
 </style>

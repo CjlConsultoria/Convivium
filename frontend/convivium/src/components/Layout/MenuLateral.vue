@@ -33,6 +33,9 @@ aside.menu-lateral
     li(v-if="(perfilUsuario === 'ADMINISTRATIVO' || perfilUsuario === 'ADMIN')", :class="{ ativo: itemSelecionado === 'editar-info-condominio' }")
       RouterLink(to="/editar-informacoes-condominio", @click="fecharMenu") Editar Informações do Condomínio
 
+    li(v-if="isLoggedIn && empresa?.id", :class="{ ativo: itemSelecionado === 'encomendas' }")
+      RouterLink(to="/encomendas", @click="fecharMenu") Encomendas
+
     li(v-if="perfilUsuario === 'ADMIN'", :class="{ ativo: itemSelecionado === 'licenca' }")
       RouterLink(to="/licenca", @click="fecharMenu") Gestão de Licenças
 
@@ -136,8 +139,8 @@ function fecharMenu() {
   width: 220px;
   max-width: 240px;
   min-width: 180px;
-  background-color: #f9f7e8;
-  border-right: 2px solid #d9c877;
+  background-color: var(--color-surface);
+  border-right: 2px solid var(--color-primary-border);
   padding: 1.5rem 1rem;
   position: sticky;
   top: 0;
@@ -151,7 +154,7 @@ function fecharMenu() {
 .menu-lateral h3 {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
-  color: #b38600;
+  color: var(--color-primary);
   line-height: 1.2;
 }
 
@@ -172,7 +175,7 @@ function fecharMenu() {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
   transition: background 0.2s ease;
   display: flex;
   align-items: center;
@@ -185,13 +188,13 @@ function fecharMenu() {
 
 .menu-lateral li:hover:not(.ativo),
 .menu-lateral ul.submenu-lateral li:hover:not(.ativo) {
-  background-color: #fff8d1;
+  background-color: var(--color-primary-light);
 }
 
 .menu-lateral li.ativo,
 .menu-lateral a.ativo {
-  background-color: #b38600;
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
   pointer-events: none;
   border-radius: 8px;
   height: 2.5rem;
@@ -199,14 +202,13 @@ function fecharMenu() {
   align-items: center;
 }
 
-/* Submenu lateral que abre para o lado */
 .menu-lateral ul.submenu-lateral {
   position: absolute;
   top: 0;
   left: 100%;
   margin-left: 6px;
-  background-color: #fff8d1;
-  border: 1px solid #d9c877;
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border);
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   min-width: 180px;
@@ -218,7 +220,6 @@ function fecharMenu() {
   transition: opacity 0.2s ease;
 }
 
-/* Botão Administração */
 .menu-lateral button.submenu-toggle {
   background: none;
   border: none;
@@ -228,7 +229,7 @@ function fecharMenu() {
   font-size: 1rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  color: #b38600;
+  color: var(--color-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -237,13 +238,13 @@ function fecharMenu() {
 }
 
 .menu-lateral button.submenu-toggle:hover {
-  background-color: #fff8d1;
+  background-color: var(--color-primary-light);
 }
 
 .menu-lateral .seta {
   font-size: 0.8rem;
   user-select: none;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 .menu-lateral a {
@@ -267,7 +268,7 @@ function fecharMenu() {
   text-align: left;
   padding: 0.6rem 1rem;
   font-weight: 600;
-  color: #a00000;
+  color: var(--color-danger);
   cursor: pointer;
   border-radius: 8px;
   margin-top: auto;
@@ -275,7 +276,7 @@ function fecharMenu() {
 }
 
 .btn-sair:hover {
-  background-color: #ffe0e0;
+  background-color: var(--color-danger-bg);
 }
 
 @media (max-width: 768px) {
@@ -306,8 +307,8 @@ function fecharMenu() {
     font-size: 2rem !important;
     width: 36px !important;
     height: 36px !important;
-    background-color: #b38600 !important;
-    color: white !important;
+    background-color: var(--color-primary) !important;
+    color: var(--color-primary-text-on) !important;
     border-radius: 50% !important;
     box-shadow: none !important;
   }

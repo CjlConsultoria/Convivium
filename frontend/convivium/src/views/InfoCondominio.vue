@@ -119,18 +119,18 @@ onMounted(async () => {
 }
 .info-condominio h3 {
   margin-bottom: 1rem;
-  color: var(--color-heading, #1a1a1a);
+  color: var(--color-text);
 }
 .bloco {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: var(--surface, #f8f9fa);
+  background: var(--color-surface-input);
   border-radius: 8px;
 }
 .bloco h4 {
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
-  color: var(--color-heading, #333);
+  color: var(--color-text);
 }
 .bloco ul {
   margin: 0;
@@ -140,7 +140,7 @@ onMounted(async () => {
   margin: 0.25rem 0;
 }
 .bloco a {
-  color: var(--primary, #2563eb);
+  color: var(--color-primary);
 }
 .info-vazio {
   color: #666;

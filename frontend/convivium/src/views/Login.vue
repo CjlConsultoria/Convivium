@@ -165,7 +165,7 @@ const handleLogin = async () => {
 /* Títulos e textos */
 h2 {
   text-align: center;
-  color: #b38600; /* amarelo escuro */
+  color: var(--color-primary); /* amarelo escuro */
   margin-bottom: 1.5rem;
 }
 
@@ -179,7 +179,7 @@ button {
   border-radius: 6px;
   border: 1px solid #333;
   background-color: #222;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 input::placeholder {
@@ -187,7 +187,7 @@ input::placeholder {
 }
 
 button {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   border: none;
   cursor: pointer;
   font-weight: 600;
@@ -195,7 +195,7 @@ button {
 }
 
 button:hover {
-  background-color: #d9a500;
+  background-color: var(--color-primary-hover);
   color: #000;
 }
 
@@ -203,7 +203,7 @@ button:hover {
 RouterLink {
   display: block;
   text-align: center;
-  color: #b38600;
+  color: var(--color-primary);
   margin-top: 1rem;
   cursor: pointer;
 }
@@ -211,7 +211,7 @@ RouterLink {
 .center-link {
   display: block;
   text-align: center;
-  color: #b38600;
+  color: var(--color-primary);
   margin-top: 1rem;
 }
 
@@ -226,7 +226,7 @@ RouterLink {
   flex-grow: 1;
   padding-right: 2.5rem;
   background-color: #222;
-  color: #b38600;
+  color: var(--color-primary);
   border-radius: 6px;
   border: 1px solid #333;
   font-size: 1rem;
@@ -238,7 +238,7 @@ RouterLink {
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #b38600;
+  color: var(--color-primary);
   font-size: 1.1rem;
   user-select: none;
 }
@@ -256,21 +256,21 @@ RouterLink {
   text-align: right;
   margin-top: 2rem;
   margin-bottom: 1rem;
-  color: #b38600;
+  color: var(--color-primary);
   font-size: 0.9rem;
   cursor: pointer;
   text-decoration: underline;
 }
 
 .forgot-password:hover {
-  color: #d9a500;
+  color: var(--color-primary-hover);
 }
 
 /* Labels mais destacados */
 label {
   display: block;
   font-weight: 700;
-  color: #d9a500; /* amarelo vivo para destaque */
+  color: var(--color-primary-hover); /* amarelo vivo para destaque */
   margin-bottom: 0.5rem; /* espaço maior do label para o input */
   text-shadow: 0 0 3px rgba(217, 165, 0, 0.8); /* leve brilho amarelo */
 }
@@ -284,17 +284,17 @@ input {
   border-radius: 6px;
   border: 2px solid transparent;
   background-color: #222;
-  color: #b38600;
+  color: var(--color-primary);
   transition:
     border-color 0.3s ease,
     box-shadow 0.3s ease;
-  box-shadow: inset 0 0 5px #b38600; /* brilho interno suave */
+  box-shadow: inset 0 0 5px var(--color-primary); /* brilho interno suave */
 }
 
 input:focus {
   outline: none;
-  border-color: #d9a500; /* contorno amarelo vivo ao focar */
-  box-shadow: 0 0 8px #d9a500; /* brilho externo amarelo */
+  border-color: var(--color-primary-hover); /* contorno amarelo vivo ao focar */
+  box-shadow: 0 0 8px var(--color-primary-hover); /* brilho externo amarelo */
 }
 
 /* Mantém o espaçamento dos grupos */
@@ -304,12 +304,12 @@ input:focus {
 
 /* Botão Entrar com texto mais visível */
 button {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   border: none;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.1rem;
-  color: #fff9d1; /* amarelo clarinho para texto */
+  color: var(--color-primary-light); /* amarelo clarinho para texto */
   text-shadow: 0 0 4px rgba(255, 255, 224, 0.8);
   padding: 0.9rem;
   border-radius: 8px;
@@ -319,7 +319,7 @@ button {
 }
 
 button:hover {
-  background-color: #d9a500;
+  background-color: var(--color-primary-hover);
   color: #000;
 }
 
@@ -354,13 +354,13 @@ body {
   width: 100%;
   max-width: 400px; /* agora fica pequena */
   box-shadow: 0 0 15px rgba(179, 134, 0, 0.6);
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 /* Título */
 h2 {
   text-align: center;
-  color: #b38600;
+  color: var(--color-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -374,13 +374,13 @@ button {
   border-radius: 6px;
   border: 1px solid #333;
   background-color: #222;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 input:focus {
   outline: none;
-  border-color: #d9a500;
-  box-shadow: 0 0 8px #d9a500;
+  border-color: var(--color-primary-hover);
+  box-shadow: 0 0 8px var(--color-primary-hover);
 }
 
 /* Erro */
@@ -392,12 +392,12 @@ input:focus {
 
 /* Botão */
 button {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   border: none;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.1rem;
-  color: #fff9d1;
+  color: var(--color-primary-light);
   text-shadow: 0 0 4px rgba(255, 255, 224, 0.8);
   padding: 0.9rem;
   border-radius: 8px;
@@ -407,7 +407,7 @@ button {
 }
 
 button:hover {
-  background-color: #d9a500;
+  background-color: var(--color-primary-hover);
   color: #000;
 }
 

@@ -58,13 +58,12 @@
   margin: 0;
 }
 
-/* Garante que o corpo ocupe toda a altura da tela */
 body {
-  min-height: 100vh; /* Corpo ocupa toda a altura */
-  display: flex; /* Flexbox para ajustar o layout */
-  flex-direction: column; /* Alinha o conteúdo em coluna */
-  justify-content: space-between; /* Distribui o conteúdo, empurrando o rodapé para o fim */
-  background-color: #f9f7e8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--color-surface);
 }
 
 #app {
@@ -110,10 +109,10 @@ a,
   }
 
   .main-content {
-    flex: 1; /* Certifica-se de que o conteúdo vai ocupar o restante do espaço disponível */
+    flex: 1;
     padding: 2rem;
     width: 100%;
-    background-color: #eaebdb;
+    background-color: var(--color-surface-alt);
   }
 
   /* Rodapé e Navbar */

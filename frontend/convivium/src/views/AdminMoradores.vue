@@ -660,7 +660,7 @@ const abrirModalNovoMoradorCompleto = () => {
 /* Caixa de link condomínio */
 .link-condominio {
   background: #f9fafb;
-  border: 1px solid #d9c877; /* amarelo suave */
+  border: 1px solid var(--color-primary-border); /* amarelo suave */
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
@@ -670,13 +670,13 @@ const abrirModalNovoMoradorCompleto = () => {
 }
 
 .link-condominio a {
-  color: #b38600; /* amarelo mais escuro */
+  color: var(--color-primary); /* amarelo mais escuro */
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .link-condominio a:hover {
-  color: #8c6500; /* amarelo escuro hover */
+  color: var(--color-primary-active); /* amarelo escuro hover */
   text-decoration: underline;
 }
 
@@ -700,7 +700,7 @@ const abrirModalNovoMoradorCompleto = () => {
 .input-group select {
   width: 100%;
   padding: 0.5rem 2.2rem 0.5rem 0.9rem;
-  border: 1.5px solid #d9c877; /* amarelo suave */
+  border: 1.5px solid var(--color-primary-border); /* amarelo suave */
   border-radius: 8px;
   font-size: 0.9rem;
   color: #333;
@@ -717,7 +717,7 @@ const abrirModalNovoMoradorCompleto = () => {
 .input-group input:focus,
 .input-group select:focus {
   outline: none;
-  border-color: #b38600; /* amarelo médio */
+  border-color: var(--color-primary); /* amarelo médio */
   box-shadow: 0 0 8px rgba(179, 134, 0, 0.3);
 }
 
@@ -726,7 +726,7 @@ const abrirModalNovoMoradorCompleto = () => {
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #b38600;
+  color: var(--color-primary);
   pointer-events: none;
   font-size: 1.1rem;
 }
@@ -736,9 +736,9 @@ const abrirModalNovoMoradorCompleto = () => {
   padding: 0.4rem 1rem;
   font-weight: 600;
   font-size: 0.95rem;
-  color: #b38600;
+  color: var(--color-primary);
   background: transparent;
-  border: 2px solid #b38600;
+  border: 2px solid var(--color-primary);
   border-radius: 8px;
   cursor: pointer;
   user-select: none;
@@ -749,19 +749,19 @@ const abrirModalNovoMoradorCompleto = () => {
 
 .btn-outline:hover,
 .btn-outline:focus {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   outline: none;
 }
 
 .btn-principal {
-  border-color: #8c6500;
-  color: #8c6500;
+  border-color: var(--color-primary-active);
+  color: var(--color-primary-active);
 }
 
 .btn-principal:hover,
 .btn-principal:focus {
-  background-color: #8c6500;
+  background-color: var(--color-primary-active);
   color: white;
 }
 
@@ -777,9 +777,9 @@ const abrirModalNovoMoradorCompleto = () => {
   padding: 0.45rem 1.3rem;
   font-weight: 700;
   font-size: 1rem;
-  border: 2px solid #b38600;
+  border: 2px solid var(--color-primary);
   background: transparent;
-  color: #b38600;
+  color: var(--color-primary);
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -790,13 +790,13 @@ const abrirModalNovoMoradorCompleto = () => {
 
 .btn-nav:hover,
 .btn-nav:focus {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   outline: none;
 }
 
 .btn-nav.ativo {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   cursor: default;
   pointer-events: none;
@@ -810,7 +810,7 @@ const abrirModalNovoMoradorCompleto = () => {
   margin: 0 auto;
   border-collapse: separate;
   border-spacing: 0;
-  border: 1px solid #d9c877;
+  border: 1px solid var(--color-primary-border);
   border-radius: 12px;
   overflow: hidden;
   font-size: 1rem;
@@ -836,7 +836,7 @@ const abrirModalNovoMoradorCompleto = () => {
 }
 
 .lista-moradores thead th {
-  background-color: #f9f7e8;
+  background-color: var(--color-surface);
   color: #222;
   font-weight: 700;
   text-align: left;
@@ -849,7 +849,7 @@ const abrirModalNovoMoradorCompleto = () => {
 }
 
 .lista-moradores tbody tr:hover {
-  background-color: #fff8d1;
+  background-color: var(--color-primary-light);
   cursor: pointer;
 }
 
@@ -857,7 +857,7 @@ const abrirModalNovoMoradorCompleto = () => {
 .dropdown-menu {
   position: absolute;
   background: white;
-  border: 1px solid #d9c877;
+  border: 1px solid var(--color-primary-border);
   border-radius: 8px;
   margin-top: 6px;
   min-width: 140px;
@@ -877,7 +877,7 @@ const abrirModalNovoMoradorCompleto = () => {
 }
 
 .dropdown-menu li:hover {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: #fff;
 }
 
@@ -890,8 +890,8 @@ const abrirModalNovoMoradorCompleto = () => {
 }
 
 .pag-btn {
-  border-color: #d9c877;
-  color: #b38600;
+  border-color: var(--color-primary-border);
+  color: var(--color-primary);
   border-radius: 8px;
   padding: 0.5rem 0.8rem;
   min-width: 32px;
@@ -905,14 +905,14 @@ const abrirModalNovoMoradorCompleto = () => {
 
 .pag-btn:hover:not(:disabled),
 .pag-btn.ativo {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: #fff;
   box-shadow: 0 0 10px rgba(179, 134, 0, 0.6);
 }
 
 .pag-btn:disabled {
-  color: #d9c877;
-  border-color: #d9c877;
+  color: var(--color-primary-border);
+  border-color: var(--color-primary-border);
   cursor: default;
 }
 
@@ -965,7 +965,7 @@ modal input {
 }
 
 modal input:focus {
-  border-color: #b38600;
+  border-color: var(--color-primary);
   outline: none;
   box-shadow: 0 0 6px rgba(179, 134, 0, 0.3);
 }
@@ -982,8 +982,8 @@ modal input:focus {
   margin-top: 2rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #b38600;
-  border-bottom: 2px solid #b3860033;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary)33;
   padding-bottom: 0.4rem;
 }
 
@@ -1001,12 +1001,12 @@ modal input:focus {
 }
 
 .btn-reset {
-  border-color: #b38600;
-  color: #b38600;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .btn-reset:hover {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
 }
 
@@ -1018,8 +1018,8 @@ modal input:focus {
 .menu-lateral {
   width: 220px;
   min-width: 200px;
-  background-color: #f9f7e8;
-  border-right: 2px solid #d9c877;
+  background-color: var(--color-surface);
+  border-right: 2px solid var(--color-primary-border);
   padding: 1.5rem 1rem;
   height: 100vh;
   position: sticky;
@@ -1031,7 +1031,7 @@ modal input:focus {
 .menu-lateral h3 {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 .menu-lateral ul {
@@ -1052,11 +1052,11 @@ modal input:focus {
 }
 
 .menu-lateral li:hover {
-  background-color: #fff8d1;
+  background-color: var(--color-primary-light);
 }
 
 .menu-lateral li.ativo {
-  background-color: #b38600;
+  background-color: var(--color-primary);
   color: white;
   pointer-events: none;
 }
@@ -1080,8 +1080,8 @@ modal input:focus {
     left: 0;
     height: 100vh;
     width: 220px;
-    background-color: #f9f7e8;
-    border-right: 2px solid #d9c877;
+    background-color: var(--color-surface);
+    border-right: 2px solid var(--color-primary-border);
     padding: 1.5rem 1rem;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
@@ -1165,7 +1165,7 @@ modal input:focus {
   width: 100%; /* tabela ocupa toda largura do container */
   border-collapse: separate;
   border-spacing: 0;
-  border: 1px solid #d9c877;
+  border: 1px solid var(--color-primary-border);
   border-radius: 12px;
   overflow: hidden;
   font-size: 1rem;

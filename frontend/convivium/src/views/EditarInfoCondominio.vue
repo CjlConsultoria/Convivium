@@ -242,13 +242,13 @@ onMounted(carregar)
 .bloco {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: var(--surface, #f8f9fa);
+  background: var(--color-surface-input);
   border-radius: 8px;
 }
 .bloco h4 {
   margin: 0 0 0.75rem 0;
   font-size: 1rem;
-  color: var(--color-heading, #333);
+  color: var(--color-text);
 }
 .grid-campos {
   display: grid;

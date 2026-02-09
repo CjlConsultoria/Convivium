@@ -281,7 +281,7 @@ async function onSubmit() {
 
 .modal-container {
   background: #fff;
-  border: 2px solid #f5c518;
+  border: 2px solid var(--color-primary);
   border-radius: 8px;
   padding: 1.5rem;
   width: 100%;
@@ -297,7 +297,7 @@ async function onSubmit() {
 /* Header */
 .modal-header h3 {
   margin-bottom: 1rem;
-  color: #b37f00;
+  color: var(--color-primary);
   font-weight: 700;
   font-size: 1.6rem;
   text-align: center;
@@ -312,14 +312,14 @@ async function onSubmit() {
 label {
   margin-top: 1rem;
   font-weight: 600;
-  color: #b37f00;
+  color: var(--color-primary);
   font-size: 1rem;
 }
 
 input {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 2px solid #f5c518;
+  border: 2px solid var(--color-primary);
   border-radius: 5px;
   background: #fff;
   color: #333;
@@ -331,7 +331,7 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: var(--color-primary-border);
   background: #fff9db;
 }
 
@@ -358,23 +358,23 @@ button.btn {
 }
 
 button.btn-primary {
-  background-color: #f5c518;
-  color: #4a3200;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
 }
 
 button.btn-primary:hover {
-  background-color: #d4af37;
+  background-color: var(--color-primary-hover);
 }
 
 button.btn-secondary {
   background-color: transparent;
-  border: 2px solid #f5c518;
-  color: #b37f00;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
 }
 
 button.btn-secondary:hover {
-  background-color: #f5c518;
-  color: #4a3200;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
 }
 
 /* Responsividade */

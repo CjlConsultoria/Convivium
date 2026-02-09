@@ -164,7 +164,7 @@ section.container
 
 .denuncia-container {
   background-color: white;
-  border: 1px solid #d9c877; /* amarelo suave */
+  border: 1px solid var(--color-primary-border); /* amarelo suave */
   border-radius: 8px;
   padding: 2rem;
   width: 100%;
@@ -189,7 +189,7 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #cfc89a; /* amarelo claro sutil */
+  color: var(--color-primary-border); /* amarelo claro sutil */
   flex: 1;
   font-size: 0.85rem;
 }
@@ -200,11 +200,11 @@ h2 {
 }
 
 .etapa.ativa {
-  color: #b38600; /* amarelo médio */
+  color: var(--color-primary); /* amarelo médio */
 }
 
 .etapa.ativa i {
-  color: #b38600;
+  color: var(--color-primary);
 }
 
 /* Etapa content */
@@ -225,7 +225,7 @@ input[type='file'] {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #d9c877; /* amarelo suave */
+  border: 1px solid var(--color-primary-border); /* amarelo suave */
   border-radius: 4px;
   margin-bottom: 1.5rem;
   transition: border-color 0.3s ease;
@@ -234,7 +234,7 @@ input[type='file'] {
 select:focus,
 textarea:focus,
 input[type='file']:focus {
-  border-color: #b38600; /* amarelo médio */
+  border-color: var(--color-primary); /* amarelo médio */
   outline: none;
   box-shadow: 0 0 8px rgba(179, 134, 0, 0.25);
 }
@@ -287,25 +287,25 @@ button.voltar:hover {
 }
 
 button.proximo {
-  background-color: #b38600; /* amarelo médio */
+  background-color: var(--color-primary); /* amarelo médio */
   color: white;
 }
 
 button.proximo:hover {
-  background-color: #d9a500; /* amarelo mais claro */
+  background-color: var(--color-primary-hover); /* amarelo mais claro */
 }
 
 button.enviar {
-  background-color: #8c6f00; /* amarelo escuro */
+  background-color: var(--color-primary-active); /* amarelo escuro */
   color: white;
 }
 
 button.enviar:hover {
-  background-color: #6b5300;
+  background-color: var(--color-primary-active);
 }
 
 button:disabled {
-  background-color: #e0e0e0;
+  background-color: var(--color-disabled-bg);
   cursor: not-allowed;
 }
 

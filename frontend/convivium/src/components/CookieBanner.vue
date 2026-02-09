@@ -38,8 +38,8 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #f5c518;
-  color: #4a3200;
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
   padding: 1rem;
   display: flex;
   justify-content: space-between;
@@ -51,7 +51,7 @@ onMounted(() => {
 }
 
 .cookie-banner a {
-  color: #4a3200;
+  color: var(--color-primary-text-on);
   text-decoration: underline;
 }
 
@@ -62,10 +62,10 @@ onMounted(() => {
 }
 
 .cookie-banner button {
-  background: #4a3200;
-  color: #fff;
+  background: var(--color-primary-active);
+  color: var(--color-primary-light);
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-weight: 700;
@@ -73,6 +73,7 @@ onMounted(() => {
 }
 
 .cookie-banner button:hover {
-  background: #3a2600;
+  background: var(--color-primary-hover);
+  color: var(--color-primary-text-on);
 }
 </style>

@@ -148,7 +148,7 @@ onMounted(() => {
 .hero-title {
   font-size: 3rem;
   font-weight: bold;
-  color: #f2c200;
+  color: var(--color-primary);
   margin-bottom: 1rem;
 }
 
@@ -212,7 +212,7 @@ onMounted(() => {
 
 .feature-card h3 {
   font-size: 1.25rem;
-  color: #f2c200;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -246,7 +246,7 @@ onMounted(() => {
 
 .stat-card h3 {
   font-size: 2rem;
-  color: #f2c200;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -277,7 +277,7 @@ onMounted(() => {
 
 .diff-card h3 {
   font-size: 1.25rem;
-  color: #f2c200;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -312,7 +312,7 @@ onMounted(() => {
   display: block;
   margin-top: 1rem;
   font-weight: bold;
-  color: #f2c200;
+  color: var(--color-primary);
 }
 
 /* PRÓS E CONTRAS */
@@ -370,17 +370,17 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background-color: #f2c200;
+  background-color: var(--color-primary);
   color: #000;
 }
 
 .btn-primary:hover {
-  background-color: #d9a500;
+  background-color: var(--color-primary-hover);
 }
 
 .btn-secondary {
-  border: 2px solid #f2c200;
-  color: #f2c200;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
   background-color: transparent;
 }
 

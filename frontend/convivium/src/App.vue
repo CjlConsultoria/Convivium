@@ -254,7 +254,7 @@ body {
   border: none;
   font-size: 1.8rem;
   cursor: pointer;
-  color: #886f0d;
+  color: var(--color-primary);
 }
 
 /* Mostra só no mobile/tablet */
@@ -305,8 +305,8 @@ body {
 }
 
 .nav-link:hover {
-  background-color: #886f0d;
-  color: #000;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
 }
 
 .nav-buttons {
@@ -319,29 +319,27 @@ body {
 .nav-button {
   text-decoration: none;
   padding: 0.4rem 0.8rem;
-  border: 1px solid #886f0d;
+  border: 1px solid var(--color-primary);
   border-radius: 4px;
-  color: #ffffff;
+  color: #fff;
   background-color: transparent;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
   cursor: pointer;
 }
 
 .nav-button:hover {
-  background-color: #886f0d;
-  color: #000;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
 }
 
 .nav-button.primary {
-  background-color: #886f0d;
-  color: #000;
-  border-color: #886f0d;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
+  border-color: var(--color-primary);
 }
 
 .nav-button.primary:hover {
-  background-color: #a2850f;
+  background-color: var(--color-primary-hover);
 }
 
 /* Seção do usuário no navbar */
@@ -372,7 +370,7 @@ body {
 }
 
 .nav-button.dropdown-toggle:focus {
-  outline: 2px solid #886f0d;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
@@ -381,7 +379,7 @@ body {
   top: 100%;
   right: 0;
   background-color: #1c1c1c;
-  border: 1px solid #d4af37;
+  border: 1px solid var(--color-primary-border);
   border-radius: 10px;
   padding: 1rem;
   min-width: 260px;
@@ -398,7 +396,7 @@ body {
   gap: 0.5rem;
   font-weight: bold;
   font-size: 1rem;
-  color: #f0e68c;
+  color: var(--color-primary-light);
   margin-bottom: 0.75rem;
 }
 
@@ -436,19 +434,19 @@ body {
 }
 
 .dropdown-menu .nav-button.primary {
-  background-color: #d4af37;
-  color: #000;
-  border-color: #d4af37;
+  background-color: var(--color-primary);
+  color: var(--color-primary-text-on);
+  border-color: var(--color-primary);
 }
 
 .dropdown-menu .nav-button.primary:hover {
-  background-color: #e5c94f;
+  background-color: var(--color-primary-hover);
 }
 
 .info-empresa {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
-  color: #d4af37;
+  color: var(--color-primary);
 }
 
 .info-empresa strong {
@@ -515,7 +513,7 @@ body {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #886f0d;
+  color: var(--color-primary);
 }
 
 @media (max-width: 768px) {
@@ -543,7 +541,7 @@ footer.footer {
   width: 100%;
 }
 .icone-usuario {
-  color: #d4af37;
+  color: var(--color-primary);
   font-size: 1.4rem;
 }
 </style>

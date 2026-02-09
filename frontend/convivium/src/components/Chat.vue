@@ -115,7 +115,7 @@ watch(
 }
 
 .chat-header {
-  background-color: #886f0d;
+  background-color: var(--color-primary);
   color: #000;
   padding: 0.5rem 0.8rem;
   border-radius: 8px 8px 0 0;
@@ -149,7 +149,7 @@ watch(
 
 .chat-message.usuario {
   align-self: flex-end;
-  background-color: #886f0d;
+  background-color: var(--color-primary);
   color: #000;
 }
 

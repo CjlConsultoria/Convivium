@@ -519,7 +519,7 @@ h2.text-xl.font-bold.mb-6 {
 
 /* Botões padrão */
 button.btn {
-  background: #d6b94e;
+  background: var(--color-primary);
   color: #1f2937;
   padding: 0.55rem 1.4rem;
   border: none;
@@ -538,7 +538,7 @@ button.btn {
 }
 
 button.btn:hover:not(:disabled) {
-  background-color: #b8952f;
+  background-color: var(--color-primary-hover);
   box-shadow: 0 4px 14px rgba(184, 149, 47, 0.6);
 }
 
@@ -580,9 +580,9 @@ button.btn.btn-danger:hover:not(:disabled) {
   position: absolute;
   left: 100%;
   top: 0;
-  background-color: #f9f7e8;
+  background-color: var(--color-surface);
   z-index: 9999;
-  border: 1px solid #d9c877;
+  border: 1px solid var(--color-primary-border);
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   min-width: 180px;
@@ -591,7 +591,7 @@ button.btn.btn-danger:hover:not(:disabled) {
 
 /* Botão amarelo */
 button.btn.btn-yellow {
-  background-color: #d6b94e;
+  background-color: var(--color-primary);
   color: #1f2937;
   display: inline-flex;
   align-items: center;
@@ -605,7 +605,7 @@ button.btn.btn-yellow {
 }
 
 button.btn.btn-yellow:hover {
-  background-color: #b8952f;
+  background-color: var(--color-primary-hover);
   box-shadow: 0 4px 14px rgba(184, 149, 47, 0.6);
 }
 
@@ -654,7 +654,7 @@ table.table thead {
 table.table th {
   background-color: #e9e5d8;
   font-weight: 700;
-  color: #5a5500;
+  color: var(--color-primary-text-on);
   white-space: nowrap;
   padding: 0.8rem 1rem;
   border-radius: 8px;
@@ -702,7 +702,7 @@ table.table td {
     top: 0.5rem;
     left: 1rem;
     font-weight: 700;
-    color: #5a5500;
+    color: var(--color-primary-text-on);
     white-space: nowrap;
     width: auto;
     transform: none;
@@ -780,7 +780,7 @@ table.table td {
     top: 50%;
     transform: translateY(-50%);
     font-weight: 700;
-    color: #5a5500;
+    color: var(--color-primary-text-on);
     white-space: nowrap;
     width: 40%;
     overflow: hidden;
@@ -837,8 +837,8 @@ table.table td {
 }
 
 .input-pesquisa:focus {
-  border-color: #d6b94e;
-  box-shadow: 0 0 6px #d6b94eaa;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary)aa;
   outline: none;
 }
 
@@ -859,7 +859,7 @@ table.table td {
   padding: 0.4rem 1rem;
   font-size: 0.9rem;
   border-radius: 0.4rem;
-  background-color: #d6b94e;
+  background-color: var(--color-primary);
   color: #1f2937;
   border: none;
   cursor: pointer;
@@ -884,7 +884,7 @@ table.table td {
 }
 
 .pagination button.btn-sm:not(:disabled):hover {
-  background-color: #b8952f;
+  background-color: var(--color-primary-hover);
   box-shadow: 0 5px 15px rgba(184, 149, 47, 0.7);
   transform: scale(1.05);
 }

@@ -346,7 +346,7 @@ function exportarXLS() {
   font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 2rem;
-  color: #4b4b0e;
+  color: var(--color-primary-text-on);
 }
 
 /* Filtros */
@@ -372,7 +372,7 @@ function exportarXLS() {
 
 .btn-filtrar {
   padding: 0.5rem 1rem;
-  background: #facc15;
+  background: var(--color-primary);
   border: none;
   border-radius: 6px;
   font-weight: bold;
@@ -382,7 +382,7 @@ function exportarXLS() {
 }
 
 .btn-filtrar:hover {
-  background: #e0b300;
+  background: var(--color-primary-hover);
 }
 
 /* Métricas */
@@ -507,7 +507,7 @@ function exportarXLS() {
 .card-historico h3 {
   margin-bottom: 1rem;
   font-size: 1.2rem;
-  color: #4b4b0e;
+  color: var(--color-primary-text-on);
 }
 
 .lista-historico {

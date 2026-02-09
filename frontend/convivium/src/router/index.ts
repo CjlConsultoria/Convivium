@@ -9,6 +9,7 @@ import AdminMoradores from '@/views/AdminMoradores.vue'
 import AdminReclamacoes from '@/views/AdminReclamacoes.vue'
 import { fetchUserData } from '@/services/authService'
 import Relatorios from '@/views/RelatoriosView.vue'
+import EncomendasView from '@/views/EncomendasView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -107,6 +108,12 @@ const router = createRouter({
       component: () => import('@/views/EditarInfoCondominio.vue'),
       meta: { requiresAuth: true, allowedRoles: ['ADMINISTRATIVO', 'ADMIN'] },
     },
+    {
+      path: '/encomendas',
+      name: 'encomendas',
+      component: EncomendasView,
+      meta: { requiresAuth: true },
+    },
   ],
 })
 router.beforeEach(async (to, from, next) => {
@@ -148,7 +155,7 @@ router.beforeEach(async (to, from, next) => {
         })
       }
 
-      if (['ADMIN', 'ADMINISTRATIVO'].includes(perfil)) {
+      if (['ADMIN', 'ADMINISTRATIVO', 'SINDICO', 'SUB_SINDICO', 'CONSELHEIRO', 'PORTARIA', 'SEGURANCA', 'ZELADOR'].includes(perfil)) {
         return next({ name: 'painel-admin' })
       }
 

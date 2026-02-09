@@ -173,11 +173,11 @@ public class ReclamacaoService {
         return dto;
     }
 
+    @Transactional(readOnly = true)
     public Page<ReclamacaoDTO> listarComFiltro(ReclamacaoFiltroDTO filtro, Pageable pageable) {
         Specification<Reclamacao> spec = ReclamacaoSpecification.filtro(filtro);
         Page<Reclamacao> page = reclamacaoRepository.findAll(spec, pageable);
-
-        return page.map(this::toDto); // converte para DTO
+        return page.map(this::toDto);
     }
 
     @Transactional
