@@ -128,17 +128,14 @@ public class AuthenticationService {
         user.setEmpresa(empresa);
         user.setRole(role);
 
+        // Salvar o usuário primeiro
+        userRepository.save(user);
+        
+        // Se a empresa não tem responsável, definir este usuário como responsável
         if (empresa.getUsuarioResponsavel() == null) {
-            userRepository.save(user); // salvar o usuário antes
-
             empresa.setUsuarioResponsavel(user);
             empresaRepository.save(empresa);
-        } else {
-            userRepository.save(user); // salvar normalmente se já tem responsável
         }
-
-
-        userRepository.save(user);
         String token = gerarToken(user, TipoToken.ATIVACAO_CONTA);
         Map<String, Object> usuarioMap = new HashMap<>();
         usuarioMap.put("username", user.getUsername());

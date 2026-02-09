@@ -86,11 +86,11 @@ public class User {
     @Column(name = "DATA_ATUALIZACAO")
     private LocalDateTime dataAtualizacao;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ROLE", referencedColumnName = "ID")
     private Role role;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "EMPRESA", referencedColumnName = "ID")
     private Empresa empresa;
@@ -107,7 +107,7 @@ public class User {
     @Column(name = "VAGA_MOTO")
     private String vagaMoto;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TIPO", referencedColumnName = "ID")
     private Tipo tipo;
 

@@ -75,6 +75,13 @@ public class ReclamacaoController {
         return reclamacaoService.listarTodas();
     }
 
+    @GetMapping("/{id}/detalhes")
+    public ResponseEntity<ReclamacaoDTO> buscarDetalhes(@PathVariable Long id) {
+        return reclamacaoService.buscarDetalhesPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // Retorna ações por ID da reclamação
     @GetMapping("/{id}")
     public List<AcaoReclamacao> listarPorReclamacao(@PathVariable Long id) {

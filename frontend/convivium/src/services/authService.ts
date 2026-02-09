@@ -53,20 +53,17 @@ export const salvarMoradorCompleto = async (dados: MoradorPayload) => {
 export const fetchUserData = async () => {
   const token = getAuthToken()
 
-  if (token) {
-    try {
-      const response = await api.get('/auth/user', {
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-      })
-      return response.data
-    } catch (error) {
-      console.error('Erro ao buscar dados do usuário:', error)
-      throw error
-    }
-  } else {
+  if (!token) {
     throw new Error('Token de autenticação não encontrado.')
+  }
+
+  try {
+    // O interceptor já adiciona o token automaticamente
+    const response = await api.get('/auth/user')
+    return response.data
+  } catch (error: any) {
+    console.error('Erro ao buscar dados do usuário:', error)
+    throw error
   }
 }
 
@@ -145,12 +142,8 @@ export const updateUserData = async (
   }
 
   try {
-    const response = await api.put(`/auth/usuario/update/${id}`, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-
+    // O interceptor já adiciona o token automaticamente
+    const response = await api.put(`/auth/usuario/update/${id}`, body)
     return response
   } catch (error) {
     console.error('Erro ao atualizar dados do usuário:', error)

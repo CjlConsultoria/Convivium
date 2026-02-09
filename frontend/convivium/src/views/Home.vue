@@ -8,12 +8,12 @@ section.presentation-container
         | Organize, controle e facilite a administração do seu condomínio de forma simples, segura e eficiente, em qualquer dispositivo.
       div.hero-actions
         RouterLink.btn-primary(to="/login") Começar Agora
-        RouterLink.btn-secondary(to="/sobre") Saiba Mais
+        a.btn-secondary(href="#features") Saiba Mais
     div.hero-image
       img(src="https://via.placeholder.com/400x300?text=Mobile+Preview" alt="Visual do sistema em mobile")
 
   // FUNCIONALIDADES PRINCIPAIS
-  section.features
+  section#features.features
     h2.section-title Funcionalidades Principais
     div.features-grid
       div.feature-card

@@ -2,18 +2,14 @@
 import api from './api'
 
 export const buscarRelatorioReclamacoes = async (
-  idCondominio: number | string,
+  idEmpresa: number | string | null,
   inicio: string,
   fim: string,
 ) => {
   try {
-    const response = await api.get('/relatorios/metricas', {
-      params: {
-        idCondominio,
-        inicio,
-        fim,
-      },
-    })
+    const params: Record<string, string | number> = { inicio, fim }
+    if (idEmpresa != null) params.empresaId = idEmpresa
+    const response = await api.get('/relatorios/metricas', { params })
     return response.data
   } catch (error) {
     console.error('Erro ao buscar relatório de reclamações:', error)

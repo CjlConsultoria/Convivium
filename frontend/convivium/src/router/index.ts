@@ -95,6 +95,18 @@ const router = createRouter({
       name: 'RedefinirSenha',
       component: () => import('@/views/components/PasswordResetModal.vue'),
     },
+    {
+      path: '/informacoes-condominio',
+      name: 'infoCondominio',
+      component: () => import('@/views/InfoCondominio.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/editar-informacoes-condominio',
+      name: 'editarInfoCondominio',
+      component: () => import('@/views/EditarInfoCondominio.vue'),
+      meta: { requiresAuth: true, allowedRoles: ['ADMINISTRATIVO', 'ADMIN'] },
+    },
   ],
 })
 router.beforeEach(async (to, from, next) => {
@@ -111,9 +123,10 @@ router.beforeEach(async (to, from, next) => {
     const userData = await fetchUserData()
 
     localStorage.setItem('userName', userData.username)
-    localStorage.setItem('userPerfil', userData.role) // <-- role é string direta
+    localStorage.setItem('userPerfil', userData.role)
     localStorage.setItem('userId', userData.id.toString())
     localStorage.setItem('userEmpresa', JSON.stringify(userData.empresa || {}))
+    localStorage.setItem('user', JSON.stringify(userData))
     window.dispatchEvent(new Event('storage'))
 
     const perfil = userData.role // <-- usar direto

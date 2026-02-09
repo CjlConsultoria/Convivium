@@ -22,10 +22,13 @@ public class CustomUserDetailsService implements org.springframework.security.co
         br.com.convivium.entity.User userEntity = userRepository.findByCpf(cpf)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with CPF: " + cpf));
 
+        // Garantir que role está carregado (já está com @EntityGraph)
+        String roleName = userEntity.getRole() != null ? userEntity.getRole().getName() : "USER";
+
         return new User(
                 userEntity.getCpf(), // o CPF será o "username" usado internamente pelo Spring
                 userEntity.getPassword(),
-                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(userEntity.getRole().getName()))
+                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(roleName))
         );
     }
 }

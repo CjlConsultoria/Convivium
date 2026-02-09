@@ -21,20 +21,21 @@ public class RelatorioController {
         this.service = service;
     }
 
-    // Endpoint principal que retorna TODOS os dados para a tela
+    // Endpoint principal que retorna dados da tela de relatórios (filtrado por empresa quando informado)
     @GetMapping("/metricas")
     public ResponseEntity<RelatorioDTO> buscarMetricas(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(required = false) Long empresaId) {
 
         RelatorioDTO dto = new RelatorioDTO();
-        dto.setTotalReclamacoes(service.contarTotalReclamacoes(inicio, fim));
-        dto.setTotalPendentes(service.contarPendentes(inicio, fim));
-        dto.setTempoMedioResolucao(service.calcularTempoMedioResolucao(inicio, fim));
-        dto.setUnidadeMaisReclama(service.unidadeComMaisReclamacoes(inicio, fim));
-        dto.setUltimasReclamacoes(service.ultimas10ReclamacoesAbertas());
-        dto.setTopUnidadesQueMaisReclamam(service.topUnidadesQueMaisReclamam(inicio, fim));
-        dto.setTopUnidadesMaisReclamadas(service.topUnidadesMaisReclamadas(inicio, fim));
+        dto.setTotalReclamacoes(service.contarTotalReclamacoes(inicio, fim, empresaId));
+        dto.setTotalPendentes(service.contarPendentes(inicio, fim, empresaId));
+        dto.setTempoMedioResolucao(service.calcularTempoMedioResolucao(inicio, fim, empresaId));
+        dto.setUnidadeMaisReclama(service.unidadeComMaisReclamacoes(inicio, fim, empresaId));
+        dto.setUltimasReclamacoes(service.ultimas10ReclamacoesAbertas(empresaId));
+        dto.setTopUnidadesQueMaisReclamam(service.topUnidadesQueMaisReclamam(inicio, fim, empresaId));
+        dto.setTopUnidadesMaisReclamadas(service.topUnidadesMaisReclamadas(inicio, fim, empresaId));
 
         return ResponseEntity.ok(dto);
     }

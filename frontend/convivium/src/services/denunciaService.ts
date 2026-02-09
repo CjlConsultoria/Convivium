@@ -1,3 +1,5 @@
+import api from './api'
+
 export async function enviarDenuncia(data: {
   tipo: string
   detalhes: string
@@ -15,22 +17,11 @@ export async function enviarDenuncia(data: {
     formData.append('arquivos', file)
   })
 
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/reclamacoes`, {
-    method: 'POST',
-    body: formData,
-    credentials: 'include', // se sua API usa cookies/sessão
+  const response = await api.post('/reclamacoes', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   })
-
-  if (!response.ok) {
-    const error = await response.text()
-    console.error('Erro ao enviar denúncia:', error)
-    throw new Error('Erro ao enviar denúncia')
-  }
-
-  return await response.json()
+  return response.data
 }
-
-import api from './api'
 
 export interface Anexo {
   id: number

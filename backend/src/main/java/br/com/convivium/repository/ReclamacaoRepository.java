@@ -14,5 +14,9 @@ import java.util.List;
 public interface ReclamacaoRepository extends JpaRepository<Reclamacao, Long>, JpaSpecificationExecutor<Reclamacao> {
     List<Reclamacao> findByDataCriacaoBetween(LocalDateTime inicio, LocalDateTime fim);
 
+    List<Reclamacao> findByEmpresa_IdAndDataCriacaoBetween(Long empresaId, LocalDateTime inicio, LocalDateTime fim);
+
     List<Reclamacao> findTop10ByStatusOrderByDataCriacaoDesc(StatusReclamacao status);
+
+    List<Reclamacao> findTop10ByEmpresa_IdAndStatusOrderByDataCriacaoDesc(Long empresaId, StatusReclamacao status);
 }

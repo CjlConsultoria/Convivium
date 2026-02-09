@@ -41,55 +41,33 @@ public class HttpSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .cors()  // O Spring Security usará as configurações definidas no application.properties
-                .and()
-                .headers().frameOptions().disable()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers(
-                        "/",
-                        "/**", // ← libera tudo que for acessado diretamente (inclusive arquivos estáticos)
-                        "/index.html",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/api/login",
-                        "/api/register",
-                        "/api/forgotPassword",
-                        "/api/reset-password",
-                        "/h2-console/**/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-resources/**",
-                        "/configuration/**",
-                        "/webjars/**"
-                ).permitAll()
-                .antMatchers(
-                        "/",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/**/*.png",
-                        "/**/*.jpg",
-                        "/**/*.jpeg",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.woff",
-                        "/**/*.woff2",
-                        "/**/*.ttf",
-                        "/**/*.eot",
-                        "/**/*.otf",
-                        "/**/*.pdf"
-                ).permitAll()
-
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos de autenticação
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/forgotPassword",
+                                "/api/auth/reset-password",
+                                "/api/auth/buscar-por-cpf/**"
+                        ).permitAll()
+                        // Endpoints públicos de condomínio
+                        .requestMatchers("/api/public/**").permitAll()
+                        // Swagger e documentação (apenas em desenvolvimento)
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/configuration/**",
+                                "/webjars/**"
+                        ).permitAll()
+                        // Todos os outros endpoints requerem autenticação
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -129,17 +107,18 @@ public class HttpSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Configuração explícita para permitir o acesso do frontend
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://convivium-front.onrender.com"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        String frontUrl = frontendUrl != null ? frontendUrl.trim() : "";
+        if (frontUrl.isEmpty()) {
+            configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://convivium-front.onrender.com"));
+        } else {
+            configuration.setAllowedOrigins(Arrays.asList(frontUrl.split(",\\s*")));
+        }
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        configuration.setAllowCredentials(true);  // Permite enviar cookies e cabeçalhos de autenticação entre domínios
+        configuration.setAllowCredentials(true);
 
-        // Cria a configuração de CORS
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);  // Aplica a configuração a todas as requisições
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-
 }

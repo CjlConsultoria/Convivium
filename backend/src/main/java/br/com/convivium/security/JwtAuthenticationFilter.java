@@ -4,6 +4,8 @@ package br.com.convivium.security;
 import br.com.convivium.service.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,14 +54,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             } catch (ExpiredJwtException ex) {
                 // Token expirado, invoca o AuthenticationEntryPoint
-                SecurityContextHolder.clearContext();  // Limpa o contexto de segurança
+                SecurityContextHolder.clearContext();
                 jwtAuthenticationEntryPoint.commence(request, response, new AuthenticationException("Token expirado") {});
-                return;  // Não segue o filtro para que a exceção seja tratada
-            } catch (JwtException | IllegalArgumentException ex) {
-                // Token inválido ou malformado, invoca o AuthenticationEntryPoint
-                SecurityContextHolder.clearContext();  // Limpa o contexto de segurança
+                return;
+            } catch (SignatureException | MalformedJwtException ex) {
+                // Token inválido ou malformado
+                SecurityContextHolder.clearContext();
                 jwtAuthenticationEntryPoint.commence(request, response, new AuthenticationException("Token inválido") {});
-                return;  // Não segue o filtro para que a exceção seja tratada
+                return;
+            } catch (JwtException | IllegalArgumentException ex) {
+                // Outros erros de JWT
+                SecurityContextHolder.clearContext();
+                jwtAuthenticationEntryPoint.commence(request, response, new AuthenticationException("Erro ao processar token") {});
+                return;
             }
         }
 

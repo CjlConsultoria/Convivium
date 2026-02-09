@@ -27,6 +27,12 @@ aside.menu-lateral
     li(v-if="isLoggedIn", :class="{ ativo: itemSelecionado === 'meus-dados' }")
       RouterLink(:to="`/empresa/${empresa?.codigoPublico}/meus-dados`", @click="fecharMenu") Meus Dados
 
+    li(v-if="isLoggedIn", :class="{ ativo: itemSelecionado === 'info-condominio' }")
+      RouterLink(to="/informacoes-condominio", @click="fecharMenu") Informações do Condomínio
+
+    li(v-if="(perfilUsuario === 'ADMINISTRATIVO' || perfilUsuario === 'ADMIN')", :class="{ ativo: itemSelecionado === 'editar-info-condominio' }")
+      RouterLink(to="/editar-informacoes-condominio", @click="fecharMenu") Editar Informações do Condomínio
+
     li(v-if="perfilUsuario === 'ADMIN'", :class="{ ativo: itemSelecionado === 'licenca' }")
       RouterLink(to="/licenca", @click="fecharMenu") Gestão de Licenças
 
@@ -98,6 +104,7 @@ function sair() {
   localStorage.removeItem('userName')
   localStorage.removeItem('userPerfil')
   localStorage.removeItem('userEmpresa')
+  localStorage.removeItem('user')
   router.push({ name: 'login' })
 }
 

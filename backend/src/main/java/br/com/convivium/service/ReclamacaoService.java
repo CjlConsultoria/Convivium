@@ -5,6 +5,7 @@ import br.com.convivium.dto.request.ReclamacaoFiltroDTO;
 import br.com.convivium.dto.request.SolucaoReclamacaoDTO;
 import br.com.convivium.dto.response.*;
 import br.com.convivium.entity.*;
+import br.com.convivium.exception.ApiException;
 import br.com.convivium.entity.enums.StatusReclamacao;
 import br.com.convivium.entity.enums.TipoTemplateEmail;
 import br.com.convivium.entity.specification.ReclamacaoSpecification;
@@ -65,10 +66,14 @@ public class ReclamacaoService {
     @Transactional
     public Reclamacao criarReclamacao(String tipo, String detalhes, Long usuarioId, Long empresaId, MultipartFile[] arquivos) throws IOException {
         User usuario = userRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado"));
 
         Empresa empresa = empresaRepository.findById(empresaId)
-                .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
+                .orElseThrow(() -> new ApiException.NotFoundException("Empresa não encontrada"));
+
+        if (usuario.getEmpresa() == null || !usuario.getEmpresa().getId().equals(empresaId)) {
+            throw new ApiException.ForbiddenException("Usuário não pertence a este condomínio.");
+        }
 
         Reclamacao reclamacao = new Reclamacao();
         reclamacao.setTipo(tipo);
@@ -117,7 +122,8 @@ public class ReclamacaoService {
         templateVariables.put("reclamacao", reclamacaoMap);
         templateVariables.put("empresa", empresaMap);
 
-        String emailSindico = empresa.getUsuarioResponsavel().getEmail();
+        User responsavel = empresa.getUsuarioResponsavel();
+        String emailSindico = responsavel != null ? responsavel.getEmail() : null;
 
         if (emailSindico != null && !emailSindico.isEmpty()) {
             emailService.enviarEmailComTemplate(
@@ -177,7 +183,7 @@ public class ReclamacaoService {
     @Transactional
     public AcaoReclamacao adicionarAcao(Long reclamacaoId, AcaoReclamacaoDTO dto) {
         Reclamacao reclamacao = reclamacaoRepository.findById(reclamacaoId)
-                .orElseThrow(() -> new RuntimeException("Reclamação não encontrada"));
+                .orElseThrow(() -> new ApiException.NotFoundException("Reclamação não encontrada"));
 
         AcaoReclamacao acao = new AcaoReclamacao();
         acao.setStatus(dto.getTipo());
@@ -219,7 +225,7 @@ public class ReclamacaoService {
     @Transactional
     public Reclamacao solucionarReclamacao(Long reclamacaoId, SolucaoReclamacaoDTO dto) {
         Reclamacao reclamacao = reclamacaoRepository.findById(reclamacaoId)
-                .orElseThrow(() -> new RuntimeException("Reclamação não encontrada"));
+                .orElseThrow(() -> new ApiException.NotFoundException("Reclamação não encontrada"));
 
         reclamacao.setDescricaoSolucao(dto.getDescricao());
         reclamacao.setDataResolucao(LocalDateTime.now());
@@ -310,26 +316,39 @@ public class ReclamacaoService {
                 .collect(Collectors.toList());
     }
 
-    public long contarTotalReclamacoes(LocalDate inicio, LocalDate fim) {
+    private List<Reclamacao> listarReclamacoesPorPeriodo(LocalDate inicio, LocalDate fim, Long empresaId) {
         LocalDateTime start = inicio.atStartOfDay();
         LocalDateTime end = fim.atTime(23, 59, 59);
-        return reclamacaoRepository.findByDataCriacaoBetween(start, end).size();
+        if (empresaId != null) {
+            return reclamacaoRepository.findByEmpresa_IdAndDataCriacaoBetween(empresaId, start, end);
+        }
+        return reclamacaoRepository.findByDataCriacaoBetween(start, end);
+    }
+
+    public long contarTotalReclamacoes(LocalDate inicio, LocalDate fim) {
+        return contarTotalReclamacoes(inicio, fim, null);
+    }
+
+    public long contarTotalReclamacoes(LocalDate inicio, LocalDate fim, Long empresaId) {
+        return listarReclamacoesPorPeriodo(inicio, fim, empresaId).size();
     }
 
     public long contarPendentes(LocalDate inicio, LocalDate fim) {
-        LocalDateTime start = inicio.atStartOfDay();
-        LocalDateTime end = fim.atTime(23, 59, 59);
+        return contarPendentes(inicio, fim, null);
+    }
 
-        return reclamacaoRepository.findByDataCriacaoBetween(start, end).stream()
+    public long contarPendentes(LocalDate inicio, LocalDate fim, Long empresaId) {
+        return listarReclamacoesPorPeriodo(inicio, fim, empresaId).stream()
                 .filter(r -> r.getStatus() == StatusReclamacao.EM_ANALISE)
                 .count();
     }
 
     public double calcularTempoMedioResolucao(LocalDate inicio, LocalDate fim) {
-        LocalDateTime start = inicio.atStartOfDay();
-        LocalDateTime end = fim.atTime(23, 59, 59);
+        return calcularTempoMedioResolucao(inicio, fim, null);
+    }
 
-        List<Reclamacao> resolvidas = reclamacaoRepository.findByDataCriacaoBetween(start, end).stream()
+    public double calcularTempoMedioResolucao(LocalDate inicio, LocalDate fim, Long empresaId) {
+        List<Reclamacao> resolvidas = listarReclamacoesPorPeriodo(inicio, fim, empresaId).stream()
                 .filter(r -> r.getStatus() == StatusReclamacao.SOLUCIONADA && r.getDataResolucao() != null)
                 .collect(Collectors.toList());
 
@@ -343,10 +362,11 @@ public class ReclamacaoService {
     }
 
     public String unidadeComMaisReclamacoes(LocalDate inicio, LocalDate fim) {
-        LocalDateTime start = inicio.atStartOfDay();
-        LocalDateTime end = fim.atTime(23, 59, 59);
+        return unidadeComMaisReclamacoes(inicio, fim, null);
+    }
 
-        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+    public String unidadeComMaisReclamacoes(LocalDate inicio, LocalDate fim, Long empresaId) {
+        List<Reclamacao> reclamacoes = listarReclamacoesPorPeriodo(inicio, fim, empresaId);
 
         Map<String, Long> contagem = reclamacoes.stream()
                 .collect(Collectors.groupingBy(
@@ -364,16 +384,22 @@ public class ReclamacaoService {
     }
 
     public List<ReclamacaoResumoDTO> ultimas10ReclamacoesAbertas() {
-        // Ajuste no repository para buscar por status PENDENTE (Aberta)
-        List<Reclamacao> list = reclamacaoRepository.findTop10ByStatusOrderByDataCriacaoDesc(StatusReclamacao.EM_ANALISE);
+        return ultimas10ReclamacoesAbertas(null);
+    }
+
+    public List<ReclamacaoResumoDTO> ultimas10ReclamacoesAbertas(Long empresaId) {
+        List<Reclamacao> list = empresaId != null
+                ? reclamacaoRepository.findTop10ByEmpresa_IdAndStatusOrderByDataCriacaoDesc(empresaId, StatusReclamacao.EM_ANALISE)
+                : reclamacaoRepository.findTop10ByStatusOrderByDataCriacaoDesc(StatusReclamacao.EM_ANALISE);
         return list.stream().map(this::toResumoDTO).collect(Collectors.toList());
     }
 
     public List<UnidadeQtdDTO> topUnidadesQueMaisReclamam(LocalDate inicio, LocalDate fim) {
-        LocalDateTime start = inicio.atStartOfDay();
-        LocalDateTime end = fim.atTime(23, 59, 59);
+        return topUnidadesQueMaisReclamam(inicio, fim, null);
+    }
 
-        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+    public List<UnidadeQtdDTO> topUnidadesQueMaisReclamam(LocalDate inicio, LocalDate fim, Long empresaId) {
+        List<Reclamacao> reclamacoes = listarReclamacoesPorPeriodo(inicio, fim, empresaId);
 
         Map<String, Long> contagem = reclamacoes.stream()
                 .collect(Collectors.groupingBy(
@@ -390,26 +416,18 @@ public class ReclamacaoService {
                 .map(e -> new UnidadeQtdDTO(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
     }
+
     public List<UnidadeQtdDTO> topUnidadesMaisReclamadas(LocalDate inicio, LocalDate fim) {
-        LocalDateTime start = inicio.atStartOfDay();
-        LocalDateTime end = fim.atTime(23, 59, 59);
+        return topUnidadesMaisReclamadas(inicio, fim, null);
+    }
 
-        List<Reclamacao> reclamacoes = reclamacaoRepository.findByDataCriacaoBetween(start, end);
+    public List<UnidadeQtdDTO> topUnidadesMaisReclamadas(LocalDate inicio, LocalDate fim, Long empresaId) {
+        return topUnidadesQueMaisReclamam(inicio, fim, empresaId);
+    }
 
-        Map<String, Long> contagem = reclamacoes.stream()
-                .collect(Collectors.groupingBy(
-                        r -> {
-                            String bloco = Optional.ofNullable(r.getUsuario().getBloco()).orElse("-");
-                            String apt = Optional.ofNullable(r.getUsuario().getApartamento()).orElse("-");
-                            return "Bloco " + bloco + " Apart. " + apt;
-                        },
-                        Collectors.counting()));
-
-        return contagem.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .limit(10)
-                .map(e -> new UnidadeQtdDTO(e.getKey(), e.getValue()))
-                .collect(Collectors.toList());
+    public Optional<ReclamacaoDTO> buscarDetalhesPorId(Long id) {
+        return reclamacaoRepository.findById(id)
+                .map(this::toDto);
     }
 
     private ReclamacaoResumoDTO toResumoDTO(Reclamacao r) {
@@ -427,24 +445,5 @@ public class ReclamacaoService {
         );
     }
 
-    // DTO para top unidades
-    public static class UnidadeQtdDTO {
-        private String unidade;
-        private Long qtd;
-
-        public UnidadeQtdDTO(String unidade, Long qtd) {
-            this.unidade = unidade;
-            this.qtd = qtd;
-        }
-
-        // getters e setters
-        public String getUnidade() {
-            return unidade;
-        }
-
-        public Long getQtd() {
-            return qtd;
-        }
-    }
 }
 

@@ -1,6 +1,5 @@
 package br.com.convivium.dto.response;
 
-import br.com.convivium.service.ReclamacaoService;
 import lombok.Data;
 
 import java.util.List;
@@ -14,8 +13,8 @@ public class RelatorioDTO {
     private String unidadeMaisReclama;
 
     private List<ReclamacaoResumoDTO> ultimasReclamacoes;
-    private List<ReclamacaoService.UnidadeQtdDTO> topUnidadesQueMaisReclamam;
-    private List<ReclamacaoService.UnidadeQtdDTO> topUnidadesMaisReclamadas;
+    private List<UnidadeQtdDTO> topUnidadesQueMaisReclamam;
+    private List<UnidadeQtdDTO> topUnidadesMaisReclamadas;
 
 }
 

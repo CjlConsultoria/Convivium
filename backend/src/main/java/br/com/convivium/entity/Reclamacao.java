@@ -55,11 +55,11 @@ public class Reclamacao {
     private LocalDateTime dataResolucao;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_USUARIO", referencedColumnName = "ID", nullable = false)
     private User usuario; // reclamante
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "ID", nullable = false)
     private Empresa empresa;
 

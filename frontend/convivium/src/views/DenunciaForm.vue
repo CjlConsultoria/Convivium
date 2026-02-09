@@ -9,14 +9,14 @@ const etapa = ref(1)
 
 const user = JSON.parse(localStorage.getItem('user') || '{}')
 
-// Dados do denunciante para mostrar no formulário
+// Dados do denunciante (API retorna role/tipo como string e empresa com campo nome)
 const denunciante = {
   nome: user.username || '',
-  tipo: user.tipo?.name || '',
+  tipo: user.tipo || '',
   bloco: user.bloco || '',
   apartamento: user.apartamento || '',
-  empresaNome: user.empresa?.name || '',
-  perfil: user.role?.name || '',
+  empresaNome: user.empresa?.nome || '',
+  perfil: user.role || '',
 }
 
 // Campos da denúncia
@@ -39,11 +39,17 @@ const enviarDenunciaForm = async () => {
   try {
     store.startLoading()
 
+    const usuarioId = user.id ?? Number(localStorage.getItem('userId'))
+    const empresa = user.empresa ?? JSON.parse(localStorage.getItem('userEmpresa') || '{}')
+    if (!usuarioId || !empresa?.id) {
+      toast.error('Dados do usuário incompletos. Faça login novamente.')
+      return
+    }
     await enviarDenuncia({
       tipo: tipoSelecionado.value,
       detalhes: detalhes.value,
-      usuarioId: user.id,
-      empresaId: user.empresa?.id,
+      usuarioId: Number(usuarioId),
+      empresaId: empresa.id,
       arquivos: anexos.value,
     })
 

@@ -144,7 +144,7 @@ async function filtrarReclamacoes() {
   if (!dataInicio.value || !dataFim.value) return alert('Selecione um período válido.')
 
   const empresa = JSON.parse(localStorage.getItem('userEmpresa') || '{}')
-  const idEmpresa = empresa.id
+  const idEmpresa = empresa.id || null
 
   try {
     const resposta = await buscarRelatorioReclamacoes(idEmpresa, dataInicio.value, dataFim.value)
