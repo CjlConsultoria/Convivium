@@ -111,6 +111,22 @@ public class EncomendaService {
         return encomendaRepository.findByCodigoRetiradaAndEmpresaId(codigoRetirada, empresaId).map(this::toDto);
     }
 
+    // Novos métodos para dashboard com filtro por condomínio
+    @Transactional(readOnly = true)
+    public long contarEncomendasPorMoradorEEmpresa(Long moradorId, Long empresaId) {
+        return encomendaRepository.countByMoradorIdAndEmpresaId(moradorId, empresaId);
+    }
+
+    @Transactional(readOnly = true)
+    public long contarEncomendasDisponiveisPorMoradorEEmpresa(Long moradorId, Long empresaId) {
+        return encomendaRepository.countByMoradorIdAndEmpresaIdAndStatus(moradorId, empresaId, StatusEncomenda.DISPONIVEL);
+    }
+
+    @Transactional(readOnly = true)
+    public long contarEncomendasRetiradasPorMoradorEEmpresa(Long moradorId, Long empresaId) {
+        return encomendaRepository.countByMoradorIdAndEmpresaIdAndStatus(moradorId, empresaId, StatusEncomenda.RETIRADA);
+    }
+
     public EncomendaDTO toDto(Encomenda e) {
         EncomendaDTO dto = new EncomendaDTO();
         dto.setId(e.getId());
