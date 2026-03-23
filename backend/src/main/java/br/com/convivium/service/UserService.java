@@ -55,6 +55,10 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public User buscarPorCpf(String cpf) {
+        return userRepository.findByCpf(cpf).orElse(null);
+    }
+
     public Optional<UserResponseDTO> buscarPorIdComDTO(Long id) {
         return userRepository.findByIdWithRelations(id).map(this::mapToDTO);
     }
@@ -137,6 +141,12 @@ public class UserService {
 
     public Page<UserResponseDTO> listarComFiltro(UsuarioFiltroDTO filtro, Pageable pageable) {
         Specification<User> spec = UsuarioSpecification.filtrarPorNomeECpf(filtro);
+        Page<User> page = userRepository.findAll(spec, pageable);
+        return page.map(this::mapToDTO);
+    }
+
+    public Page<UserResponseDTO> listarComFiltroComEmpresa(UsuarioFiltroDTO filtro, Long empresaId, Pageable pageable) {
+        Specification<User> spec = UsuarioSpecification.filtrarPorNomeECpfComEmpresa(filtro, empresaId);
         Page<User> page = userRepository.findAll(spec, pageable);
         return page.map(this::mapToDTO);
     }
