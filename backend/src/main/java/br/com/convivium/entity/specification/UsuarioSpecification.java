@@ -11,6 +11,11 @@ public class UsuarioSpecification {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 
+            // Always filter by empresaId for multi-tenant isolation
+            if (filtro.getEmpresaId() != null) {
+                predicate = cb.and(predicate, cb.equal(root.get("empresa").get("id"), filtro.getEmpresaId()));
+            }
+
             // OR entre nome e CPF (um campo único no frontend pode cair aqui)
             if ((filtro.getNome() != null && !filtro.getNome().isBlank()) ||
                     (filtro.getCpf() != null && !filtro.getCpf().isBlank())) {
@@ -32,5 +37,3 @@ public class UsuarioSpecification {
         };
     }
 }
-
-
