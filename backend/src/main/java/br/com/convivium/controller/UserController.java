@@ -5,6 +5,7 @@ import br.com.convivium.dto.request.UsuarioFiltroDTO;
 import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.entity.Role;
 import br.com.convivium.entity.Tipo;
+import br.com.convivium.entity.User;
 import br.com.convivium.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,7 +105,25 @@ public class UserController {
     public ResponseEntity<Page<UserResponseDTO>> filtrarUsuarios(
             @RequestBody UsuarioFiltroDTO filtro,
             @PageableDefault(page = 0, size = 10, sort = "username") Pageable pageable) {
-        Page<UserResponseDTO> resultado = userService.listarComFiltro(filtro, pageable);
+        
+        // Verificar autenticação
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || 
+            "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        // Obter usuário autenticado
+        String cpfUsuario = authentication.getName();
+        User usuarioAutenticado = userService.buscarPorCpf(cpfUsuario);
+        
+        if (usuarioAutenticado == null || usuarioAutenticado.getEmpresa() == null) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        // Filtrar apenas usuários da mesma empresa
+        Long empresaId = usuarioAutenticado.getEmpresa().getId();
+        Page<UserResponseDTO> resultado = userService.listarComFiltroComEmpresa(filtro, empresaId, pageable);
         return ResponseEntity.ok(resultado);
     }
 
