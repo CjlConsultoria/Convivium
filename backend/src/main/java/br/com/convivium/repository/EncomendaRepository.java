@@ -19,4 +19,6 @@ public interface EncomendaRepository extends JpaRepository<Encomenda, Long> {
     Page<Encomenda> findByMoradorIdAndEmpresaId(Long moradorId, Long empresaId, Pageable pageable);
 
     Page<Encomenda> findByEmpresaIdAndStatus(Long empresaId, StatusEncomenda status, Pageable pageable);
+    
+    Page<Encomenda> findByMoradorIdAndEmpresaIdAndStatus(Long moradorId, Long empresaId, StatusEncomenda status, Pageable pageable);
 }
