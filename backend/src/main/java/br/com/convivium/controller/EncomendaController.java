@@ -132,4 +132,21 @@ public class EncomendaController {
         Optional<EncomendaDTO> opt = encomendaService.buscarPorCodigo(codigoRetirada, empresaId);
         return opt.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
+
+    // Endpoint específico para o morador ver suas próprias encomendas (sempre filtrado por condomínio)
+    @GetMapping("/minhas")
+    public ResponseEntity<Page<EncomendaDTO>> getMyParcels(
+            @RequestParam Long condominioId,
+            Pageable pageable) {
+        User current = getCurrentUser();
+        if (current == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        
+        // Verifica se o usuário pertence ao condomínio solicitado
+        if (current.getEmpresa() == null || !current.getEmpresa().getId().equals(condominioId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // Sempre filtra por morador E condomínio para evitar vazamento
+        return ResponseEntity.ok(encomendaService.listarPorMorador(current.getId(), condominioId, pageable));
+    }
 }

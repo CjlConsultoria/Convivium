@@ -107,8 +107,23 @@ public class EncomendaService {
     }
 
     @Transactional(readOnly = true)
+    public Page<EncomendaDTO> getMyParcels(Long userId, Long condoId, Pageable pageable) {
+        return encomendaRepository.findByMoradorIdAndEmpresaId(userId, condoId, pageable).map(this::toDto);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<EncomendaDTO> buscarPorCodigo(String codigoRetirada, Long empresaId) {
         return encomendaRepository.findByCodigoRetiradaAndEmpresaId(codigoRetirada, empresaId).map(this::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public long countEncomendas(Long moradorId, Long empresaId) {
+        return encomendaRepository.countByMoradorIdAndEmpresaId(moradorId, empresaId);
+    }
+
+    @Transactional(readOnly = true)
+    public long countEncomendasPendentes(Long moradorId, Long empresaId) {
+        return encomendaRepository.countByMoradorIdAndEmpresaIdAndStatus(moradorId, empresaId, StatusEncomenda.DISPONIVEL);
     }
 
     public EncomendaDTO toDto(Encomenda e) {
