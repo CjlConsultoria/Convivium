@@ -8,6 +8,7 @@ import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.dto.response.UsuarioDTO;
 import br.com.convivium.entity.User;
 import br.com.convivium.service.AuthenticationService;
+import br.com.convivium.service.TwoFactorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,8 +20,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -30,6 +33,9 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationService authenticationService;
+    
+    @Autowired
+    private TwoFactorService twoFactorService;
 
     // Constructor for AuthenticationManager (optional, as AuthenticationService is already autowired)
     @Autowired
@@ -43,7 +49,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "422", description = "Invalid username/password supplied")
     })
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.generateToken(loginRequest.getCpf(), loginRequest.getPassword());
         return ResponseEntity.ok(new AuthResponse(token));
     }
@@ -55,11 +61,12 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "409", description = "Username already exists")
     })
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authenticationService.register(registerRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(Map.of("success", true, "message", "Usuário criado com sucesso"));    }
+                .body(Map.of("success", true, "message", "Usuário criado com sucesso"));
+    }
 
     @Operation(summary = "Register a new user", description = "Create a new user and save it to the database")
     @ApiResponses(value = {
@@ -68,20 +75,43 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "409", description = "Username already exists")
     })
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest emailCpf) {
-        authenticationService.forgotPassword(emailCpf.getEmailCpf());
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest emailCpf) {
+        Map<String, Object> result = authenticationService.forgotPassword(emailCpf.getEmailCpf());
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of("success", true, "message", "Usuário criado com sucesso"));    }
+                .status(HttpStatus.OK)
+                .body(result);
+    }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> redefinirSenha(@RequestBody ResetarSenhaRequest request) {
-        boolean sucesso = authenticationService.resetarSenha(request.getToken(), request.getNovaSenha(), request.getCpf());
-        if (sucesso) {
-            return ResponseEntity.ok("Senha redefinida com sucesso.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido ou expirado.");
+    public ResponseEntity<?> redefinirSenha(@Valid @RequestBody ResetarSenhaRequest request) {
+        authenticationService.resetarSenha(request.getToken(), request.getNovaSenha(), request.getCpf());
+        return ResponseEntity.ok(Map.of("success", true, "message", "Senha redefinida com sucesso."));
+    }
+
+    @PostMapping("/enable-2fa")
+    public ResponseEntity<?> enableTwoFactor() {
+        String cpf = getCurrentUsername();
+        if (cpf == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        
+        User user = authenticationService.getUserDetails(cpf);
+        authenticationService.enableTwoFactor(user.getId());
+        
+        return ResponseEntity.ok(Map.of("success", true, "message", "Autenticação de dois fatores habilitada com sucesso."));
+    }
+
+    @PostMapping("/disable-2fa")
+    public ResponseEntity<?> disableTwoFactor() {
+        String cpf = getCurrentUsername();
+        if (cpf == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        User user = authenticationService.getUserDetails(cpf);
+        authenticationService.disableTwoFactor(user.getId());
+        
+        return ResponseEntity.ok(Map.of("success", true, "message", "Autenticação de dois fatores desabilitada."));
     }
 
     @Operation(summary = "Get user details", description = "Retrieve the details of the authenticated user")
@@ -108,24 +138,15 @@ public class AuthenticationController {
     @PutMapping("/usuario/update/{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable String id,
-            @RequestBody RegisterRequest userUpdateRequest) {
-
-        try {
-            authenticationService.updateUserData(id, userUpdateRequest);
-            return ResponseEntity.ok("Usuário atualizado com sucesso.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Erro ao atualizar os dados do usuário.");
-        }
+            @Valid @RequestBody RegisterRequest userUpdateRequest) {
+        authenticationService.updateUserData(id, userUpdateRequest);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Usuário atualizado com sucesso."));
     }
 
     @DeleteMapping("/usuario/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
-        try {
-            authenticationService.deleteUserById(id);
-            return ResponseEntity.ok("Usuário deletado com sucesso.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Erro ao deletar o usuário.");
-        }
+        authenticationService.deleteUserById(id);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Usuário deletado com sucesso."));
     }
 
     @GetMapping("/buscar-por-cpf/{cpf}")
