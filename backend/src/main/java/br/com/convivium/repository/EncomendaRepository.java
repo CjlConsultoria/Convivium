@@ -22,7 +22,6 @@ public interface EncomendaRepository extends JpaRepository<Encomenda, Long> {
 
     Page<Encomenda> findByEmpresaIdAndStatus(Long empresaId, StatusEncomenda status, Pageable pageable);
 
-    // Novos métodos para contar encomendas com filtro por condomínio
     @Query("SELECT COUNT(e) FROM Encomenda e WHERE e.morador.id = :moradorId AND e.empresa.id = :empresaId")
     long countByMoradorIdAndEmpresaId(@Param("moradorId") Long moradorId, @Param("empresaId") Long empresaId);
 
