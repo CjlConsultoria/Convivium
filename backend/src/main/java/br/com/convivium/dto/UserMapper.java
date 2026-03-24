@@ -12,8 +12,8 @@ public class UserMapper {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        dto.setCpf(user.getCpf());
-        dto.setTelefone(user.getTelefone());
+        dto.setCpf(maskCpf(user.getCpf()));
+        dto.setTelefone(maskTelefone(user.getTelefone()));
         dto.setAtivo(user.getAtivo());
         dto.setSobrenome(user.getSobrenome());
         dto.setGenero(user.getGenero());
@@ -35,7 +35,7 @@ public class UserMapper {
             EmpresaResumoDTO empresaDTO = new EmpresaResumoDTO();
             empresaDTO.setId(user.getEmpresa().getId());
             empresaDTO.setNome(user.getEmpresa().getName());
-            empresaDTO.setCnpj(user.getEmpresa().getCnpj());
+            empresaDTO.setCnpj(maskCnpj(user.getEmpresa().getCnpj()));
             empresaDTO.setCodigoPublico(user.getEmpresa().getCodigoPublico());
 
             dto.setEmpresa(empresaDTO);
@@ -43,5 +43,25 @@ public class UserMapper {
 
         return dto;
     }
-}
 
+    private static String maskCpf(String cpf) {
+        if (cpf == null || cpf.length() != 11) {
+            return cpf;
+        }
+        return cpf.substring(0, 3) + "*****" + cpf.substring(8);
+    }
+
+    private static String maskCnpj(String cnpj) {
+        if (cnpj == null || cnpj.length() < 8) {
+            return cnpj;
+        }
+        return cnpj.substring(0, 2) + "******" + cnpj.substring(cnpj.length() - 2);
+    }
+
+    private static String maskTelefone(String telefone) {
+        if (telefone == null || telefone.length() < 8) {
+            return telefone;
+        }
+        return telefone.substring(0, 2) + "****" + telefone.substring(telefone.length() - 2);
+    }
+}
