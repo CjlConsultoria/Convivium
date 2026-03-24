@@ -1,5 +1,6 @@
 package br.com.convivium.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +11,11 @@ import javax.validation.constraints.NotBlank;
 public class LoginRequest {
 
     @NotBlank
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String cpf;  // Alterado de 'username' para 'cpf'
 
     @NotBlank
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     public String getCpf() {
