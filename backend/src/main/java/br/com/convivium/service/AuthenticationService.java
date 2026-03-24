@@ -12,6 +12,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ import java.util.*;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final RoleRepository roleRepository;
     private final EmpresaRepository empresaRepository;
@@ -29,9 +30,10 @@ public class AuthenticationService {
     private final EmailService emailService;
     private final LicencaRepository licencaRepository;
     private final UserTokenRepository userTokenRepository;
+    
     @Autowired
     public AuthenticationService(UserRepository userRepository,
-                                 BCryptPasswordEncoder passwordEncoder,
+                                 PasswordEncoder passwordEncoder,
                                  JwtTokenUtil jwtTokenUtil,
                                  RoleRepository roleRepository,
                                  EmpresaRepository empresaRepository, TipoRepository tipoRepository, EmailService emailService, LicencaRepository licencaRepository, UserTokenRepository userTokenRepository) {
@@ -87,6 +89,23 @@ public class AuthenticationService {
         }
     }
 
+    public void enableTwoFactor(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado"));
+        
+        user.setTwoFactorEnabled(true);
+        userRepository.save(user);
+    }
+
+    public void disableTwoFactor(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado"));
+        
+        user.setTwoFactorEnabled(false);
+        user.setTwoFactorSecret(null);
+        userRepository.save(user);
+    }
+
     public void register(RegisterRequest registerRequest) {
         userRepository.findByCpf(registerRequest.getCpf()).ifPresent(user -> {
             if (Boolean.TRUE.equals(user.getAtivo())) {
@@ -127,17 +146,14 @@ public class AuthenticationService {
         user.setEmpresa(empresa);
         user.setRole(role);
 
+        // Salvar o usuário primeiro
+        userRepository.save(user);
+        
+        // Se a empresa não tem responsável, definir este usuário como responsável
         if (empresa.getUsuarioResponsavel() == null) {
-            userRepository.save(user); // salvar o usuário antes
-
             empresa.setUsuarioResponsavel(user);
             empresaRepository.save(empresa);
-        } else {
-            userRepository.save(user); // salvar normalmente se já tem responsável
         }
-
-
-        userRepository.save(user);
         String token = gerarToken(user, TipoToken.ATIVACAO_CONTA);
         Map<String, Object> usuarioMap = new HashMap<>();
         usuarioMap.put("username", user.getUsername());
@@ -303,23 +319,20 @@ public class AuthenticationService {
         user.setComplemento(request.getComplemento());
         user.setGenero(request.getGenero());
         user.setAlerta(request.getAlerta());
-
-        // Atualiza Empresa, Role e Tipo (se fornecidos)
-        if (request.getEmpresa() != null) {
-            Empresa empresa = empresaRepository.findById(request.getEmpresa())
-                    .orElseThrow(() -> new ApiException.NotFoundException("Empresa não encontrada com ID: " + request.getEmpresa()));
-            user.setEmpresa(empresa);
-        }
-
+        user.setBloco(request.getBloco());
+        user.setApartamento(request.getApartamento());
+        user.setVagaCarro(request.getVagaCarro());
+        user.setVagaMoto(request.getVagaMoto());
+        
         if (request.getRole() != null) {
             Role role = roleRepository.findById(request.getRole())
-                    .orElseThrow(() -> new ApiException.NotFoundException("Perfil não encontrado com ID: " + request.getRole()));
+                    .orElseThrow(() -> new ApiException.NotFoundException("Perfil não encontrado"));
             user.setRole(role);
         }
-
+        
         if (request.getTipoUsuario() != null) {
             Tipo tipo = tipoRepository.findById(request.getTipoUsuario())
-                    .orElseThrow(() -> new ApiException.NotFoundException("Cargo não encontrado com ID: " + request.getTipoUsuario()));
+                    .orElseThrow(() -> new ApiException.NotFoundException("Tipo não encontrado"));
             user.setTipo(tipo);
         }
 
@@ -327,17 +340,12 @@ public class AuthenticationService {
         return true;
     }
 
-
     public void deleteUserById(String id) {
-        Optional<User> userOptional = userRepository.findById(Long.valueOf(id));
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setAtivo(false);
-            user.setStatus("INATIVO");
-            userRepository.save(user);
-        } else {
-            throw new RuntimeException("Usuário não encontrado");
-        }
+        User user = userRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado."));
+        
+        user.setAtivo(false);
+        userRepository.save(user);
     }
 
     public Optional<User> buscarPorCpf(String cpf) {
