@@ -1,5 +1,6 @@
 package br.com.convivium.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -7,8 +8,13 @@ public class UserResponseDTO {
     private Long id;
     private String username;
     private String email;
+    
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String cpf;
+    
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String telefone;
+    
     private boolean ativo;
     private String sobrenome;
     private String genero;
