@@ -24,9 +24,9 @@ public class Empresa {
     @Column(name = "EMPRESA", nullable = false, unique = true, length = 100)
     private String name;
 
+    @JsonIgnore
     @Column(name = "CNPJ", length = 18, nullable = false, unique = true)
     private String cnpj;
-
 
     @Column(name = "CEP", length = 8)
     private String cep;
@@ -68,6 +68,5 @@ public class Empresa {
     @OneToOne(mappedBy = "condominio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private CondominioInfo infoCondominio;
-
 
 }
