@@ -1,6 +1,7 @@
 package br.com.convivium.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,6 +31,7 @@ public class User {
     private String username;
 
     @NotBlank
+    @JsonIgnore
     @Column(name = "SENHA", nullable = false)
     private String password;
 

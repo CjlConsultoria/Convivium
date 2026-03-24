@@ -1,5 +1,6 @@
 package br.com.convivium.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -8,8 +9,13 @@ public class UserUpdateRequest {
     private String username;
     private String sobrenome;
     private String email;
+    
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String cpf;
+    
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String telefone;
+    
     private String cep;
     private String logradouro;
     private String cidade;

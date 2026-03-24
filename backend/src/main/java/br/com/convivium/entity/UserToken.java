@@ -1,6 +1,7 @@
 package br.com.convivium.entity;
 
 import br.com.convivium.entity.enums.TipoToken;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ public class UserToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @Column(nullable = false, unique = true)
     private String token;
 
@@ -30,4 +32,3 @@ public class UserToken {
     @Column(nullable = false)
     private boolean used = false;
 }
-

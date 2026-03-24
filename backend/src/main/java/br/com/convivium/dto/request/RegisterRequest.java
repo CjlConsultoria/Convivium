@@ -1,5 +1,6 @@
 package br.com.convivium.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -14,6 +15,7 @@ public class RegisterRequest {
     private String sobrenome;
 
     @NotBlank(message = "Senha é obrigatória")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotBlank(message = "Email é obrigatório")
@@ -22,9 +24,11 @@ public class RegisterRequest {
 
     @NotBlank(message = "CPF é obrigatório")
     @Pattern(regexp = "^[0-9]{11}$", message = "CPF deve conter exatamente 11 dígitos")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String cpf;
 
     @NotBlank(message = "Telefone é obrigatório")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String telefone;
 
     @NotBlank(message = "CEP é obrigatório")
