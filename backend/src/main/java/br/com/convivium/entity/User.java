@@ -1,6 +1,7 @@
 package br.com.convivium.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +32,7 @@ public class User {
 
     @NotBlank
     @Column(name = "SENHA", nullable = false)
+    @JsonIgnore
     private String password;
 
     @NotBlank
@@ -42,33 +44,43 @@ public class User {
     private String email;
 
     @Column(name = "CPF", length = 11)
+    @JsonIgnore
     private String cpf;
 
     @Column(name = "TELEFONE")
+    @JsonIgnore
     private String telefone;
 
     @Column(name = "CEP")
+    @JsonIgnore
     private String cep;
 
     @Column(name = "LOGRADOURO")
+    @JsonIgnore
     private String logradouro;
 
     @Column(name = "CIDADE")
+    @JsonIgnore
     private String cidade;
 
     @Column(name = "ESTADO")
+    @JsonIgnore
     private String estado;
 
     @Column(name = "BAIRRO")
+    @JsonIgnore
     private String bairro;
 
     @Column(name = "NUMERO")
+    @JsonIgnore
     private String numero;
 
     @Column(name = "COMPLEMENTO")
+    @JsonIgnore
     private String complemento;
 
     @Column(name = "GENERO")
+    @JsonIgnore
     private String genero;
 
     @Column(name = "ALERTA")
@@ -102,9 +114,11 @@ public class User {
     private String apartamento;
 
     @Column(name = "VAGA_CARRO")
+    @JsonIgnore
     private String vagaCarro;
 
     @Column(name = "VAGA_MOTO")
+    @JsonIgnore
     private String vagaMoto;
 
     @ManyToOne(fetch = FetchType.LAZY)
