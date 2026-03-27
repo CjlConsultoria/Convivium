@@ -7,6 +7,7 @@ public class VerificarCpfResponse {
     private String status; // "nao_encontrado", "ativo", "pendente_ativacao"
     private Long idUsuario;
     private String nome;
+    // CPF removido para não expor dados sensíveis na resposta
 
     public VerificarCpfResponse(String status) {
         this.status = status;
@@ -17,8 +18,4 @@ public class VerificarCpfResponse {
         this.idUsuario = idUsuario;
         this.nome = nome;
     }
-
-    // Getters e Setters
 }
-
-
