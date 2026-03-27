@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,30 +34,20 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    // Constructor for AuthenticationManager (optional, as AuthenticationService is already autowired)
     @Autowired
     public AuthenticationController(AuthenticationManager authenticationManager) {
     }
 
-    @Operation(summary = "Login to get JWT token", description = "Authenticate user and return JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful login, JWT token returned"),
-            @ApiResponse(responseCode = "400", description = "Something went wrong"),
-            @ApiResponse(responseCode = "422", description = "Invalid username/password supplied")
-    })
+    @Operation(summary = "Login para obter token JWT")
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.generateToken(loginRequest.getCpf(), loginRequest.getPassword());
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
-    @Operation(summary = "Register a new user", description = "Create a new user and save it to the database")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User  registered successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "409", description = "Username already exists")
-    })
+    @Operation(summary = "Registrar novo usuário")
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authenticationService.register(registerRequest);
         return ResponseEntity
@@ -64,12 +55,7 @@ public class AuthenticationController {
                 .body(Map.of("success", true, "message", "Usuário criado com sucesso"));
     }
 
-    @Operation(summary = "Register a new user", description = "Create a new user and save it to the database")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User  registered successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "409", description = "Username already exists")
-    })
+    @Operation(summary = "Esqueceu a senha")
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest emailCpf) {
         Map<String, Object> result = authenticationService.forgotPassword(emailCpf.getEmailCpf());
@@ -84,11 +70,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Senha redefinida com sucesso."));
     }
 
-    @Operation(summary = "Get user details", description = "Retrieve the details of the authenticated user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User  details retrieved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized, invalid token")
-    })
+    @Operation(summary = "Obter detalhes do usuário autenticado")
     @GetMapping("/user")
     public ResponseEntity<UserResponseAuthDTO> getUserDetails() {
         String cpf = getCurrentUsername();
@@ -109,23 +91,41 @@ public class AuthenticationController {
     public ResponseEntity<?> updateUser(
             @PathVariable String id,
             @Valid @RequestBody RegisterRequest userUpdateRequest) {
+        
+        // Verificar se o usuário está tentando atualizar seus próprios dados
+        String currentUserCpf = getCurrentUsername();
+        User currentUser = authenticationService.getUserDetails(currentUserCpf);
+        
+        if (!currentUser.getId().toString().equals(id) && 
+            !("ADMIN".equals(currentUser.getRole().getName()) || "ADMINISTRATIVO".equals(currentUser.getRole().getName()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("success", false, "message", "Acesso negado para atualizar este usuário."));
+        }
+        
         authenticationService.updateUserData(id, userUpdateRequest);
         return ResponseEntity.ok(Map.of("success", true, "message", "Usuário atualizado com sucesso."));
     }
 
     @DeleteMapping("/usuario/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         authenticationService.deleteUserById(id);
         return ResponseEntity.ok(Map.of("success", true, "message", "Usuário deletado com sucesso."));
     }
 
     @GetMapping("/buscar-por-cpf/{cpf}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     public ResponseEntity<UsuarioDTO> buscarPorCpf(@PathVariable String cpf) {
-        return authenticationService.buscarPorCpf(cpf)
+        // CPF deve ser validado e limpo antes da busca
+        String cpfLimpo = cpf.replaceAll("[^0-9]", "");
+        if (cpfLimpo.length() != 11) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        return authenticationService.buscarPorCpf(cpfLimpo)
                 .map(user -> ResponseEntity.ok(new UsuarioDTO(user)))
                 .orElse(ResponseEntity.notFound().build());
     }
-
 
     private String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -144,6 +144,4 @@ public class AuthenticationController {
 
         return null;
     }
-
-
 }
