@@ -7,22 +7,18 @@ import javax.persistence.criteria.*;
 
 public class UsuarioSpecification {
 
-    public static Specification<User> filtrarPorNomeECpf(UsuarioFiltroDTO filtro) {
+    public static Specification<User> filtrarPorNome(UsuarioFiltroDTO filtro) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 
-            // OR entre nome e CPF (um campo único no frontend pode cair aqui)
-            if ((filtro.getNome() != null && !filtro.getNome().isBlank()) ||
-                    (filtro.getCpf() != null && !filtro.getCpf().isBlank())) {
-
-                String termo = filtro.getNome() != null && !filtro.getNome().isBlank()
-                        ? filtro.getNome()
-                        : filtro.getCpf();
-
-                Predicate porNome = cb.like(cb.lower(root.get("username")), "%" + termo.toLowerCase() + "%");
-                Predicate porCpf = cb.like(cb.lower(root.get("cpf")), "%" + termo.toLowerCase() + "%");
-
-                predicate = cb.and(predicate, cb.or(porNome, porCpf));
+            // Busca apenas por nome/sobrenome - CPF removido por segurança
+            if (filtro.getNome() != null && !filtro.getNome().isBlank()) {
+                String termo = filtro.getNome().toLowerCase();
+                
+                Predicate porNome = cb.like(cb.lower(root.get("username")), "%" + termo + "%");
+                Predicate porSobrenome = cb.like(cb.lower(root.get("sobrenome")), "%" + termo + "%");
+                
+                predicate = cb.and(predicate, cb.or(porNome, porSobrenome));
             }
 
             // Sempre trazer apenas usuários ativos
@@ -31,6 +27,20 @@ public class UsuarioSpecification {
             return predicate;
         };
     }
+    
+    // Specification específica para administradores que precisam buscar por CPF
+    public static Specification<User> filtrarPorCpfAdmin(String cpf) {
+        return (root, query, cb) -> {
+            Predicate predicate = cb.conjunction();
+            
+            if (cpf != null && !cpf.isBlank()) {
+                // Remove qualquer formatação do CPF
+                String cpfLimpo = cpf.replaceAll("[^0-9]", "");
+                predicate = cb.and(predicate, cb.equal(root.get("cpf"), cpfLimpo));
+            }
+            
+            predicate = cb.and(predicate, cb.isTrue(root.get("ativo")));
+            return predicate;
+        };
+    }
 }
-
-
