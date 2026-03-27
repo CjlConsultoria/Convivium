@@ -1,5 +1,6 @@
 package br.com.convivium.service;
 
+import br.com.convivium.dto.UserMapper;
 import br.com.convivium.dto.request.UsuarioFiltroDTO;
 import br.com.convivium.dto.response.UserResponseDTO;
 import br.com.convivium.entity.*;
@@ -10,6 +11,9 @@ import br.com.convivium.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +35,7 @@ public class UserService {
         this.userTokenRepository = userTokenRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     public Page<User> listAll(Long empresaId, Pageable pageable) {
         return userRepository.findByEmpresaIdAndAtivoTrue(empresaId, pageable);
     }
@@ -43,20 +48,49 @@ public class UserService {
         return roleRepository.findAll();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     public Optional<User> buscarUserId(Long id) {
         return userRepository.findById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     public User buscarPorCpfECondominio(String cpf, Long idCondominio) {
         return userRepository.findByCpfAndEmpresaId(cpf, idCondominio);
     }
 
     public User buscarPorId(Long id) {
-        return userRepository.findById(id).orElse(null);
+        User currentUser = getCurrentUser();
+        User targetUser = userRepository.findById(id).orElse(null);
+        
+        // Usuário só pode acessar seus próprios dados ou ser admin
+        if (targetUser != null && !canAccessUserData(currentUser, targetUser)) {
+            throw new ApiException.ForbiddenException("Acesso negado aos dados do usuário.");
+        }
+        
+        return targetUser;
     }
 
     public Optional<UserResponseDTO> buscarPorIdComDTO(Long id) {
-        return userRepository.findByIdWithRelations(id).map(this::mapToDTO);
+        User currentUser = getCurrentUser();
+        Optional<User> targetUserOpt = userRepository.findByIdWithRelations(id);
+        
+        if (targetUserOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        User targetUser = targetUserOpt.get();
+        
+        if (!canAccessUserData(currentUser, targetUser)) {
+            return Optional.of(UserMapper.toPublicDTO(targetUser));
+        }
+        
+        // Se é admin, retorna versão com dados mascarados
+        if (isAdmin(currentUser) && !currentUser.getId().equals(targetUser.getId())) {
+            return Optional.of(UserMapper.toAdminDTO(targetUser));
+        }
+        
+        // Se é o próprio usuário, retorna dados completos via AuthDTO convertido
+        return Optional.of(UserMapper.toPublicDTO(targetUser));
     }
 
     public void ativarConta(Long idUsuario, String senhaCriptografada, String token) {
@@ -92,55 +126,56 @@ public class UserService {
         userTokenRepository.save(userToken);
     }
 
-
-
     public Page<UserResponseDTO> listarUsuariosSemSenha(Long idEmpresa, Pageable pageable) {
+        User currentUser = getCurrentUser();
         Page<User> usuarios = userRepository.findAllByEmpresaId(idEmpresa, pageable);
-        return usuarios.map(this::mapToDTO);
-    }
-
-    private UserResponseDTO mapToDTO(User user) {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setCpf(user.getCpf());
-        dto.setTelefone(user.getTelefone());
-        dto.setAtivo(user.getAtivo());
-        dto.setSobrenome(user.getSobrenome());
-        dto.setGenero(user.getGenero());
-        dto.setCep(user.getCep());
-        dto.setLogradouro(user.getLogradouro());
-        dto.setCidade(user.getCidade());
-        dto.setEstado(user.getEstado());
-        dto.setBairro(user.getBairro());
-        dto.setNumero(user.getNumero());
-        dto.setComplemento(user.getComplemento());
-        dto.setAlerta(user.getAlerta());
-        dto.setBloco(user.getBloco());
-        dto.setApartamento(user.getApartamento());
-        dto.setVagaCarro(user.getVagaCarro());
-        dto.setVagaMoto(user.getVagaMoto());
-
-        if (user.getRole() != null) {
-            dto.setRole(user.getRole().getName());
-        }
-        if (user.getTipo() != null) {
-            dto.setTipo(user.getTipo().getName());
-        }
-        if (user.getEmpresa() != null) {
-            dto.setEmpresa(user.getEmpresa().getName());
-        }
-
-        return dto;
+        
+        return usuarios.map(user -> {
+            if (isAdmin(currentUser)) {
+                return UserMapper.toAdminDTO(user);
+            } else {
+                return UserMapper.toPublicDTO(user);
+            }
+        });
     }
 
     public Page<UserResponseDTO> listarComFiltro(UsuarioFiltroDTO filtro, Pageable pageable) {
-        Specification<User> spec = UsuarioSpecification.filtrarPorNomeECpf(filtro);
+        User currentUser = getCurrentUser();
+        
+        if (!isAdmin(currentUser)) {
+            throw new ApiException.ForbiddenException("Apenas administradores podem realizar buscas filtradas.");
+        }
+        
+        Specification<User> spec = UsuarioSpecification.filtrarPorNome(filtro);
         Page<User> page = userRepository.findAll(spec, pageable);
-        return page.map(this::mapToDTO);
+        
+        return page.map(UserMapper::toAdminDTO);
     }
-
-
-
+    
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ApiException.UnauthorizedException("Usuário não autenticado.");
+        }
+        
+        String cpf = authentication.getName();
+        return userRepository.findByCpf(cpf)
+                .orElseThrow(() -> new ApiException.NotFoundException("Usuário não encontrado."));
+    }
+    
+    private boolean canAccessUserData(User currentUser, User targetUser) {
+        // O próprio usuário pode acessar seus dados
+        if (currentUser.getId().equals(targetUser.getId())) {
+            return true;
+        }
+        
+        // Administradores podem acessar dados de usuários da mesma empresa
+        return isAdmin(currentUser) && 
+               currentUser.getEmpresa().getId().equals(targetUser.getEmpresa().getId());
+    }
+    
+    private boolean isAdmin(User user) {
+        return user.getRole() != null && 
+               ("ADMIN".equals(user.getRole().getName()) || "ADMINISTRATIVO".equals(user.getRole().getName()));
+    }
 }
